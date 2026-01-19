@@ -7,7 +7,7 @@ int main()
     float value{0.f};
 
     quick_imgui::loop(
-        "Chess",
+        "ChessImac",
         {
             .init = [&]() {},
             .loop =
