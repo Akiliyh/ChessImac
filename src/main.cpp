@@ -1,57 +1,13 @@
 #include <imgui.h>
 #include <iostream>
 #include <string>
-#include "quick_imgui/quick_imgui.hpp"
+#include "Renderer.hpp"
+#include "Chessboard.hpp"
 
 int main()
 {
     float value{0.f};
-
-    quick_imgui::loop(
-        "ChessImac",
-        {
-            .init = [&]() {},
-            .loop =
-                [&]() {
-                    ImGui::ShowDemoWindow(); // This opens a window which shows tons of examples of what you can do with ImGui. You should check it out! Also, you can use the "Item Picker" in the top menu of that demo window: then click on any widget and it will show you the corresponding code directly in your IDE!
-
-                    ImGui::Begin("Example");
-
-                    const int BOARD_SIZE{8}; // 8x8
-
-                    for (int i = 0; i < BOARD_SIZE * BOARD_SIZE; i++)
-                    {
-                        int row = i / BOARD_SIZE;
-                        int col = i % BOARD_SIZE;
-
-                        bool isDark = (row + col) % 2 == 1;
-                        if (isDark)
-                        {
-                            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{1.f, 0.f, 0.f, 1.f});
-                        }
-                        else
-                        {
-                            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{1.f, 0.5f, 0.f, 1.f});
-                        }
-
-                        ImGui::PushID(i);
-                        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
-                        if (ImGui::Button(std::to_string(i).c_str(), ImVec2{50.f, 50.f}))
-                        {
-                            std::cout << "Clicked button " << i << "\n";
-                        }
-                        ImGui::PopStyleVar();
-                        ImGui::PopID();
-                        ImGui::PopStyleColor();
-
-                        if ((i % BOARD_SIZE) != (BOARD_SIZE - 1))
-                        {
-                            ImGui::SameLine(0, 0); // we smash the tiles together
-                        }
-                    }
-
-                    ImGui::End();
-                },
-        }
-    );
+    Renderer renderer{};
+    Chessboard board{};
+    renderer.draw(board);
 }
