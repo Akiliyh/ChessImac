@@ -15,6 +15,10 @@ class Rook : public Piece {
     public:
         Rook(const int position, const bool white);
         std::vector<int> get_moves(std::vector<Piece*>& board);
+
+        void get_moves_vertical(const int delta, const std::vector<Piece*>& board, std::vector<int>& moves);
+        void get_moves_horizontal(const int delta, const std::vector<Piece*>& board, std::vector<int>& moves);
+
 };
 
 class Bishop : public Piece {

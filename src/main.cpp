@@ -11,13 +11,20 @@ int main()
     Chessboard board{};
 
     Rook rook_test(20,1);
+    Bishop bishop_test(33,1);
     Knight knight_test(46,1);
 
     auto moves = rook_test.get_moves(board.board_data);
+    auto bishop_moves = bishop_test.get_moves(board.board_data);
     auto knight_moves = knight_test.get_moves(board.board_data);
 
     for (int i = 0; i < moves.size(); i++) {
         std::cout << moves[i] << " " ;
+    }
+    std::cout << std::endl;
+
+    for (int i = 0; i < bishop_moves.size(); i++) {
+        std::cout << bishop_moves[i] << " " ;
     }
     std::cout << std::endl;
 
