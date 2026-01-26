@@ -19,5 +19,6 @@ class Rook : public Piece {
 
 class Bishop : public Piece {
     public:
-        std::vector<std::vector<int>> get_moves(std::vector<Piece*>& board);
+        Bishop(const int position, const bool white);
+        std::vector<int> get_moves(std::vector<Piece*>& board);
 };
