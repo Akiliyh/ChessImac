@@ -21,3 +21,9 @@ class Bishop : public Piece {
     public:
         std::vector<std::vector<int>> get_moves(std::vector<Piece*>& board);
 };
+
+class Knight : public Piece {
+    public:
+        Knight(const int position, const bool white);
+        std::vector<int> get_moves(std::vector<Piece*>& board);
+};
