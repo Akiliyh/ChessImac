@@ -2,10 +2,23 @@
 #include <iostream>
 #include <string>
 #include "quick_imgui/quick_imgui.hpp"
+#include "Pieces.hpp"
 
 int main()
 {
     float value{0.f};
+
+    std::vector<Piece*> board(64, nullptr);
+
+    Rook rook_test(27,1);
+
+    auto moves = rook_test.get_moves(board);
+
+    for (int i = 0; i < moves.size(); i++) {
+        std::cout << moves[i] << " " ;
+    }
+    std::cout << std::endl;
+
 
     quick_imgui::loop(
         "ChessImac",
