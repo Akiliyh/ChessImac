@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "Pieces.hpp"
 
 class Chessboard {
     private:
@@ -8,9 +9,8 @@ class Chessboard {
 
     public:
         // futur private
-        // std::vector<Piece*> board_data // todo 
-        std::vector<int> board_data {};
+        std::vector<Piece*> board_data {};
         void init_board();
         int get_size() const;
-        Chessboard() = default;
+        Chessboard();
 };
