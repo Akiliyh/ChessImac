@@ -57,8 +57,7 @@ std::vector<int> Rook::get_moves(std::vector<Piece*>& board){
     // }
 
     int i = m_position + 1;
-
-    while (i < 64 && (i % 8) != 0) {
+    while (i < 64 && (i / 8) == (m_position / 8)) {
         if (board[i] == nullptr) {
             free_case.push_back(i);
         } 
@@ -88,22 +87,19 @@ std::vector<int> Rook::get_moves(std::vector<Piece*>& board){
     // }
 
     i = m_position - 1;
-    while ((i % 8) != (8 - 1) && i >= 0) {
-        int next_case {i};
-        if (board[next_case] == nullptr) {
-            // board[m_position + 1] => color space free;
-            free_case.push_back(next_case);
+    while (i >= 0 && (i / 8) == (m_position / 8)) {
+        if (board[i] == nullptr) {
+            free_case.push_back(i);
         } 
-        else 
-        {
-            if (this->m_white != board[next_case]->m_white) {                    
-                // board[m_position + 1] => color space taken;
-                free_case.push_back(next_case);
-                break;
+        else {
+            if (board[i]->m_white != m_white) {
+                free_case.push_back(i);
             }
+            break;
         }
         i--;
-    };
+    }
+
 
     // moves.push_back(free_case);
     // moves.push_back(take_case);

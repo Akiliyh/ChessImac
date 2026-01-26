@@ -10,7 +10,7 @@ int main()
 
     std::vector<Piece*> board(64, nullptr);
 
-    Rook rook_test(27,1);
+    Rook rook_test(20,1);
 
     auto moves = rook_test.get_moves(board);
 
