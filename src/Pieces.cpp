@@ -70,81 +70,43 @@ std::vector<int> Rook::get_moves(std::vector<Piece*>& board){
         i--;
     }
 
-
-    // moves.push_back(free_case);
-    // moves.push_back(take_case);
-
     return free_case;
 }
 
 Bishop::Bishop(const int position, const bool white): Piece(position, white) {};
 
+void Bishop::get_moves_diag (const int delta, const std::vector<Piece*>& board, std::vector<int>& moves)
+{
+    int i = m_position + delta;
+    int prev = m_position;
+
+    while (i >= 0 && i < 64 &&
+           abs((i % 8) - (prev % 8)) == 1) {
+        if (!board[i]) {
+            moves.push_back(i);
+        } else {
+            if (board[i]->m_white != m_white)
+                moves.push_back(i);
+            break;
+        }
+        prev = i;
+        i += delta;
+    }
+}
+
 std::vector<int> Bishop::get_moves(std::vector<Piece*>& board){
+
     std::vector<int> free_case;
-    int i {};
-    int prev {};
 
-    i = m_position + 9;
-    prev = m_position;
+    int top_left{-9};
+    int top_right{-7}; 
+    int bottom_left{9};
+    int bottom_right{7};
 
-    while (i < 64 && abs((i % 8) - (prev % 8)) == 1) {
-        if (!board[i]) {
-            free_case.push_back(i);
-        } else {
-            if (board[i]->m_white != m_white)
-                free_case.push_back(i);
-            break;
-        }
-        prev = i;
-        i += 9;
-    }
-
-    i = m_position - 9;
-    prev = m_position;
-
-    while (i >= 0 && abs((i % 8) - (prev % 8)) == 1) {
-        if (!board[i]) {
-            free_case.push_back(i);
-        } else {
-            if (board[i]->m_white != m_white)
-                free_case.push_back(i);
-            break;
-        }
-        prev = i;
-        i -= 9;
-    }
-
-
-    i = m_position + 7;
-    prev = m_position;
-
-    while (i < 64 && abs((i % 8) - (prev % 8)) == 1) {
-        if (!board[i]) {
-            free_case.push_back(i);
-        } else {
-            if (board[i]->m_white != m_white)
-                free_case.push_back(i);
-            break;
-        }
-        prev = i;
-        i += 7;
-    }
-
-    i = m_position - 7;
-    prev = m_position;
-
-    while (i >= 0 && abs((i % 8) - (prev % 8)) == 1) {
-        if (!board[i]) {
-            free_case.push_back(i);
-        } else {
-            if (board[i]->m_white != m_white)
-                free_case.push_back(i);
-            break;
-        }
-        prev = i;
-        i -= 7;
-    }
-
+    Bishop::get_moves_diag(top_left, board, free_case);
+    Bishop::get_moves_diag(top_right, board, free_case);
+    Bishop::get_moves_diag(bottom_left, board, free_case);
+    Bishop::get_moves_diag(bottom_right, board, free_case);
 
     return free_case;
 };
