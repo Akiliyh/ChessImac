@@ -25,3 +25,9 @@ class Bishop : public Piece {
         void get_moves_diag (const int delta, const std::vector<Piece*>& board, std::vector<int>& moves);
 
 };
+
+class Knight : public Piece {
+    public:
+        Knight(const int position, const bool white);
+        std::vector<int> get_moves(std::vector<Piece*>& board);
+};
