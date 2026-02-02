@@ -7,7 +7,8 @@ class Piece {
         bool m_white;
         
         std::vector<std::vector<int>> get_moves();
-        int mouvement();
+        int movement();
+        char m_label;
 };
 
 class Rook : public Piece {

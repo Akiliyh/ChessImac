@@ -70,7 +70,9 @@ void Moves::get_moves_diag (const int m_position, const bool m_white,const int d
     }
 }
 
-Rook::Rook(const int position, const bool white) : Piece(position, white) {};
+Rook::Rook(const int position, const bool white) : Piece(position, white) {
+    m_label = white ? 'R' : 'r';
+};
 
 std::vector<int> Rook::get_moves(std::vector<Piece*>& board)
 {
@@ -89,7 +91,9 @@ std::vector<int> Rook::get_moves(std::vector<Piece*>& board)
     return free_case;
 }
 
-Bishop::Bishop(const int position, const bool white): Piece(position, white) {};
+Bishop::Bishop(const int position, const bool white): Piece(position, white) {
+    m_label = white ? 'B' : 'b';
+};
 
 std::vector<int> Bishop::get_moves(std::vector<Piece*>& board){
 
@@ -108,7 +112,9 @@ std::vector<int> Bishop::get_moves(std::vector<Piece*>& board){
     return free_case;
 };
 
-Queen::Queen(const int position, const bool white) : Piece(position, white) {};
+Queen::Queen(const int position, const bool white) : Piece(position, white) {
+    m_label = white ? 'Q' : 'q';
+};
 
 std::vector<int> Queen::get_moves(std::vector<Piece*>& board)
 {
@@ -137,7 +143,9 @@ std::vector<int> Queen::get_moves(std::vector<Piece*>& board)
     return free_case;
 };
 
-Knight::Knight(const int position, const bool white) : Piece(position, white) {};
+Knight::Knight(const int position, const bool white) : Piece(position, white) {
+    m_label = white ? 'N' : 'n';
+};
 
 std::vector<int> Knight::get_moves(std::vector<Piece*>& board)
 {

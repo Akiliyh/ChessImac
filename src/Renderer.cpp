@@ -1,16 +1,20 @@
 #include "Renderer.hpp"
-#include "Chessboard.hpp"
-#include "quick_imgui/quick_imgui.hpp"
+#include <charconv>
+#include <cstddef>
 #include <iostream>
+#include <string>
+#include "Chessboard.hpp"
+#include "Pieces.hpp"
+#include "quick_imgui/quick_imgui.hpp"
 
-void Renderer::draw(Chessboard& board) {
-    
+void Renderer::draw(Chessboard& board)
+{
     quick_imgui::loop(
         "ChessImac",
         {
             .init = [&]() {},
             .loop =
-            
+
                 [&]() {
                     ImGui::ShowDemoWindow(); // This opens a window which shows tons of examples of what you can do with ImGui. You should check it out! Also, you can use the "Item Picker" in the top menu of that demo window: then click on any widget and it will show you the corresponding code directly in your IDE!
 
@@ -35,10 +39,15 @@ void Renderer::draw(Chessboard& board) {
 
                         ImGui::PushID(i);
                         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
-                        if (ImGui::Button(std::to_string(i).c_str(), ImVec2{50.f, 50.f}))
+
+                        std::string label {};
+                        if (board.board_data[i] != nullptr) label=board.board_data[i]->m_label;
+
+                        if (ImGui::Button(label.c_str(), ImVec2{50.f, 50.f}))
                         {
                             std::cout << "Clicked button " << i << "\n";
                         }
+
                         ImGui::PopStyleVar();
                         ImGui::PopID();
                         ImGui::PopStyleColor();
