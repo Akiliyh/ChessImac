@@ -29,6 +29,12 @@ class Queen : public Piece {
         std::vector<int> get_moves(std::vector<Piece*>& board);
 };
 
+class King : public Piece {
+    public:
+        King(const int position, const bool white);
+        std::vector<int> get_moves(std::vector<Piece*>& board);
+};
+
 class Knight : public Piece {
     public:
         Knight(const int position, const bool white);

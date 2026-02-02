@@ -191,3 +191,39 @@ std::vector<int> Knight::get_moves(std::vector<Piece*>& board)
 
     return free_case;
 }
+
+King::King(const int position, const bool white) : Piece(position, white) {};
+
+std::vector<int> King::get_moves(std::vector<Piece*>& board)
+{
+    std::vector<int> free_case;
+
+    int next_case {};
+    std::array<int, 8 > moves{7,8,9,1,-7,-8,-9,-1};
+    
+    for (int delta : moves)
+    {
+        int i = m_position + delta;
+
+        // hors échiquier
+        if (i < 0 || i >= 64)
+            continue;
+
+        // empêche le wrap horizontal
+        if (abs((i % 8) - (m_position % 8)) > 1)
+            continue;
+
+        // case vide
+        if (board[i] == nullptr)
+        {
+            free_case.push_back(i);
+        }
+        // capture possible
+        else if (board[i]->m_white != m_white)
+        {
+            free_case.push_back(i);
+        }
+    }
+
+    return free_case;
+}
