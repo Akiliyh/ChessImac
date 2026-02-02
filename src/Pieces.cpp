@@ -6,9 +6,7 @@
 #include <vector>
 #include <iostream>
 
-Rook::Rook(const int position, const bool white) : Piece(position, white) {};
-
-void Rook::get_moves_vertical(const int delta, const std::vector<Piece*>& board, std::vector<int>& moves)
+void Moves::get_moves_vertical(const int m_position, const bool m_white, const int delta, const std::vector<Piece*>& board, std::vector<int>& moves)
 {
     for (int i = m_position + delta; i >= 0 && i < 64; i += delta)
     {
@@ -20,7 +18,7 @@ void Rook::get_moves_vertical(const int delta, const std::vector<Piece*>& board,
         }
         else
         {
-            if (this->m_white != board[next_case]->m_white)
+            if (m_white != board[next_case]->m_white)
             {
                 moves.push_back(next_case);
                 break;
@@ -30,7 +28,7 @@ void Rook::get_moves_vertical(const int delta, const std::vector<Piece*>& board,
     }
 };
 
-void Rook::get_moves_horizontal(const int delta, const std::vector<Piece*>& board, std::vector<int>& moves)
+void Moves::get_moves_horizontal(const int m_position, const bool m_white, const int delta, const std::vector<Piece*>& board, std::vector<int>& moves)
 {
     int i {};
 
@@ -53,26 +51,7 @@ void Rook::get_moves_horizontal(const int delta, const std::vector<Piece*>& boar
     }
 }
 
-std::vector<int> Rook::get_moves(std::vector<Piece*>& board)
-{
-    std::vector<int> free_case;
-
-    int top {-8};
-    int bottom {8};
-    int left {-1};
-    int right {1};
-
-    Rook::get_moves_vertical(top, board, free_case);
-    Rook::get_moves_vertical(bottom, board, free_case);
-    Rook::get_moves_horizontal(left, board, free_case);
-    Rook::get_moves_horizontal(right, board, free_case);
-
-    return free_case;
-}
-
-Bishop::Bishop(const int position, const bool white): Piece(position, white) {};
-
-void Bishop::get_moves_diag (const int delta, const std::vector<Piece*>& board, std::vector<int>& moves)
+void Moves::get_moves_diag (const int m_position, const bool m_white,const int delta, const std::vector<Piece*>& board, std::vector<int>& moves)
 {
     int i = m_position + delta;
     int prev = m_position;
@@ -91,6 +70,27 @@ void Bishop::get_moves_diag (const int delta, const std::vector<Piece*>& board, 
     }
 }
 
+Rook::Rook(const int position, const bool white) : Piece(position, white) {};
+
+std::vector<int> Rook::get_moves(std::vector<Piece*>& board)
+{
+    std::vector<int> free_case;
+
+    int top {-8};
+    int bottom {8};
+    int left {-1};
+    int right {1};
+
+    Moves::get_moves_vertical(m_position,m_white,top, board, free_case);
+    Moves::get_moves_vertical(m_position,m_white,bottom, board, free_case);
+    Moves::get_moves_horizontal(m_position,m_white,left, board, free_case);
+    Moves::get_moves_horizontal(m_position,m_white,right, board, free_case);
+
+    return free_case;
+}
+
+Bishop::Bishop(const int position, const bool white): Piece(position, white) {};
+
 std::vector<int> Bishop::get_moves(std::vector<Piece*>& board){
 
     std::vector<int> free_case;
@@ -100,10 +100,39 @@ std::vector<int> Bishop::get_moves(std::vector<Piece*>& board){
     int bottom_left{9};
     int bottom_right{7};
 
-    Bishop::get_moves_diag(top_left, board, free_case);
-    Bishop::get_moves_diag(top_right, board, free_case);
-    Bishop::get_moves_diag(bottom_left, board, free_case);
-    Bishop::get_moves_diag(bottom_right, board, free_case);
+    Moves::get_moves_diag(m_position, m_white,top_left, board, free_case);
+    Moves::get_moves_diag(m_position, m_white,top_right, board, free_case);
+    Moves::get_moves_diag(m_position, m_white,bottom_left, board, free_case);
+    Moves::get_moves_diag(m_position, m_white,bottom_right, board, free_case);
+
+    return free_case;
+};
+
+Queen::Queen(const int position, const bool white) : Piece(position, white) {};
+
+std::vector<int> Queen::get_moves(std::vector<Piece*>& board)
+{
+    std::vector<int> free_case;
+
+    int top {-8};
+    int bottom {8};
+    int left {-1};
+    int right {1};
+
+    Moves::get_moves_vertical(m_position,m_white,top, board, free_case);
+    Moves::get_moves_vertical(m_position,m_white,bottom, board, free_case);
+    Moves::get_moves_horizontal(m_position,m_white,left, board, free_case);
+    Moves::get_moves_horizontal(m_position,m_white,right, board, free_case);
+
+    int top_left{-9};
+    int top_right{-7}; 
+    int bottom_left{9};
+    int bottom_right{7};
+
+    Moves::get_moves_diag(m_position, m_white,top_left, board, free_case);
+    Moves::get_moves_diag(m_position, m_white,top_right, board, free_case);
+    Moves::get_moves_diag(m_position, m_white,bottom_left, board, free_case);
+    Moves::get_moves_diag(m_position, m_white,bottom_right, board, free_case);
 
     return free_case;
 };
@@ -121,7 +150,7 @@ std::vector<int> Knight::get_moves(std::vector<Piece*>& board)
     std::array <std::pair<int, int>, 8> knight_orientation{{{-2,1}, {-1,2}, {1,2}, {2,1}, {-2,-1}, {-1,-2}, {1,-2}, {2,-1}}};
     // explaination for 36 we want to have an L shape
     // -1 row and +2 col makes this and so on
-    //         ///
+    //         oo/
     //        o/
 
     int next_case {};
@@ -151,9 +180,6 @@ std::vector<int> Knight::get_moves(std::vector<Piece*>& board)
             }
         }
     }
-
-    // moves.push_back(free_case);
-    // moves.push_back(take_case);
 
     return free_case;
 }
