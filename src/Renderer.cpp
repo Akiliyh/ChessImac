@@ -1,14 +1,19 @@
 #include "Renderer.hpp"
+#include <algorithm>
 #include <charconv>
 #include <cstddef>
 #include <iostream>
 #include <string>
+#include <vector>
 #include "Chessboard.hpp"
 #include "Pieces.hpp"
 #include "quick_imgui/quick_imgui.hpp"
 
 void Renderer::draw(Chessboard& board)
 {
+    std::vector<int> possible_moves{};
+    Piece*      previous_square{};
+
     quick_imgui::loop(
         "ChessImac",
         {
@@ -27,6 +32,16 @@ void Renderer::draw(Chessboard& board)
                         int row = i / BOARD_SIZE;
                         int col = i % BOARD_SIZE;
 
+                        auto it = std::find(possible_moves.begin(), possible_moves.end(), i);
+
+                        // Check if we should show the border
+                        bool should_border = (it != possible_moves.end());
+
+                        if (should_border)
+                        {
+                            ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 2.0f);
+                        }
+
                         bool isDark = (row + col) % 2 == 1;
                         if (isDark)
                         {
@@ -40,12 +55,45 @@ void Renderer::draw(Chessboard& board)
                         ImGui::PushID(i);
                         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
 
-                        std::string label {};
-                        if (board.board_data[i] != nullptr) label=board.board_data[i]->m_label;
+                        std::string label{};
+                        Piece*      current_square{board.board_data[i]};
+
+                        if (current_square != nullptr)
+                            label = current_square->m_label;
 
                         if (ImGui::Button(label.c_str(), ImVec2{50.f, 50.f}))
                         {
                             std::cout << "Clicked button " << i << "\n";
+
+                            if (current_square != nullptr)
+                            {
+                                if (current_square->on_focus)
+                                {
+                                    current_square->on_focus = false;
+                                    possible_moves.clear();
+                                    
+                                } else {
+                                    possible_moves.clear();
+                                    possible_moves = current_square->get_moves(board.board_data);
+                                    for (int possible_move : possible_moves) {
+                                        std::cout << possible_move << std::endl;
+                                    }
+                                    current_square->on_focus = true;
+                                }
+
+                                previous_square = current_square;
+                                
+                            } else {
+                                if (previous_square != nullptr) {
+                                    previous_square->on_focus = false;
+                                }
+                                possible_moves.clear();
+                            }
+                        }
+
+                        if (should_border)
+                        {
+                            ImGui::PopStyleVar();
                         }
 
                         ImGui::PopStyleVar();

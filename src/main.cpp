@@ -12,11 +12,11 @@ int main()
 
     int position_test {24};
 
-    Rook rook_test(position_test,1);
+    Rook rook_test(position_test+1,1);
     Bishop bishop_test(position_test,1);
-    Queen queen_test(position_test,1);
-    King king_test(position_test,1);
-    Knight knight_test(position_test,1);
+    Queen queen_test(position_test+2,1);
+    King king_test(position_test+3,1);
+    Knight knight_test(position_test+4,1);
 
     auto moves = rook_test.get_moves(board.board_data);
     auto bishop_moves = bishop_test.get_moves(board.board_data);
