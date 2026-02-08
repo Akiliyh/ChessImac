@@ -79,10 +79,14 @@ void Renderer::draw(Chessboard& board)
                                         std::cout << possible_move << std::endl;
                                     }
                                     current_square->on_focus = true;
+                                    
+                                    if (previous_square != nullptr) {
+                                        previous_square->on_focus = false;
+                                    }
                                 }
 
                                 previous_square = current_square;
-                                
+
                             } else {
                                 if (previous_square != nullptr) {
                                     previous_square->on_focus = false;
