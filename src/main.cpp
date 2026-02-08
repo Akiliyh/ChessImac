@@ -14,7 +14,7 @@ int main()
 
     Rook rook_test(position_test+1,1);
     Bishop bishop_test(position_test,1);
-    Queen queen_test(position_test+2,1);
+    Queen queen_test(position_test+2,0);
     King king_test(position_test+3,1);
     Knight knight_test(position_test+4,1);
 
@@ -54,6 +54,9 @@ int main()
     board.board_data[bishop_test.m_position] = (&bishop_test);
     board.board_data[queen_test.m_position] = (&queen_test);
     board.board_data[knight_test.m_position] = (&knight_test);
+
+    board.move_piece(&rook_test, 9);
+    board.move_piece(&queen_test, 24);
 
     renderer.draw(board);
 }

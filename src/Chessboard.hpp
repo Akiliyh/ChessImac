@@ -13,4 +13,5 @@ class Chessboard {
         void init_board();
         int get_size() const;
         Chessboard();
+        void move_piece(Piece* active_square, int dest_position);
 };
