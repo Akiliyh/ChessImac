@@ -55,6 +55,12 @@ class Knight : public Piece {
         std::vector<int> get_moves(std::vector<Piece*>& board) override;
 };
 
+class Pawn : public Piece {
+    public:
+        Pawn(const int x, const int y, const PieceColor color);
+        std::vector<int> get_moves(std::vector<Piece*>& board) override;
+};
+
 struct Moves {
     public:
         static void get_moves_vertical(const int m_position, const bool m_white, const int delta, const std::vector<Piece*>& board, std::vector<int>& moves);

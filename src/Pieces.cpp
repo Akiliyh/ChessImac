@@ -229,3 +229,71 @@ std::vector<int> King::get_moves(std::vector<Piece*>& board)
 
     return free_case;
 }
+
+Pawn::Pawn(const int x, const int y, const PieceColor color) : Piece(x, y, color) {
+    m_label = color == White ? 'P' : 'p' ;
+};
+    
+std::vector<int> Pawn::get_moves(std::vector<Piece*>& board)
+{
+    std::vector<int> free_case;
+
+    int next_case {};
+    std::array<int, 3 > moves_w{-7,-8,-9};
+    std::array<int, 3 > moves_b{7,8,9};
+    
+    if (m_color == White) {
+        for (int delta : moves_w)
+        {
+            int i = m_position + delta;
+    
+            // hors échiquier
+            if (i < 0 || i >= 64)
+                continue;
+    
+            // empêche le wrap horizontal
+            if (abs((i % 8) - (m_position % 8)) > 1)
+                continue;
+    
+            // case vide
+            if (board[i] == nullptr && delta == -8)
+            {
+                free_case.push_back(i);
+            }
+            // capture possible
+            if (board[i] != nullptr && board[i]->m_color != m_color && (delta == -7 || delta == -9))
+            {
+                free_case.push_back(i);
+            }
+            
+        }
+    }
+    else
+    {
+        for (int delta : moves_b)
+        {
+            int i = m_position + delta;
+    
+            // hors échiquier
+            if (i < 0 || i >= 64)
+                continue;
+    
+            // empêche le wrap horizontal
+            if (abs((i % 8) - (m_position % 8)) > 1)
+                continue;
+    
+            // case vide
+            if (board[i] == nullptr && delta == 8)
+            {
+                free_case.push_back(i);
+            }
+            // capture possible
+            if (board[i] != nullptr && board[i]->m_color != m_color && (delta == 7 || delta == 9))
+            {
+                free_case.push_back(i);
+            }
+        }
+    }
+
+    return free_case;
+};
