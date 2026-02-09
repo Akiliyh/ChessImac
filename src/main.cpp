@@ -17,7 +17,7 @@ int main()
     Queen queen_test(4,5,White);
     King king_test(1,1,Black);
     Knight knight_test(2,1,Black);
-    Pawn pawn_test(1,2,White);
+    Pawn pawn_test("g3",White);
 
     auto moves = rook_test.get_moves(board.board_data);
     auto bishop_moves = bishop_test.get_moves(board.board_data);
