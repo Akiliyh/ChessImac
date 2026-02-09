@@ -9,10 +9,47 @@
 #include "Pieces.hpp"
 #include "quick_imgui/quick_imgui.hpp"
 
+void Renderer::display_possible_moves(Chessboard& board, Piece* current_square, Piece* previous_square, std::vector<int>& possible_moves)
+{
+    if (current_square != nullptr)
+    {
+        if (current_square->on_focus)
+        {
+            current_square->on_focus = false;
+            possible_moves.clear();
+        }
+        else
+        {
+            possible_moves.clear();
+            possible_moves = current_square->get_moves(board.board_data);
+            for (int possible_move : possible_moves)
+            {
+                std::cout << possible_move << '\n';
+            }
+            current_square->on_focus = true;
+
+            if (previous_square != nullptr)
+            {
+                previous_square->on_focus = false;
+            }
+        }
+
+        previous_square = current_square;
+    }
+    else
+    {
+        if (previous_square != nullptr)
+        {
+            previous_square->on_focus = false;
+        }
+        possible_moves.clear();
+    }
+}
+
 void Renderer::draw(Chessboard& board)
 {
     std::vector<int> possible_moves{};
-    Piece*      previous_square{};
+    Piece*           previous_square{};
 
     quick_imgui::loop(
         "ChessImac",
@@ -39,7 +76,7 @@ void Renderer::draw(Chessboard& board)
 
                         if (should_border)
                         {
-                            ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 2.0f);
+                            ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 5.0f);
                         }
 
                         bool isDark = (row + col) % 2 == 1;
@@ -59,41 +96,29 @@ void Renderer::draw(Chessboard& board)
                         Piece*      current_square{board.board_data[i]};
 
                         if (current_square != nullptr)
+                        {
                             label = current_square->m_label;
+
+                            if (current_square->m_color == PieceColor::White)
+                            {
+                                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+                            }
+                            else
+                            {
+                                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
+                            }
+                        }
 
                         if (ImGui::Button(label.c_str(), ImVec2{50.f, 50.f}))
                         {
                             std::cout << "Clicked button " << i << "\n";
 
-                            if (current_square != nullptr)
-                            {
-                                if (current_square->on_focus)
-                                {
-                                    current_square->on_focus = false;
-                                    possible_moves.clear();
-                                    
-                                } else {
-                                    possible_moves.clear();
-                                    possible_moves = current_square->get_moves(board.board_data);
-                                    for (int possible_move : possible_moves) {
-                                        std::cout << possible_move << std::endl;
-                                    }
-                                    current_square->on_focus = true;
-                                    
-                                    if (previous_square != nullptr) {
-                                        previous_square->on_focus = false;
-                                    }
-                                }
-
-                                previous_square = current_square;
-
-                            } else {
-                                if (previous_square != nullptr) {
-                                    previous_square->on_focus = false;
-                                }
-                                possible_moves.clear();
-                            }
+                            Renderer::display_possible_moves(board, current_square, previous_square, possible_moves);
                         }
+
+                        // ImGui::PushStyleColor(ImGuiCol_Text, <your color>);
+                        // ImGui::LabelText("##LabelID", Text_to_Display, Text_Size);
+                        // ImGui::PopStyleColor();
 
                         if (should_border)
                         {
@@ -103,6 +128,10 @@ void Renderer::draw(Chessboard& board)
                         ImGui::PopStyleVar();
                         ImGui::PopID();
                         ImGui::PopStyleColor();
+
+                        if (current_square != nullptr) {
+                            ImGui::PopStyleColor(); // corresponds to the change of color of the button label
+                        }
 
                         if ((i % BOARD_SIZE) != (BOARD_SIZE - 1))
                         {
