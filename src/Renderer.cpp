@@ -1,4 +1,5 @@
 #include "Renderer.hpp"
+#include <imgui.h>
 #include <algorithm>
 #include <charconv>
 #include <cstddef>
@@ -116,20 +117,13 @@ void Renderer::draw(Chessboard& board)
                             Renderer::display_possible_moves(board, current_square, previous_square, possible_moves);
                         }
 
-                        // ImGui::PushStyleColor(ImGuiCol_Text, <your color>);
-                        // ImGui::LabelText("##LabelID", Text_to_Display, Text_Size);
-                        // ImGui::PopStyleColor();
-
                         if (should_border)
                         {
                             ImGui::PopStyleVar();
                         }
 
-                        ImGui::PopStyleVar();
-                        ImGui::PopID();
-                        ImGui::PopStyleColor();
-
-                        if (current_square != nullptr) {
+                        if (current_square != nullptr)
+                        {
                             ImGui::PopStyleColor(); // corresponds to the change of color of the button label
                         }
 
@@ -137,6 +131,41 @@ void Renderer::draw(Chessboard& board)
                         {
                             ImGui::SameLine(0, 0); // we smash the tiles together
                         }
+                        else
+                        {
+                            ImGui::SameLine(0, 10);
+
+                            float textHeight = ImGui::CalcTextSize("1").y;
+                            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (50.0f - textHeight) * 0.5f); // we center vertically
+                            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.f));
+                            ImGui::Text("%i", (BOARD_SIZE - row));
+                            ImGui::PopStyleColor();
+                        }
+
+                        ImGui::PopStyleVar();
+                        ImGui::PopID();
+                        ImGui::PopStyleColor();
+                    }
+
+                    // col letters
+
+                    ImGui::Dummy(ImVec2(0.f, 10.0f));
+
+                    char  col_c     = 'a';
+                    float tile_size = 50.f; // to later set to the square size
+
+                    float text_width = ImGui::CalcTextSize("A").x;
+
+                    float start_x = ImGui::GetCursorPosX() + (tile_size - text_width) / 2.0f;
+
+                    for (int i = 0; i < BOARD_SIZE; i++)
+                    {
+                        ImGui::SetCursorPosX(start_x + i * tile_size); // we offset to the enter of each square every col
+
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.f));
+                        ImGui::Text("%c", col_c + i); // we increment
+                        ImGui::PopStyleColor();
+                        ImGui::SameLine(0, 0);
                     }
 
                     ImGui::End();
