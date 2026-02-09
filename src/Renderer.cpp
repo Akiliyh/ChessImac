@@ -65,6 +65,8 @@ void Renderer::draw(Chessboard& board)
 
                     const int BOARD_SIZE{board.get_size()}; // 8x8
 
+                    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
+
                     for (int i = 0; i < BOARD_SIZE * BOARD_SIZE; i++)
                     {
                         int row = i / BOARD_SIZE;
@@ -91,7 +93,7 @@ void Renderer::draw(Chessboard& board)
                         }
 
                         ImGui::PushID(i);
-                        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
+                        
 
                         std::string label{};
                         Piece*      current_square{board.board_data[i]};
@@ -142,7 +144,7 @@ void Renderer::draw(Chessboard& board)
                             ImGui::PopStyleColor();
                         }
 
-                        ImGui::PopStyleVar();
+                        
                         ImGui::PopID();
                         ImGui::PopStyleColor();
                     }
@@ -168,6 +170,7 @@ void Renderer::draw(Chessboard& board)
                         ImGui::SameLine(0, 0);
                     }
 
+                    ImGui::PopStyleVar();
                     ImGui::End();
                 },
         }
