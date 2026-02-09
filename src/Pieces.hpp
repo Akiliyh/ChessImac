@@ -13,40 +13,51 @@ class Piece {
         char m_label;
         PieceColor m_color;
         
-        Piece(int position, PieceColor color)
-        : m_position(position), m_color(color), on_focus(false), m_label{} {}
+        Piece(const int x, const int y, PieceColor color)
+        : m_position(at(x,y)), m_color(color), on_focus(false), m_label{} {}
         
         virtual std::vector<int> get_moves(std::vector<Piece*>& board) = 0;
         int movement();
+
+        int at(int x, int y)
+        {
+            return x + y * 8;
+        }
 };
 
 class Rook : public Piece {
     public:
-        Rook(const int position, const PieceColor color);
+        Rook(const int x, const int y, const PieceColor color);
         std::vector<int> get_moves(std::vector<Piece*>& board) override;
 };
 
 class Bishop : public Piece {
     public:
-        Bishop(const int position, const PieceColor color);
+        Bishop(const int x, const int y, const PieceColor color);
         std::vector<int> get_moves(std::vector<Piece*>& board) override;
 };
 
 class Queen : public Piece {
    public:
-        Queen(const int position, const PieceColor color);
+        Queen(const int x, const int y, const PieceColor color);
         std::vector<int> get_moves(std::vector<Piece*>& board) override;
 };
 
 class King : public Piece {
     public:
-        King(const int position, const PieceColor color);
+        King(const int x, const int y, const PieceColor color);
         std::vector<int> get_moves(std::vector<Piece*>& board) override;
 };
 
 class Knight : public Piece {
     public:
-        Knight(const int position, const PieceColor color);
+        Knight(const int x, const int y, const PieceColor color);
+        std::vector<int> get_moves(std::vector<Piece*>& board) override;
+};
+
+class Pawn : public Piece {
+    public:
+        Pawn(const int x, const int y, const PieceColor color);
         std::vector<int> get_moves(std::vector<Piece*>& board) override;
 };
 

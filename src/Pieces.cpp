@@ -70,7 +70,7 @@ void Moves::get_moves_diag (const int m_position, const bool m_color,const int d
     }
 }
 
-Rook::Rook(const int position, const PieceColor color) : Piece(position, color) {
+Rook::Rook(const int x, const int y, const PieceColor color) : Piece(x, y, color) {
     m_label = color == White ? 'R' : 'r';
 };
 
@@ -91,7 +91,7 @@ std::vector<int> Rook::get_moves(std::vector<Piece*>& board)
     return free_case;
 }
 
-Bishop::Bishop(const int position, const PieceColor color): Piece(position, color) {
+Bishop::Bishop(const int x, const int y, const PieceColor color): Piece(x, y, color) {
     m_label = color == White ? 'B' : 'b';
 };
 
@@ -112,7 +112,7 @@ std::vector<int> Bishop::get_moves(std::vector<Piece*>& board){
     return free_case;
 };
 
-Queen::Queen(const int position, const PieceColor color) : Piece(position, color) {
+Queen::Queen(const int x, const int y, const PieceColor color) : Piece(x, y, color) {
     m_label = color == White ? 'Q' : 'q';
 };
 
@@ -143,7 +143,7 @@ std::vector<int> Queen::get_moves(std::vector<Piece*>& board)
     return free_case;
 };
 
-Knight::Knight(const int position, const PieceColor color) : Piece(position, color) {
+Knight::Knight(const int x, const int y, const PieceColor color) : Piece(x, y, color) {
     m_label = color == White ? 'N' : 'n';
 };
 
@@ -192,7 +192,9 @@ std::vector<int> Knight::get_moves(std::vector<Piece*>& board)
     return free_case;
 }
 
-King::King(const int position, const PieceColor color) : Piece(position, color) {};
+King::King(const int x, const int y, const PieceColor color) : Piece(x, y, color) {
+    m_label = color == White ? 'K' : 'k';
+};
 
 std::vector<int> King::get_moves(std::vector<Piece*>& board)
 {
@@ -227,3 +229,71 @@ std::vector<int> King::get_moves(std::vector<Piece*>& board)
 
     return free_case;
 }
+
+Pawn::Pawn(const int x, const int y, const PieceColor color) : Piece(x, y, color) {
+    m_label = color == White ? 'P' : 'p' ;
+};
+    
+std::vector<int> Pawn::get_moves(std::vector<Piece*>& board)
+{
+    std::vector<int> free_case;
+
+    int next_case {};
+    std::array<int, 3 > moves_w{-7,-8,-9};
+    std::array<int, 3 > moves_b{7,8,9};
+    
+    if (m_color == White) {
+        for (int delta : moves_w)
+        {
+            int i = m_position + delta;
+    
+            // hors échiquier
+            if (i < 0 || i >= 64)
+                continue;
+    
+            // empêche le wrap horizontal
+            if (abs((i % 8) - (m_position % 8)) > 1)
+                continue;
+    
+            // case vide
+            if (board[i] == nullptr && delta == -8)
+            {
+                free_case.push_back(i);
+            }
+            // capture possible
+            if (board[i] != nullptr && board[i]->m_color != m_color && (delta == -7 || delta == -9))
+            {
+                free_case.push_back(i);
+            }
+            
+        }
+    }
+    else
+    {
+        for (int delta : moves_b)
+        {
+            int i = m_position + delta;
+    
+            // hors échiquier
+            if (i < 0 || i >= 64)
+                continue;
+    
+            // empêche le wrap horizontal
+            if (abs((i % 8) - (m_position % 8)) > 1)
+                continue;
+    
+            // case vide
+            if (board[i] == nullptr && delta == 8)
+            {
+                free_case.push_back(i);
+            }
+            // capture possible
+            if (board[i] != nullptr && board[i]->m_color != m_color && (delta == 7 || delta == 9))
+            {
+                free_case.push_back(i);
+            }
+        }
+    }
+
+    return free_case;
+};
