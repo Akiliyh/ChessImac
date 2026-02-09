@@ -6,7 +6,7 @@
 #include <vector>
 #include <iostream>
 
-void Moves::get_moves_vertical(const int m_position, const bool m_white, const int delta, const std::vector<Piece*>& board, std::vector<int>& moves)
+void Moves::get_moves_vertical(const int m_position, const bool m_color, const int delta, const std::vector<Piece*>& board, std::vector<int>& moves)
 {
     for (int i = m_position + delta; i >= 0 && i < 64; i += delta)
     {
@@ -18,7 +18,7 @@ void Moves::get_moves_vertical(const int m_position, const bool m_white, const i
         }
         else
         {
-            if (m_white != board[next_case]->m_white)
+            if (m_color != board[next_case]->m_color)
             {
                 moves.push_back(next_case);
                 break;
@@ -28,7 +28,7 @@ void Moves::get_moves_vertical(const int m_position, const bool m_white, const i
     }
 };
 
-void Moves::get_moves_horizontal(const int m_position, const bool m_white, const int delta, const std::vector<Piece*>& board, std::vector<int>& moves)
+void Moves::get_moves_horizontal(const int m_position, const bool m_color, const int delta, const std::vector<Piece*>& board, std::vector<int>& moves)
 {
     int i {};
 
@@ -39,7 +39,7 @@ void Moves::get_moves_horizontal(const int m_position, const bool m_white, const
         }
         else
         {
-            if (board[i]->m_white != m_white)
+            if (board[i]->m_color != m_color)
             {
                 moves.push_back(i);
                 break;
@@ -51,7 +51,7 @@ void Moves::get_moves_horizontal(const int m_position, const bool m_white, const
     }
 }
 
-void Moves::get_moves_diag (const int m_position, const bool m_white,const int delta, const std::vector<Piece*>& board, std::vector<int>& moves)
+void Moves::get_moves_diag (const int m_position, const bool m_color,const int delta, const std::vector<Piece*>& board, std::vector<int>& moves)
 {
     int i = m_position + delta;
     int prev = m_position;
@@ -61,7 +61,7 @@ void Moves::get_moves_diag (const int m_position, const bool m_white,const int d
         if (!board[i]) {
             moves.push_back(i);
         } else {
-            if (board[i]->m_white != m_white)
+            if (board[i]->m_color != m_color)
                 moves.push_back(i);
             break;
         }
@@ -70,8 +70,8 @@ void Moves::get_moves_diag (const int m_position, const bool m_white,const int d
     }
 }
 
-Rook::Rook(const int position, const bool white) : Piece(position, white) {
-    m_label = white ? 'R' : 'r';
+Rook::Rook(const int position, const PieceColor color) : Piece(position, color) {
+    m_label = color == White ? 'R' : 'r';
 };
 
 std::vector<int> Rook::get_moves(std::vector<Piece*>& board)
@@ -83,16 +83,16 @@ std::vector<int> Rook::get_moves(std::vector<Piece*>& board)
     int left {-1};
     int right {1};
 
-    Moves::get_moves_vertical(m_position,m_white,top, board, free_case);
-    Moves::get_moves_vertical(m_position,m_white,bottom, board, free_case);
-    Moves::get_moves_horizontal(m_position,m_white,left, board, free_case);
-    Moves::get_moves_horizontal(m_position,m_white,right, board, free_case);
+    Moves::get_moves_vertical(m_position,m_color,top, board, free_case);
+    Moves::get_moves_vertical(m_position,m_color,bottom, board, free_case);
+    Moves::get_moves_horizontal(m_position,m_color,left, board, free_case);
+    Moves::get_moves_horizontal(m_position,m_color,right, board, free_case);
 
     return free_case;
 }
 
-Bishop::Bishop(const int position, const bool white): Piece(position, white) {
-    m_label = white ? 'B' : 'b';
+Bishop::Bishop(const int position, const PieceColor color): Piece(position, color) {
+    m_label = color == White ? 'B' : 'b';
 };
 
 std::vector<int> Bishop::get_moves(std::vector<Piece*>& board){
@@ -104,16 +104,16 @@ std::vector<int> Bishop::get_moves(std::vector<Piece*>& board){
     int bottom_left{9};
     int bottom_right{7};
 
-    Moves::get_moves_diag(m_position, m_white,top_left, board, free_case);
-    Moves::get_moves_diag(m_position, m_white,top_right, board, free_case);
-    Moves::get_moves_diag(m_position, m_white,bottom_left, board, free_case);
-    Moves::get_moves_diag(m_position, m_white,bottom_right, board, free_case);
+    Moves::get_moves_diag(m_position, m_color,top_left, board, free_case);
+    Moves::get_moves_diag(m_position, m_color,top_right, board, free_case);
+    Moves::get_moves_diag(m_position, m_color,bottom_left, board, free_case);
+    Moves::get_moves_diag(m_position, m_color,bottom_right, board, free_case);
 
     return free_case;
 };
 
-Queen::Queen(const int position, const bool white) : Piece(position, white) {
-    m_label = white ? 'Q' : 'q';
+Queen::Queen(const int position, const PieceColor color) : Piece(position, color) {
+    m_label = color == White ? 'Q' : 'q';
 };
 
 std::vector<int> Queen::get_moves(std::vector<Piece*>& board)
@@ -125,26 +125,26 @@ std::vector<int> Queen::get_moves(std::vector<Piece*>& board)
     int left {-1};
     int right {1};
 
-    Moves::get_moves_vertical(m_position,m_white,top, board, free_case);
-    Moves::get_moves_vertical(m_position,m_white,bottom, board, free_case);
-    Moves::get_moves_horizontal(m_position,m_white,left, board, free_case);
-    Moves::get_moves_horizontal(m_position,m_white,right, board, free_case);
+    Moves::get_moves_vertical(m_position,m_color,top, board, free_case);
+    Moves::get_moves_vertical(m_position,m_color,bottom, board, free_case);
+    Moves::get_moves_horizontal(m_position,m_color,left, board, free_case);
+    Moves::get_moves_horizontal(m_position,m_color,right, board, free_case);
 
     int top_left{-9};
     int top_right{-7}; 
     int bottom_left{9};
     int bottom_right{7};
 
-    Moves::get_moves_diag(m_position, m_white,top_left, board, free_case);
-    Moves::get_moves_diag(m_position, m_white,top_right, board, free_case);
-    Moves::get_moves_diag(m_position, m_white,bottom_left, board, free_case);
-    Moves::get_moves_diag(m_position, m_white,bottom_right, board, free_case);
+    Moves::get_moves_diag(m_position, m_color,top_left, board, free_case);
+    Moves::get_moves_diag(m_position, m_color,top_right, board, free_case);
+    Moves::get_moves_diag(m_position, m_color,bottom_left, board, free_case);
+    Moves::get_moves_diag(m_position, m_color,bottom_right, board, free_case);
 
     return free_case;
 };
 
-Knight::Knight(const int position, const bool white) : Piece(position, white) {
-    m_label = white ? 'N' : 'n';
+Knight::Knight(const int position, const PieceColor color) : Piece(position, color) {
+    m_label = color == White ? 'N' : 'n';
 };
 
 std::vector<int> Knight::get_moves(std::vector<Piece*>& board)
@@ -180,7 +180,7 @@ std::vector<int> Knight::get_moves(std::vector<Piece*>& board)
             }
             else
             {
-                if (this->m_white != board[next_case]->m_white)
+                if (this->m_color != board[next_case]->m_color)
                 {
                     // board[m_position + 8] => color space taken;
                     free_case.push_back(next_case);
@@ -192,7 +192,7 @@ std::vector<int> Knight::get_moves(std::vector<Piece*>& board)
     return free_case;
 }
 
-King::King(const int position, const bool white) : Piece(position, white) {};
+King::King(const int position, const PieceColor color) : Piece(position, color) {};
 
 std::vector<int> King::get_moves(std::vector<Piece*>& board)
 {
@@ -219,7 +219,7 @@ std::vector<int> King::get_moves(std::vector<Piece*>& board)
             free_case.push_back(i);
         }
         // capture possible
-        else if (board[i]->m_white != m_white)
+        else if (board[i]->m_color != m_color)
         {
             free_case.push_back(i);
         }
