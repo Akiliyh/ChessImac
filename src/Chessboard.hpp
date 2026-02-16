@@ -11,6 +11,7 @@ class Chessboard {
         // futur private
         std::vector<Piece*> board_data {};
         void init_board();
+        void load_board_from_fen(const std::string& fen);
         int get_size() const;
         Chessboard();
         void move_piece(Piece* active_square, int dest_position);

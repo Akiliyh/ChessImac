@@ -10,7 +10,7 @@ int main()
     Renderer renderer{};
     Chessboard board{};
 
-    // int position_test {24};
+    board.load_board_from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
     Rook rook_test(0,0,White);
     Bishop bishop_test(1,0,White);
