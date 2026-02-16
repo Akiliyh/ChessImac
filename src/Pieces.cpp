@@ -263,10 +263,11 @@ std::vector<int> Pawn::get_moves(std::vector<Piece*>& board)
     std::vector<int> free_case;
 
     int next_case {};
-    std::array<int, 3 > moves_w{-7,-8,-9};
-    std::array<int, 3 > moves_b{7,8,9};
+    std::array<int, 3 > moves_w{at(1,-1),at(0,-1),at(-1,-1)};
+    std::array<int, 3 > moves_b{at(-1,1),at(0,1),at(1,1)};
     
     if (m_color == White) {
+
         for (int delta : moves_w)
         {
             int i = m_position + delta;
@@ -280,12 +281,17 @@ std::vector<int> Pawn::get_moves(std::vector<Piece*>& board)
                 continue;
     
             // case vide
-            if (board[i] == nullptr && delta == -8)
+            if (board[i] == nullptr && delta == moves_w[1])
             {
-                free_case.push_back(i);
+                if (first_move) {
+                    free_case.push_back(i);
+                    free_case.push_back(i + moves_w[1]);
+                } else {
+                    free_case.push_back(i);
+                }
             }
             // capture possible
-            if (board[i] != nullptr && board[i]->m_color != m_color && (delta == -7 || delta == -9))
+            if (board[i] != nullptr && board[i]->m_color != m_color && (delta == moves_w[0] || delta == moves_w[2]))
             {
                 free_case.push_back(i);
             }
@@ -307,12 +313,18 @@ std::vector<int> Pawn::get_moves(std::vector<Piece*>& board)
                 continue;
     
             // case vide
-            if (board[i] == nullptr && delta == 8)
+            if (board[i] == nullptr && delta == moves_b[1])
             {
-                free_case.push_back(i);
+                if (first_move) {
+                    free_case.push_back(i);
+                    free_case.push_back(i + moves_b[1]);
+                } else {
+                    free_case.push_back(i);
+                }
+
             }
             // capture possible
-            if (board[i] != nullptr && board[i]->m_color != m_color && (delta == 7 || delta == 9))
+            if (board[i] != nullptr && board[i]->m_color != m_color && (delta == moves_b[0] || delta == moves_b[2]))
             {
                 free_case.push_back(i);
             }
