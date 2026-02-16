@@ -116,7 +116,24 @@ void Renderer::draw(Chessboard& board)
                         {
                             std::cout << "Clicked button " << i << "\n";
 
+
+                            if (previous_square != nullptr) { // when we selected a piece
+
+                                // here we want to update the current square 
+                                // only if it was eaten by the previous piece
+
+                                int old_position = previous_square->m_position;
+                                board.move_piece(previous_square, i);
+                                if (old_position != previous_square->m_position) { // we check if position changed
+                                    if (current_square != nullptr) { // if we select a piece we eat it with the previous
+                                        current_square = previous_square;
+                                    }
+                                    
+                                }                               
+                            }
+
                             Renderer::display_possible_moves(board, current_square, previous_square, possible_moves);
+                            previous_square = current_square;
                         }
 
                         if (should_border)
