@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include "Pieces.hpp"
 
 void Chessboard::init_board() {
     // do smth here;
@@ -24,6 +25,10 @@ void Chessboard::move_piece(Piece* active_square, int dest_position) {
         this->board_data[dest_position] = (active_square);
         this->board_data[active_square->m_position] = (nullptr);
         active_square->m_position = dest_position;
+
+        if (active_square->first_move) {
+            active_square->first_move = false;
+        }
     } else {
         std::cout << "Illegal move!" << std::endl;
     }

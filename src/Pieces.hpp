@@ -14,6 +14,8 @@ class Piece {
         bool on_focus; // we wanna display possible moves only when clicked
         char m_label;
         PieceColor m_color;
+        bool first_move {true};
+
         
         Piece(const int x, const int y, PieceColor color)
         : m_position(at(x,y)), m_color(color), on_focus(false), m_label{} {}
