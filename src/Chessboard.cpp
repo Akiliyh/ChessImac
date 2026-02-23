@@ -7,7 +7,6 @@
 #include <memory>
 #include <utility>
 #include <vector>
-#include "GameManager.hpp"
 #include "Pieces.hpp"
 
 void Chessboard::init_board()
@@ -20,13 +19,13 @@ void Chessboard::init_board()
 
 void Chessboard::load_board_from_fen(const std::string& fen)
 {
-    std::map<char, std::function<Piece*()>> pieceCorrespondance = {
-        {'r', []() { return new Rook(-1, -1, Black); }},
-        {'p', []() { return new Pawn(-1, -1, Black); }},
-        {'k', []() { return new King(-1, -1, Black); }},
-        {'n', []() { return new Knight(-1, -1, Black); }},
-        {'q', []() { return new Queen(-1, -1, Black); }},
-        {'b', []() { return new Bishop(-1, -1, Black); }},
+    std::map<char, std::function<std::unique_ptr<Piece>()>> pieceCorrespondance = {
+        {'r', []() { return std::make_unique<Rook>(-1, -1, Black); }},
+        {'p', []() { return std::make_unique<Pawn>(-1, -1, Black); }},
+        {'k', []() { return std::make_unique<King>(-1, -1, Black); }},
+        {'n', []() { return std::make_unique<Knight>(-1, -1, Black); }},
+        {'q', []() { return std::make_unique<Queen>(-1, -1, Black); }},
+        {'b', []() { return std::make_unique<Bishop>(-1, -1, Black); }},
     };
 
     std::string space        = " ";
@@ -56,9 +55,9 @@ void Chessboard::load_board_from_fen(const std::string& fen)
         int  position  = piecePositions[i].first;
 
         // Piece* piece         = pieceCorrespondance[std::tolower(pieceChar)]();
-        Piece* piece = pieceCorrespondance[static_cast<char>(std::tolower(pieceChar))]();
+        std::unique_ptr<Piece> piece = pieceCorrespondance[static_cast<char>(std::tolower(pieceChar))]();
         piece->update_position(position);
-        board_data[position] = piece;
+        board_data[position] = std::move(piece);
 
         if (isupper(pieceChar))
         {
@@ -73,34 +72,36 @@ int Chessboard::get_size() const
     return m_board_size;
 }
 
-std::vector<Piece*>& Chessboard::get_board_data()
+std::vector<std::unique_ptr<Piece>>& Chessboard::get_board_data()
 {
     return board_data;
 }
 
-Piece*& Chessboard::get_board_data(int i)
+std::unique_ptr<Piece>& Chessboard::get_board_data(int i)
 {
     return board_data[i];
 }
 
-Chessboard::Chessboard() : board_data(64, nullptr)
+Chessboard::Chessboard() : board_data(64)
 {}
 
-void Chessboard::move_piece(Piece* active_square, int dest_position)
+void Chessboard::move_piece(int from_position, int dest_position)
 {
+
+    std::unique_ptr<Piece>& active_square = board_data[from_position];
     std::vector<int> legal_moves = active_square->get_moves(this->board_data);
 
     // we check if the move is legal
     if (std::find(legal_moves.begin(), legal_moves.end(), dest_position) != legal_moves.end())
     {
-        this->board_data[active_square->get_position()] = (nullptr);
-        this->board_data[dest_position]                 = (active_square);
         active_square->update_position(dest_position);
 
         if (active_square->is_first_move())
         {
             active_square->update_first_move(false);
         }
+
+        this->board_data[dest_position]                 = std::move(active_square);        
     }
     else
     {

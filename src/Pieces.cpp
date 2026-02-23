@@ -66,7 +66,7 @@ Rook::Rook(const int x, const int y, const PieceColor color)
 Rook::Rook(const std::string& alg_notation, const PieceColor color)
     : Piece(alg_notation, color, color == White ? 'R' : 'r') {};
 
-std::vector<int> Rook::get_moves(std::vector<Piece*>& board)
+std::vector<int> Rook::get_moves(std::vector<std::unique_ptr<Piece>>& board)
 {
     std::vector<int> free_case;
     Moves::rook_moves(this->get_position(), this->get_color(), free_case, board);
@@ -83,7 +83,7 @@ Bishop::Bishop(const int x, const int y, const PieceColor color)
 Bishop::Bishop(const std::string& alg_notation, const PieceColor color)
     : Piece(alg_notation, color, color == White ? 'B' : 'b') {};
 
-std::vector<int> Bishop::get_moves(std::vector<Piece*>& board)
+std::vector<int> Bishop::get_moves(std::vector<std::unique_ptr<Piece>>& board)
 {
     std::vector<int> free_case;
     Moves::bishop_moves(this->get_position(), this->get_color(), free_case, board);
@@ -100,7 +100,7 @@ Queen::Queen(const int x, const int y, const PieceColor color)
 Queen::Queen(const std::string& alg_notation, const PieceColor color)
     : Piece(alg_notation, color, color == White ? 'Q' : 'q') {};
 
-std::vector<int> Queen::get_moves(std::vector<Piece*>& board)
+std::vector<int> Queen::get_moves(std::vector<std::unique_ptr<Piece>>& board)
 {
     std::vector<int> free_case;
     Moves::queen_moves(this->get_position(), this->get_color(), free_case, board);
@@ -117,7 +117,7 @@ Knight::Knight(const int x, const int y, const PieceColor color)
 Knight::Knight(const std::string& alg_notation, const PieceColor color)
     : Piece(alg_notation, color, color == White ? 'N' : 'n') {};
 
-std::vector<int> Knight::get_moves(std::vector<Piece*>& board)
+std::vector<int> Knight::get_moves(std::vector<std::unique_ptr<Piece>>& board)
 {
     std::vector<int> free_case;
     Moves::knight_moves(this->get_position(), this->get_color(), free_case, board);
@@ -134,7 +134,7 @@ King::King(const int x, const int y, const PieceColor color)
 King::King(const std::string& alg_notation, const PieceColor color)
     : Piece(alg_notation, color, color == White ? 'K' : 'k') {};
 
-std::vector<int> King::get_moves(std::vector<Piece*>& board)
+std::vector<int> King::get_moves(std::vector<std::unique_ptr<Piece>>& board)
 {
     std::vector<int> free_case;
     Moves::king_moves(this->get_position(), this->get_color(), free_case, board);
@@ -151,7 +151,7 @@ Pawn::Pawn(const int x, const int y, const PieceColor color)
 Pawn::Pawn(const std::string& alg_notation, const PieceColor color)
     : Piece(alg_notation, color, color == White ? 'P' : 'p') {};
 
-std::vector<int> Pawn::get_moves(std::vector<Piece*>& board)
+std::vector<int> Pawn::get_moves(std::vector<std::unique_ptr<Piece>>& board)
 {
     std::vector<int> free_case;
     Moves::pawn_moves(

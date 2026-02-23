@@ -1,5 +1,6 @@
 #include <imgui.h>
 #include <iostream>
+#include <memory>
 #include <string>
 #include "Chessboard.hpp"
 #include "GameManager.hpp"
@@ -83,18 +84,17 @@ int main()
     std::cout << '\n';
 
     // here we assign the position of the pieces to the board
-    board.get_board_data(rook_test.get_position())   = &rook_test;
-    board.get_board_data(bishop_test.get_position()) = &bishop_test;
-    board.get_board_data(queen_test.get_position())  = &queen_test;
-    board.get_board_data(knight_test.get_position()) = &knight_test;
-    board.get_board_data(king_test.get_position())   = &king_test;
-    board.get_board_data(pawn_test.get_position())   = &pawn_test;
-    board.get_board_data(pawn_test2.get_position())  = &pawn_test2;
-    board.get_board_data(pawn_test3.get_position())  = &pawn_test3;
+    board.get_board_data(rook_test.get_position())   = std::make_unique<Rook>(rook_test);
+    board.get_board_data(bishop_test.get_position()) = std::make_unique<Bishop>(bishop_test);
+    board.get_board_data(queen_test.get_position()) = std::make_unique<Queen>(queen_test);
+    board.get_board_data(knight_test.get_position()) = std::make_unique<Knight>(knight_test);
+    board.get_board_data(king_test.get_position()) = std::make_unique<King>(king_test);
+    board.get_board_data(pawn_test.get_position()) = std::make_unique<Pawn>(pawn_test);
+    board.get_board_data(pawn_test.get_position()) = std::make_unique<Pawn>(pawn_test);
+    board.get_board_data(pawn_test2.get_position()) = std::make_unique<Pawn>(pawn_test2);
+    board.get_board_data(pawn_test3.get_position()) = std::make_unique<Pawn>(pawn_test3);
 
-    // board.move_piece(&rook_test, 9);
-    // board.move_piece(&queen_test, 24);
-    board.move_piece(&pawn_test3, 27);
+    board.move_piece(pawn_test3.get_position(), 27);
 
     game.play_game();
 

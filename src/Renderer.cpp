@@ -103,7 +103,7 @@ void Renderer::draw(Chessboard& board)
                         ImGui::PushID(i);
 
                         std::string label{};
-                        Piece*      current_square{board.get_board_data(i)};
+                        Piece*      current_square = board.get_board_data(i).get();
 
                         if (current_square != nullptr)
                         {
@@ -134,7 +134,7 @@ void Renderer::draw(Chessboard& board)
                                 // only if it was eaten by the previous piece
 
                                 int old_position = previous_square->get_position();
-                                board.move_piece(previous_square, i);
+                                board.move_piece(old_position, i);
                                 if (old_position != previous_square->get_position())
                                 { // we check if position changed
                                     if (current_square != nullptr)

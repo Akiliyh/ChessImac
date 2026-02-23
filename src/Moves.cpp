@@ -4,7 +4,7 @@
 #include "Pieces.hpp"
 
 void Moves::get_moves_vertical(
-    const int m_position, const bool m_color, const int delta, const std::vector<Piece*>& board,
+    const int m_position, const bool m_color, const int delta, const std::vector<std::unique_ptr<Piece>>& board,
     std::vector<int>& moves
 )
 {
@@ -29,7 +29,7 @@ void Moves::get_moves_vertical(
 };
 
 void Moves::get_moves_horizontal(
-    const int m_position, const bool m_color, const int delta, const std::vector<Piece*>& board,
+    const int m_position, const bool m_color, const int delta, const std::vector<std::unique_ptr<Piece>>& board,
     std::vector<int>& moves
 )
 {
@@ -58,7 +58,7 @@ void Moves::get_moves_horizontal(
 }
 
 void Moves::get_moves_diag(
-    const int m_position, const bool m_color, const int delta, const std::vector<Piece*>& board,
+    const int m_position, const bool m_color, const int delta, const std::vector<std::unique_ptr<Piece>>& board,
     std::vector<int>& moves
 )
 {
@@ -84,7 +84,7 @@ void Moves::get_moves_diag(
 
 std::vector<int> Moves::bishop_moves(
     const int m_position, const bool m_color, std::vector<int>& free_case,
-    const std::vector<Piece*>& board
+    const std::vector<std::unique_ptr<Piece>>& board
 )
 {
     std::array<int, 4> directions{-9, 9, -7, 7};
@@ -99,7 +99,7 @@ std::vector<int> Moves::bishop_moves(
 
 std::vector<int> Moves::rook_moves(
     const int m_position, const bool m_color, std::vector<int>& free_case,
-    const std::vector<Piece*>& board
+    const std::vector<std::unique_ptr<Piece>>& board
 )
 {
     std::array<int, 4> directions{-8, 8, -1, 1};
@@ -121,7 +121,7 @@ std::vector<int> Moves::rook_moves(
 
 std::vector<int> Moves::knight_moves(
     const int m_position, const bool m_color, std::vector<int>& free_case,
-    const std::vector<Piece*>& board
+    const std::vector<std::unique_ptr<Piece>>& board
 )
 {
     int row{m_position / 8};
@@ -170,7 +170,7 @@ std::vector<int> Moves::knight_moves(
 
 std::vector<int> Moves::queen_moves(
     const int m_position, const bool m_color, std::vector<int>& free_case,
-    const std::vector<Piece*>& board
+    const std::vector<std::unique_ptr<Piece>>& board
 )
 {
     Moves::rook_moves(m_position, m_color, free_case, board);
@@ -181,7 +181,7 @@ std::vector<int> Moves::queen_moves(
 
 std::vector<int> Moves::king_moves(
     const int m_position, const bool m_color, std::vector<int>& free_case,
-    const std::vector<Piece*>& board
+    const std::vector<std::unique_ptr<Piece>>& board
 )
 {
     int next_case{};
@@ -212,7 +212,7 @@ std::vector<int> Moves::king_moves(
 
 std::vector<int> Moves::pawn_moves(
     const int m_position, const bool m_color, std::vector<int>& free_case,
-    const std::vector<Piece*>& board, const bool first_move
+    const std::vector<std::unique_ptr<Piece>>& board, const bool first_move
 )
 {
     int next_case{};

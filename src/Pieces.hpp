@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <cstdlib>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -44,7 +45,7 @@ class Piece {
     void update_first_move(bool is_first_move);
     void update_color(PieceColor color);
 
-    virtual std::vector<int> get_moves(std::vector<Piece*>& board) = 0;
+    virtual std::vector<int> get_moves(std::vector<std::unique_ptr<Piece>>& board) = 0;
 
     static int at(int x, int y)
     {
@@ -70,40 +71,40 @@ class Rook : public Piece {
   public:
     Rook(int x, int y, PieceColor color);
     Rook(const std::string& alg_notation, PieceColor color);
-    std::vector<int> get_moves(std::vector<Piece*>& board) override;
+    std::vector<int> get_moves(std::vector<std::unique_ptr<Piece>>& board);
 };
 
 class Bishop : public Piece {
   public:
     Bishop(int x, int y, PieceColor color);
     Bishop(const std::string& alg_notation, PieceColor color);
-    std::vector<int> get_moves(std::vector<Piece*>& board) override;
+    std::vector<int> get_moves(std::vector<std::unique_ptr<Piece>>& board);
 };
 
 class Queen : public Piece {
   public:
     Queen(int x, int y, PieceColor color);
     Queen(const std::string& alg_notation, PieceColor color);
-    std::vector<int> get_moves(std::vector<Piece*>& board) override;
+    std::vector<int> get_moves(std::vector<std::unique_ptr<Piece>>& board);
 };
 
 class King : public Piece {
   public:
     King(int x, int y, PieceColor color);
     King(const std::string& alg_notation, PieceColor color);
-    std::vector<int> get_moves(std::vector<Piece*>& board) override;
+    std::vector<int> get_moves(std::vector<std::unique_ptr<Piece>>& board);
 };
 
 class Knight : public Piece {
   public:
     Knight(int x, int y, PieceColor color);
     Knight(const std::string& alg_notation, PieceColor color);
-    std::vector<int> get_moves(std::vector<Piece*>& board) override;
+    std::vector<int> get_moves(std::vector<std::unique_ptr<Piece>>& board);
 };
 
 class Pawn : public Piece {
   public:
     Pawn(int x, int y, PieceColor color);
     Pawn(const std::string& alg_notation, PieceColor color);
-    std::vector<int> get_moves(std::vector<Piece*>& board) override;
+    std::vector<int> get_moves(std::vector<std::unique_ptr<Piece>>& board);
 };
