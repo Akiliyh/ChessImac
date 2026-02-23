@@ -55,7 +55,8 @@ void Chessboard::load_board_from_fen(const std::string& fen)
         char pieceChar = piecePositions[i].second;
         int  position  = piecePositions[i].first;
 
-        Piece* piece         = pieceCorrespondance[std::tolower(pieceChar)]();
+        // Piece* piece         = pieceCorrespondance[std::tolower(pieceChar)]();
+        Piece* piece         = pieceCorrespondance[static_cast<char>(std::tolower(pieceChar))]();
         piece->m_position    = position;
         board_data[position] = piece;
 
@@ -70,6 +71,16 @@ void Chessboard::load_board_from_fen(const std::string& fen)
 int Chessboard::get_size() const
 {
     return m_board_size;
+}
+
+std::vector<Piece*>& Chessboard::get_board_data()
+{
+    return board_data;
+}
+
+Piece*& Chessboard::get_board_data(int i)
+{
+    return board_data[i];
 }
 
 Chessboard::Chessboard() : board_data(64, nullptr)
@@ -93,6 +104,6 @@ void Chessboard::move_piece(Piece* active_square, int dest_position)
     }
     else
     {
-        std::cout << "Illegal move!" << std::endl;
+        std::cout << "Illegal move!" << '\n';
     }
 }

@@ -25,7 +25,7 @@ void Renderer::display_possible_moves(
         else
         {
             possible_moves.clear();
-            possible_moves = current_square->get_moves(board.board_data);
+            possible_moves = current_square->get_moves(board.get_board_data());
             for (int possible_move : possible_moves)
             {
                 std::cout << possible_move << '\n';
@@ -103,7 +103,7 @@ void Renderer::draw(Chessboard& board)
                         ImGui::PushID(i);
 
                         std::string label{};
-                        Piece*      current_square{board.board_data[i]};
+                        Piece*      current_square{board.get_board_data(i)};
 
                         if (current_square != nullptr)
                         {
