@@ -24,7 +24,11 @@ class Piece {
         : m_position(at(alg_notation)), m_color(color), on_focus(false), m_label{}
     {}
 
-    virtual ~Piece() = default;
+    Piece(const Piece&)            = default; // copy constructor
+    Piece& operator=(const Piece&) = default; // copy assignment
+    Piece(Piece&&)                 = default; // move constructor
+    Piece& operator=(Piece&&)      = default; // move assignment
+    virtual ~Piece()               = default; // destructor
 
     virtual std::vector<int> get_moves(std::vector<Piece*>& board) = 0;
     int                      movement();
