@@ -4,17 +4,25 @@
 
 int GameManager::get_turn() const
 {
-    return this->m_turn;
+    return m_turn;
 };
 
 void GameManager::add_turn()
 {
-    this->m_turn++;
+    m_turn++;
+}
+
+void GameManager::display_move() const
+{
+    if (m_turn % 2 == 0)
+    {
+        std::cout << "Move " << m_turn / 2 << '\n';
+    }
 }
 
 bool GameManager::is_white_turn() const
 {
-    return this->m_turn % 2 == 0;
+    return m_turn % 2 == 0;
 }
 
 void GameManager::play_game()
@@ -24,20 +32,21 @@ void GameManager::play_game()
     {
         if (this->is_white_turn())
         {
-            std::cout << "White move :" << std::endl;
-            std::cout << "turn :" << this->get_turn() << std::endl;
+            std::cout << "White move :" << '\n';
+            std::cout << "turn :" << this->get_turn() << '\n';
             this->add_turn();
         }
         else
         {
-            std::cout << "Black move :" << std::endl;
-            std::cout << "turn :" << this->get_turn() << std::endl;
+            std::cout << "Black move :" << '\n';
+            std::cout << "turn :" << this->get_turn() << '\n';
             this->add_turn();
         }
     }
 }
 
-void GameManager::player_move(const PieceColor& player_color) {
-    // Seul les pieces de la couleur player_color (White ou Black) peuvent être sélectionnées
-
+bool GameManager::is_player_move(const PieceColor& player_color) const
+{
+    return (player_color == White && is_white_turn())
+           || (player_color == Black && !is_white_turn());
 };

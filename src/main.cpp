@@ -9,13 +9,10 @@
 
 int main()
 {
-    Renderer    renderer{};
-    Chessboard  board{};
-    GameManager game{};
+    Renderer   renderer{};
+    Chessboard board{};
 
     board.load_board_from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-
-    // int position_test {24};
 
     Rook   rook_test(0, 0, White);
     Bishop bishop_test(1, 0, White);
@@ -95,8 +92,6 @@ int main()
     board.get_board_data(pawn_test3.get_position()) = std::make_unique<Pawn>(pawn_test3);
 
     board.move_piece(pawn_test3.get_position(), 27);
-
-    game.play_game();
 
     renderer.draw(board);
 }

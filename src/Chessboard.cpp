@@ -7,6 +7,7 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include "GameManager.hpp"
 #include "Pieces.hpp"
 
 void Chessboard::init_board()
@@ -16,6 +17,9 @@ void Chessboard::init_board()
 
 // for now we load the board from fen
 // WE REALLY NEED TO USE UNIQUE PTR NOW LOL
+// Lilian : I'm not sure now
+
+GameManager game_manager;
 
 void Chessboard::load_board_from_fen(const std::string& fen)
 {
@@ -55,7 +59,8 @@ void Chessboard::load_board_from_fen(const std::string& fen)
         int  position  = piecePositions[i].first;
 
         // Piece* piece         = pieceCorrespondance[std::tolower(pieceChar)]();
-        std::unique_ptr<Piece> piece = pieceCorrespondance[static_cast<char>(std::tolower(pieceChar))]();
+        std::unique_ptr<Piece> piece =
+            pieceCorrespondance[static_cast<char>(std::tolower(pieceChar))]();
         piece->update_position(position);
         board_data[position] = std::move(piece);
 
@@ -87,24 +92,29 @@ Chessboard::Chessboard() : board_data(64)
 
 void Chessboard::move_piece(int from_position, int dest_position)
 {
-
     std::unique_ptr<Piece>& active_square = board_data[from_position];
-    std::vector<int> legal_moves = active_square->get_moves(this->board_data);
+    std::vector<int>        legal_moves   = active_square->get_moves(this->board_data);
 
-    // we check if the move is legal
-    if (std::find(legal_moves.begin(), legal_moves.end(), dest_position) != legal_moves.end())
+    if (game_manager.is_player_move(active_square->get_color()))
     {
-        active_square->update_position(dest_position);
-
-        if (active_square->is_first_move())
+        // we check if the move is legal
+        if (std::find(legal_moves.begin(), legal_moves.end(), dest_position) != legal_moves.end())
         {
-            active_square->update_first_move(false);
-        }
+            active_square->update_position(dest_position);
 
-        this->board_data[dest_position]                 = std::move(active_square);        
-    }
-    else
-    {
-        std::cout << "Illegal move!" << '\n';
+            if (active_square->is_first_move())
+            {
+                active_square->update_first_move(false);
+            }
+
+            this->board_data[dest_position] = std::move(active_square);
+
+            game_manager.add_turn();
+            game_manager.display_move();
+        }
+        else
+        {
+            std::cout << "Illegal move!" << '\n';
+        }
     }
 }
