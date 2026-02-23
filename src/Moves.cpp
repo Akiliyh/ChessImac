@@ -4,7 +4,7 @@
 #include "Pieces.hpp"
 
 void Moves::get_moves_vertical(
-    const int m_position, const bool m_color, const int delta, const std::vector<std::unique_ptr<Piece>>& board,
+    const int m_position, PieceColor m_color, const int delta, const std::vector<std::unique_ptr<Piece>>& board,
     std::vector<int>& moves
 )
 {
@@ -29,7 +29,7 @@ void Moves::get_moves_vertical(
 };
 
 void Moves::get_moves_horizontal(
-    const int m_position, const bool m_color, const int delta, const std::vector<std::unique_ptr<Piece>>& board,
+    const int m_position, PieceColor m_color, const int delta, const std::vector<std::unique_ptr<Piece>>& board,
     std::vector<int>& moves
 )
 {
@@ -58,8 +58,8 @@ void Moves::get_moves_horizontal(
 }
 
 void Moves::get_moves_diag(
-    const int m_position, const bool m_color, const int delta, const std::vector<std::unique_ptr<Piece>>& board,
-    std::vector<int>& moves
+    const int m_position, const PieceColor m_color, const int delta,
+    const std::vector<std::unique_ptr<Piece>>& board, std::vector<int>& moves
 )
 {
     int i    = m_position + delta;
@@ -82,8 +82,58 @@ void Moves::get_moves_diag(
     }
 }
 
+void Moves::get_moves_pawn(
+    int m_position, const PieceColor m_color, const std::vector<std::unique_ptr<Piece>>& board,
+    std::vector<int>& moves, bool first_move
+)
+{
+    std::array<int, 3> directions{};
+
+    if (m_color == White)
+    {
+        directions = {Piece::at(1, -1), Piece::at(0, -1), Piece::at(-1, -1)};
+    }
+    else
+    {
+        directions = {Piece::at(-1, 1), Piece::at(0, 1), Piece::at(1, 1)};
+    }
+
+    for (int direction : directions)
+    {
+        int i = m_position + direction;
+
+        // hors échiquier
+        if (i < 0 || i >= 64)
+            continue;
+
+        // empêche le wrap horizontal
+        if (abs((i % 8) - (m_position % 8)) > 1)
+            continue;
+
+        // case vide
+        if (board[i] == nullptr && direction == directions[1])
+        {
+            moves.push_back(i);
+            if (first_move && board[i + directions[1]] == nullptr)
+            {
+                moves.push_back(i + directions[1]);
+            }
+        }
+        // capture possible
+        if (board[i] != nullptr && board[i]->get_color() != m_color
+            && (direction == directions[0] || direction == directions[2]))
+        {
+            moves.push_back(i);
+        }
+    }
+};
+
+//=============================================================================
+// PIECE FUNCTIONS
+//=============================================================================
+
 std::vector<int> Moves::bishop_moves(
-    const int m_position, const bool m_color, std::vector<int>& free_case,
+    const int m_position, const PieceColor m_color, std::vector<int>& free_case,
     const std::vector<std::unique_ptr<Piece>>& board
 )
 {
@@ -98,7 +148,7 @@ std::vector<int> Moves::bishop_moves(
 }
 
 std::vector<int> Moves::rook_moves(
-    const int m_position, const bool m_color, std::vector<int>& free_case,
+    const int m_position, const PieceColor m_color, std::vector<int>& free_case,
     const std::vector<std::unique_ptr<Piece>>& board
 )
 {
@@ -120,7 +170,7 @@ std::vector<int> Moves::rook_moves(
 }
 
 std::vector<int> Moves::knight_moves(
-    const int m_position, const bool m_color, std::vector<int>& free_case,
+    const int m_position, const PieceColor m_color, std::vector<int>& free_case,
     const std::vector<std::unique_ptr<Piece>>& board
 )
 {
@@ -169,7 +219,7 @@ std::vector<int> Moves::knight_moves(
 };
 
 std::vector<int> Moves::queen_moves(
-    const int m_position, const bool m_color, std::vector<int>& free_case,
+    const int m_position, const PieceColor m_color, std::vector<int>& free_case,
     const std::vector<std::unique_ptr<Piece>>& board
 )
 {
@@ -180,7 +230,7 @@ std::vector<int> Moves::queen_moves(
 };
 
 std::vector<int> Moves::king_moves(
-    const int m_position, const bool m_color, std::vector<int>& free_case,
+    const int m_position, const PieceColor m_color, std::vector<int>& free_case,
     const std::vector<std::unique_ptr<Piece>>& board
 )
 {
@@ -211,84 +261,10 @@ std::vector<int> Moves::king_moves(
 };
 
 std::vector<int> Moves::pawn_moves(
-    const int m_position, const bool m_color, std::vector<int>& free_case,
+    const int m_position, const PieceColor m_color, std::vector<int>& free_case,
     const std::vector<std::unique_ptr<Piece>>& board, const bool first_move
 )
 {
-    int next_case{};
-
-    std::array<int, 3> moves_w{Piece::at(1, -1), Piece::at(0, -1), Piece::at(-1, -1)};
-    std::array<int, 3> moves_b{Piece::at(-1, 1), Piece::at(0, 1), Piece::at(1, 1)};
-
-    if (m_color == White)
-    {
-        for (int delta : moves_w)
-        {
-            int i = m_position + delta;
-
-            // hors échiquier
-            if (i < 0 || i >= 64)
-                continue;
-
-            // empêche le wrap horizontal
-            if (abs((i % 8) - (m_position % 8)) > 1)
-                continue;
-
-            // case vide
-            if (board[i] == nullptr && delta == moves_w[1])
-            {
-                if (first_move)
-                {
-                    free_case.push_back(i);
-                    free_case.push_back(i + moves_w[1]);
-                }
-                else
-                {
-                    free_case.push_back(i);
-                }
-            }
-            // capture possible
-            if (board[i] != nullptr && board[i]->get_color() != m_color
-                && (delta == moves_w[0] || delta == moves_w[2]))
-            {
-                free_case.push_back(i);
-            }
-        }
-    }
-    else
-    {
-        for (int delta : moves_b)
-        {
-            int i = m_position + delta;
-
-            // hors échiquier
-            if (i < 0 || i >= 64)
-                continue;
-
-            // empêche le wrap horizontal
-            if (abs((i % 8) - (m_position % 8)) > 1)
-                continue;
-
-            // case vide
-            if (board[i] == nullptr && delta == moves_b[1])
-            {
-                if (first_move)
-                {
-                    free_case.push_back(i);
-                    free_case.push_back(i + moves_b[1]);
-                }
-                else
-                {
-                    free_case.push_back(i);
-                }
-            }
-            // capture possible
-            if (board[i] != nullptr && board[i]->get_color() != m_color
-                && (delta == moves_b[0] || delta == moves_b[2]))
-            {
-                free_case.push_back(i);
-            }
-        }
-    }
+    Moves::get_moves_pawn(m_position, m_color, board, free_case, first_move);
     return free_case;
 };
