@@ -13,8 +13,8 @@ class Piece {
     int        m_position;
     bool       on_focus; // we wanna display possible moves only when clicked
     char       m_label;
-    PieceColor m_color;
     bool       first_move{true};
+    PieceColor m_color;
 
     Piece(const int x, const int y, PieceColor color)
         : m_position(at(x, y)), m_color(color), on_focus(false), m_label{}
@@ -33,7 +33,7 @@ class Piece {
     virtual std::vector<int> get_moves(std::vector<Piece*>& board) = 0;
     int                      movement();
 
-    int at(int x, int y)
+    static int at(int x, int y)
     {
         return x + y * 8;
     }
@@ -43,8 +43,10 @@ class Piece {
     int at(const std::string& alg_notation)
     {
         const char base_c = 'a';
-        int        new_x  = alg_notation[0] - base_c;
-        int        new_y  = 7 - (alg_notation[1] - '1');
+
+        int new_x = alg_notation[0] - base_c;
+        int new_y = 7 - (alg_notation[1] - '1');
+
         return new_x + new_y * 8;
     }
 
@@ -91,20 +93,4 @@ class Pawn : public Piece {
     Pawn(int x, int y, PieceColor color);
     Pawn(const std::string& alg_notation, PieceColor color);
     std::vector<int> get_moves(std::vector<Piece*>& board) override;
-};
-
-struct Moves {
-  public:
-    static void get_moves_vertical(
-        int m_position, bool m_color, int delta, const std::vector<Piece*>& board,
-        std::vector<int>& moves
-    );
-    static void get_moves_horizontal(
-        int m_position, bool m_color, int delta, const std::vector<Piece*>& board,
-        std::vector<int>& moves
-    );
-    static void get_moves_diag(
-        int m_position, bool m_color, int delta, const std::vector<Piece*>& board,
-        std::vector<int>& moves
-    );
 };
