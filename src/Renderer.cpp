@@ -10,7 +10,10 @@
 #include "Pieces.hpp"
 #include "quick_imgui/quick_imgui.hpp"
 
-void Renderer::display_possible_moves(Chessboard& board, Piece* current_square, Piece* previous_square, std::vector<int>& possible_moves)
+void Renderer::display_possible_moves(
+    Chessboard& board, Piece* current_square, Piece* previous_square,
+    std::vector<int>& possible_moves
+)
 {
     if (current_square != nullptr)
     {
@@ -59,7 +62,12 @@ void Renderer::draw(Chessboard& board)
             .loop =
 
                 [&]() {
-                    ImGui::ShowDemoWindow(); // This opens a window which shows tons of examples of what you can do with ImGui. You should check it out! Also, you can use the "Item Picker" in the top menu of that demo window: then click on any widget and it will show you the corresponding code directly in your IDE!
+                    ImGui::ShowDemoWindow(); // This opens a window which shows tons of examples of
+                                             // what you can do with ImGui. You should check it out!
+                                             // Also, you can use the "Item Picker" in the top menu
+                                             // of that demo window: then click on any widget and it
+                                             // will show you the corresponding code directly in
+                                             // your IDE!
 
                     ImGui::Begin("ChessImac");
 
@@ -93,7 +101,6 @@ void Renderer::draw(Chessboard& board)
                         }
 
                         ImGui::PushID(i);
-                        
 
                         std::string label{};
                         Piece*      current_square{board.board_data[i]};
@@ -104,11 +111,15 @@ void Renderer::draw(Chessboard& board)
 
                             if (current_square->m_color == PieceColor::White)
                             {
-                                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+                                ImGui::PushStyleColor(
+                                    ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f)
+                                );
                             }
                             else
                             {
-                                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
+                                ImGui::PushStyleColor(
+                                    ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f)
+                                );
                             }
                         }
 
@@ -116,23 +127,26 @@ void Renderer::draw(Chessboard& board)
                         {
                             std::cout << "Clicked button " << i << "\n";
 
+                            if (previous_square != nullptr)
+                            { // when we selected a piece
 
-                            if (previous_square != nullptr) { // when we selected a piece
-
-                                // here we want to update the current square 
+                                // here we want to update the current square
                                 // only if it was eaten by the previous piece
 
                                 int old_position = previous_square->m_position;
                                 board.move_piece(previous_square, i);
-                                if (old_position != previous_square->m_position) { // we check if position changed
-                                    if (current_square != nullptr) { // if we select a piece we eat it with the previous
+                                if (old_position != previous_square->m_position)
+                                { // we check if position changed
+                                    if (current_square != nullptr)
+                                    { // if we select a piece we eat it with the previous
                                         current_square = previous_square;
                                     }
-                                    
-                                }                               
+                                }
                             }
 
-                            Renderer::display_possible_moves(board, current_square, previous_square, possible_moves);
+                            Renderer::display_possible_moves(
+                                board, current_square, previous_square, possible_moves
+                            );
                             previous_square = current_square;
                         }
 
@@ -143,7 +157,8 @@ void Renderer::draw(Chessboard& board)
 
                         if (current_square != nullptr)
                         {
-                            ImGui::PopStyleColor(); // corresponds to the change of color of the button label
+                            ImGui::PopStyleColor(); // corresponds to the change of color of the
+                                                    // button label
                         }
 
                         if ((i % BOARD_SIZE) != (BOARD_SIZE - 1))
@@ -155,13 +170,14 @@ void Renderer::draw(Chessboard& board)
                             ImGui::SameLine(0, 10);
 
                             float textHeight = ImGui::CalcTextSize("1").y;
-                            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (50.0f - textHeight) * 0.5f); // we center vertically
+                            ImGui::SetCursorPosY(
+                                ImGui::GetCursorPosY() + (50.0f - textHeight) * 0.5f
+                            ); // we center vertically
                             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.f));
                             ImGui::Text("%i", (BOARD_SIZE - row));
                             ImGui::PopStyleColor();
                         }
 
-                        
                         ImGui::PopID();
                         ImGui::PopStyleColor();
                     }
@@ -179,7 +195,9 @@ void Renderer::draw(Chessboard& board)
 
                     for (int i = 0; i < BOARD_SIZE; i++)
                     {
-                        ImGui::SetCursorPosX(start_x + i * tile_size); // we offset to the enter of each square every col
+                        ImGui::SetCursorPosX(
+                            start_x + i * tile_size
+                        ); // we offset to the enter of each square every col
 
                         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.f));
                         ImGui::Text("%c", col_c + i); // we increment
