@@ -7,6 +7,7 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include "GameManager.hpp"
 #include "Pieces.hpp"
 
 void Chessboard::init_board()

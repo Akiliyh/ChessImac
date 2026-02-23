@@ -40,6 +40,8 @@ class Piece {
             int new_y = 7 - (alg_notation[1] - '1');
             return new_x + new_y * 8;
         }
+
+        // I THINK I NEED TO ADD A CONDITION IF PIECE COLOR = PLAYER COLOR
 };
 
 class Rook : public Piece {

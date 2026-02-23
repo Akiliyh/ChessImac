@@ -1,6 +1,7 @@
 #include <imgui.h>
 #include <iostream>
 #include <string>
+#include "GameManager.hpp"
 #include "Renderer.hpp"
 #include "Chessboard.hpp"
 #include "Pieces.hpp"
@@ -9,8 +10,12 @@ int main()
 {
     Renderer renderer{};
     Chessboard board{};
+    GameManager game{};
 
     board.load_board_from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
+    // int position_test {24};
+
 
     Rook rook_test(0,0,White);
     Bishop bishop_test(1,0,White);
@@ -83,6 +88,8 @@ int main()
     // board.move_piece(&rook_test, 9);
     // board.move_piece(&queen_test, 24);
     board.move_piece(&pawn_test3, 27);
+
+    game.play_game();
 
     renderer.draw(board);
 }
