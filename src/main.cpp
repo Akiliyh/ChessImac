@@ -38,59 +38,59 @@ int main()
     {
         std::cout << moves[i] << " ";
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 
     for (int i = 0; i < bishop_moves.size(); i++)
     {
         std::cout << bishop_moves[i] << " ";
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 
     for (int i = 0; i < queen_moves.size(); i++)
     {
         std::cout << queen_moves[i] << " ";
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 
     for (int i = 0; i < knight_moves.size(); i++)
     {
         std::cout << knight_moves[i] << " ";
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 
     for (int i = 0; i < king_moves.size(); i++)
     {
         std::cout << king_moves[i] << " ";
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 
     for (int i = 0; i < pawn_moves.size(); i++)
     {
         std::cout << pawn_moves[i] << " ";
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 
     for (int i = 0; i < pawn_moves2.size(); i++)
     {
         std::cout << pawn_moves2[i] << " ";
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 
     for (int i = 0; i < pawn_moves3.size(); i++)
     {
         std::cout << pawn_moves3[i] << " ";
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 
     // here we assign the position of the pieces to the board
-    board.get_board_data(rook_test.m_position)   = &rook_test;
-    board.get_board_data(bishop_test.m_position) = &bishop_test;
-    board.get_board_data(queen_test.m_position)  = &queen_test;
-    board.get_board_data(knight_test.m_position) = &knight_test;
-    board.get_board_data(king_test.m_position)   = &king_test;
-    board.get_board_data(pawn_test.m_position)   = &pawn_test;
-    board.get_board_data(pawn_test2.m_position)  = &pawn_test2;
-    board.get_board_data(pawn_test3.m_position)  = &pawn_test3;
+    board.get_board_data(rook_test.get_position())   = &rook_test;
+    board.get_board_data(bishop_test.get_position()) = &bishop_test;
+    board.get_board_data(queen_test.get_position())  = &queen_test;
+    board.get_board_data(knight_test.get_position()) = &knight_test;
+    board.get_board_data(king_test.get_position())   = &king_test;
+    board.get_board_data(pawn_test.get_position())   = &pawn_test;
+    board.get_board_data(pawn_test2.get_position())  = &pawn_test2;
+    board.get_board_data(pawn_test3.get_position())  = &pawn_test3;
 
     // board.move_piece(&rook_test, 9);
     // board.move_piece(&queen_test, 24);

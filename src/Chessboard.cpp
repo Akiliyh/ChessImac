@@ -56,14 +56,14 @@ void Chessboard::load_board_from_fen(const std::string& fen)
         int  position  = piecePositions[i].first;
 
         // Piece* piece         = pieceCorrespondance[std::tolower(pieceChar)]();
-        Piece* piece         = pieceCorrespondance[static_cast<char>(std::tolower(pieceChar))]();
-        piece->m_position    = position;
+        Piece* piece = pieceCorrespondance[static_cast<char>(std::tolower(pieceChar))]();
+        piece->update_position(position);
         board_data[position] = piece;
 
         if (isupper(pieceChar))
         {
-            board_data[position]->m_color = White;
-            board_data[position]->m_label = pieceChar;
+            board_data[position]->update_color(White);
+            board_data[position]->update_label(pieceChar);
         }
     }
 }
@@ -93,13 +93,13 @@ void Chessboard::move_piece(Piece* active_square, int dest_position)
     // we check if the move is legal
     if (std::find(legal_moves.begin(), legal_moves.end(), dest_position) != legal_moves.end())
     {
-        this->board_data[active_square->m_position] = (nullptr);
-        this->board_data[dest_position]             = (active_square);
-        active_square->m_position                   = dest_position;
+        this->board_data[active_square->get_position()] = (nullptr);
+        this->board_data[dest_position]                 = (active_square);
+        active_square->update_position(dest_position);
 
-        if (active_square->first_move)
+        if (active_square->is_first_move())
         {
-            active_square->first_move = false;
+            active_square->update_first_move(false);
         }
     }
     else

@@ -17,9 +17,9 @@ void Renderer::display_possible_moves(
 {
     if (current_square != nullptr)
     {
-        if (current_square->on_focus)
+        if (current_square->is_on_focus())
         {
-            current_square->on_focus = false;
+            current_square->update_on_focus(false);
             possible_moves.clear();
         }
         else
@@ -30,11 +30,11 @@ void Renderer::display_possible_moves(
             {
                 std::cout << possible_move << '\n';
             }
-            current_square->on_focus = true;
+            current_square->update_on_focus(true);
 
             if (previous_square != nullptr)
             {
-                previous_square->on_focus = false;
+                previous_square->update_on_focus(false);
             }
         }
 
@@ -44,7 +44,7 @@ void Renderer::display_possible_moves(
     {
         if (previous_square != nullptr)
         {
-            previous_square->on_focus = false;
+            previous_square->update_on_focus(false);
         }
         possible_moves.clear();
     }
@@ -107,9 +107,9 @@ void Renderer::draw(Chessboard& board)
 
                         if (current_square != nullptr)
                         {
-                            label = current_square->m_label;
+                            label = current_square->get_label();
 
-                            if (current_square->m_color == PieceColor::White)
+                            if (current_square->get_color() == PieceColor::White)
                             {
                                 ImGui::PushStyleColor(
                                     ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f)
@@ -133,9 +133,9 @@ void Renderer::draw(Chessboard& board)
                                 // here we want to update the current square
                                 // only if it was eaten by the previous piece
 
-                                int old_position = previous_square->m_position;
+                                int old_position = previous_square->get_position();
                                 board.move_piece(previous_square, i);
-                                if (old_position != previous_square->m_position)
+                                if (old_position != previous_square->get_position())
                                 { // we check if position changed
                                     if (current_square != nullptr)
                                     { // if we select a piece we eat it with the previous

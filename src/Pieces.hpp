@@ -9,19 +9,20 @@ enum PieceColor : uint8_t {
     Black,
 };
 class Piece {
-  public:
+  private:
     int        m_position;
-    bool       on_focus; // we wanna display possible moves only when clicked
     char       m_label;
+    bool       on_focus; // we wanna display possible moves only when clicked
     bool       first_move{true};
     PieceColor m_color;
 
-    Piece(const int x, const int y, PieceColor color)
-        : m_position(at(x, y)), m_color(color), on_focus(false), m_label{}
+  public:
+    Piece(const int x, const int y, PieceColor color, char m_label)
+        : m_position(at(x, y)), m_color(color), on_focus(false), m_label(m_label)
     {}
 
-    Piece(const std::string& alg_notation, PieceColor color)
-        : m_position(at(alg_notation)), m_color(color), on_focus(false), m_label{}
+    Piece(const std::string& alg_notation, PieceColor color, char m_label)
+        : m_position(at(alg_notation)), m_color(color), on_focus(false), m_label(m_label)
     {}
 
     Piece(const Piece&)            = default; // copy constructor
@@ -30,8 +31,20 @@ class Piece {
     Piece& operator=(Piece&&)      = default; // move assignment
     virtual ~Piece()               = default; // destructor
 
+    int        get_position() const;
+    char       get_label() const;
+    bool       is_on_focus() const;
+    bool       is_first_move() const;
+    PieceColor get_color();
+    int        movement();
+
+    void update_position(int position);
+    void update_label(char label);
+    void update_on_focus(bool is_on_focus);
+    void update_first_move(bool is_first_move);
+    void update_color(PieceColor color);
+
     virtual std::vector<int> get_moves(std::vector<Piece*>& board) = 0;
-    int                      movement();
 
     static int at(int x, int y)
     {
