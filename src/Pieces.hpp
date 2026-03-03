@@ -32,12 +32,13 @@ class Piece {
     Piece& operator=(Piece&&)      = default; // move assignment
     virtual ~Piece()               = default; // destructor
 
-    int        get_position() const;
-    char       get_label() const;
-    bool       is_on_focus() const;
-    bool       is_first_move() const;
-    PieceColor get_color();
-    int        movement();
+    int                get_position() const;
+    std::string get_alg_position() const;
+    char               get_label() const;
+    bool               is_on_focus() const;
+    bool               is_first_move() const;
+    PieceColor         get_color();
+    int                movement();
 
     void update_position(int position);
     void update_label(char label);

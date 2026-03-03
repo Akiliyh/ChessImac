@@ -81,7 +81,7 @@ void Renderer::draw(GameManager& game)
 
                     ImGui::Begin("Debug");
                     if (previous_square != nullptr) {
-                        ImGui::Text("%s", ("Previous position: " + std::to_string(previous_square->get_position())).c_str());
+                        ImGui::Text("%s", ("Previous position: " + previous_square->get_alg_position()).c_str());
                     }
                     
                     for (int i = 0; i < possible_moves.size(); i++)
