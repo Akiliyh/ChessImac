@@ -14,6 +14,7 @@ void Renderer::display_possible_moves(
     std::vector<int>& possible_moves
 )
 {
+    
     if (current_square != nullptr)
     {
         if (current_square->is_on_focus())
@@ -51,9 +52,6 @@ void Renderer::display_possible_moves(
 
 void Renderer::draw(GameManager& game)
 {
-    std::vector<int> possible_moves{};
-    Piece*           previous_square{};
-
     quick_imgui::loop(
         "ChessImac",
         {
@@ -67,15 +65,31 @@ void Renderer::draw(GameManager& game)
                                              // of that demo window: then click on any widget and it
                                              // will show you the corresponding code directly in
                                              // your IDE!
-                    ImGui::SetNextWindowSize({200,200}, ImGuiCond_Once);
+                    ImGui::SetNextWindowSize({200, 200}, ImGuiCond_Once);
                     ImGui::Begin("Play history");
                     ImGui::Text("%s", ("Move: " + std::to_string(game.get_full_move())).c_str());
-                    if (game.is_white_turn()) {
+                    if (game.is_white_turn())
+                    {
                         ImGui::Text("%s", ("White to move"));
-                    } else {
+                    }
+                    else
+                    {
                         ImGui::Text("%s", ("Black to move"));
                     }
+
+                    ImGui::End();
+
+                    ImGui::Begin("Debug");
+                    if (previous_square != nullptr) {
+                        ImGui::Text("%s", ("Previous position: " + std::to_string(previous_square->get_position())).c_str());
+                    }
                     
+                    for (int i = 0; i < possible_moves.size(); i++)
+                    {
+                        ImGui::Text("%s", ("Possible moves: " + std::to_string(possible_moves[i])).c_str());
+                    }
+                    
+
                     ImGui::End();
 
                     ImGui::Begin("ChessImac");
@@ -151,12 +165,32 @@ void Renderer::draw(GameManager& game)
                                         current_square = previous_square;
                                     }
                                 }
+                                // we deselect everything after eating
+                                previous_square->update_on_focus(false);
+                                previous_square = nullptr;
+                                possible_moves.clear();
                             }
 
-                            Renderer::display_possible_moves(
-                                game.board, current_square, previous_square, possible_moves
-                            );
-                            previous_square = current_square;
+                            if (current_square != nullptr)
+                            {
+                                if ((current_square->get_color() == PieceColor::White)
+                                        && game.is_white_turn()
+                                    || (current_square->get_color() == PieceColor::Black)
+                                           && !game.is_white_turn())
+                                {
+                                    Renderer::display_possible_moves(
+                                        game.board, current_square, previous_square, possible_moves
+                                    );
+                                    previous_square = current_square;
+                                }
+                            }
+                            else
+                            {
+                                Renderer::display_possible_moves(
+                                    game.board, current_square, previous_square, possible_moves
+                                );
+                                // previous_square = current_square;
+                            }
                         }
 
                         if (should_border)

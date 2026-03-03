@@ -12,4 +12,7 @@ class Renderer {
         std::vector<int>& possible_moves
     );
     Renderer() = default;
+  private:
+    std::vector<int> possible_moves{};
+    Piece* previous_square{nullptr};
 };
