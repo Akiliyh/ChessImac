@@ -6,14 +6,16 @@
 
 struct GameManager {
   private:
-    int m_turn{0};
+    int m_full_move{0}; // full move is both color played capice? mamma miaaa
+    int m_move{0}; 
 
   public:
     Chessboard board{}; // let's put it in private once it works
     int        get_board() const;
-    int        get_turn() const;
-    void       add_turn();
-    void       display_move() const;
+    int        get_full_move() const;
+    void       add_move();
+    int        get_move() const;
+    void       display_full_move() const;
     void       display_who_is_next(PieceColor player_color) const;
     bool       is_white_turn() const;
     bool       is_player_move(const PieceColor& player_color) const;

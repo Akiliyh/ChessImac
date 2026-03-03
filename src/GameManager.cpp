@@ -10,51 +10,57 @@ void GameManager::move_piece(int from_position, int dest_position)
         bool piece_moved = board.move_piece(active_square, dest_position);
         if (piece_moved)
         {
-            add_turn();
-            display_move();
+            add_move();
+            display_full_move();
         }
     }
 };
 
-int GameManager::get_turn() const
+int GameManager::get_move() const
 {
-    return m_turn;
+    return m_move;
 };
 
-void GameManager::add_turn()
+void GameManager::add_move()
 {
-    m_turn++;
+    m_move++;
+    if (m_move % 2 == 0)
+    {
+        m_full_move++;
+    }
 }
 
-void GameManager::display_move() const
+int GameManager::get_full_move() const
 {
-    if (m_turn % 2 == 0)
-    {
-        std::cout << "Move " << m_turn / 2 << '\n';
-    }
+    return m_full_move;
+};
+
+void GameManager::display_full_move() const
+{
+    std::cout << "Move " << m_full_move << '\n';
 }
 
 bool GameManager::is_white_turn() const
 {
-    return m_turn % 2 == 0;
+    return m_move % 2 == 0;
 }
 
 void GameManager::play_game()
 {
     int test_move{0};
-    while (this->get_turn() < 100)
+    while (this->get_move() < 100)
     {
         if (this->is_white_turn())
         {
             std::cout << "White move :" << '\n';
-            std::cout << "turn :" << this->get_turn() << '\n';
-            this->add_turn();
+            std::cout << "turn :" << this->get_move() << '\n';
+            this->add_move();
         }
         else
         {
             std::cout << "Black move :" << '\n';
-            std::cout << "turn :" << this->get_turn() << '\n';
-            this->add_turn();
+            std::cout << "turn :" << this->get_move() << '\n';
+            this->add_move();
         }
     }
 }

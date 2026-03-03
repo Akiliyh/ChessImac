@@ -67,9 +67,15 @@ void Renderer::draw(GameManager& game)
                                              // of that demo window: then click on any widget and it
                                              // will show you the corresponding code directly in
                                              // your IDE!
-
-                    ImGui::Begin("Historic of Play");
-                    ImGui::Text("%i", (5));
+                    ImGui::SetNextWindowSize({200,200}, ImGuiCond_Once);
+                    ImGui::Begin("Play history");
+                    ImGui::Text("%s", ("Move: " + std::to_string(game.get_full_move())).c_str());
+                    if (game.is_white_turn()) {
+                        ImGui::Text("%s", ("White to move"));
+                    } else {
+                        ImGui::Text("%s", ("Black to move"));
+                    }
+                    
                     ImGui::End();
 
                     ImGui::Begin("ChessImac");
