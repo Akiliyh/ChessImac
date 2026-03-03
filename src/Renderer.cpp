@@ -1,12 +1,11 @@
 #include "Renderer.hpp"
 #include <imgui.h>
 #include <algorithm>
-#include <charconv>
-#include <cstddef>
 #include <iostream>
 #include <string>
 #include <vector>
 #include "Chessboard.hpp"
+#include "GameManager.hpp"
 #include "Pieces.hpp"
 #include "quick_imgui/quick_imgui.hpp"
 
@@ -50,7 +49,7 @@ void Renderer::display_possible_moves(
     }
 }
 
-void Renderer::draw(Chessboard& board)
+void Renderer::draw(GameManager& game)
 {
     std::vector<int> possible_moves{};
     Piece*           previous_square{};
@@ -69,9 +68,13 @@ void Renderer::draw(Chessboard& board)
                                              // will show you the corresponding code directly in
                                              // your IDE!
 
+                    ImGui::Begin("Historic of Play");
+                    ImGui::Text("%i", (5));
+                    ImGui::End();
+
                     ImGui::Begin("ChessImac");
 
-                    const int BOARD_SIZE{board.get_size()}; // 8x8
+                    const int BOARD_SIZE{game.board.get_size()}; // 8x8
 
                     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
 
@@ -103,7 +106,7 @@ void Renderer::draw(Chessboard& board)
                         ImGui::PushID(i);
 
                         std::string label{};
-                        Piece*      current_square = board.get_board_data(i).get();
+                        Piece*      current_square = game.board.get_board_data(i).get();
 
                         if (current_square != nullptr)
                         {
@@ -134,7 +137,7 @@ void Renderer::draw(Chessboard& board)
                                 // only if it was eaten by the previous piece
 
                                 int old_position = previous_square->get_position();
-                                board.move_piece(old_position, i);
+                                game.move_piece(old_position, i);
                                 if (old_position != previous_square->get_position())
                                 { // we check if position changed
                                     if (current_square != nullptr)
@@ -145,7 +148,7 @@ void Renderer::draw(Chessboard& board)
                             }
 
                             Renderer::display_possible_moves(
-                                board, current_square, previous_square, possible_moves
+                                game.board, current_square, previous_square, possible_moves
                             );
                             previous_square = current_square;
                         }

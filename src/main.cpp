@@ -11,6 +11,7 @@ int main()
 {
     Renderer   renderer{};
     Chessboard board{};
+    GameManager game{};
 
     board.load_board_from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
@@ -93,5 +94,5 @@ int main()
 
     // board.move_piece(queen_test.get_position(), 27);
 
-    renderer.draw(board);
+    renderer.draw(game);
 }

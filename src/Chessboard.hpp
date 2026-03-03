@@ -16,6 +16,6 @@ class Chessboard {
     std::unique_ptr<Piece>&              get_board_data(int i);
     void                 init_board();
     void                 load_board_from_fen(const std::string& fen);
-    void                 move_piece(int from_position, int dest_position);
+    bool                 move_piece(std::unique_ptr<Piece>& active_square, int dest_position);
     Chessboard();
 };

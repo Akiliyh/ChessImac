@@ -2,6 +2,20 @@
 #include <iostream>
 #include "Pieces.hpp"
 
+void GameManager::move_piece(int from_position, int dest_position)
+{
+    std::unique_ptr<Piece>& active_square = board.get_board_data()[from_position];
+    if (is_player_move(active_square->get_color()))
+    {
+        bool piece_moved = board.move_piece(active_square, dest_position);
+        if (piece_moved)
+        {
+            add_turn();
+            display_move();
+        }
+    }
+};
+
 int GameManager::get_turn() const
 {
     return m_turn;

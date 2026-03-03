@@ -19,8 +19,6 @@ void Chessboard::init_board()
 // WE REALLY NEED TO USE UNIQUE PTR NOW LOL
 // Lilian : I'm not sure now
 
-GameManager game_manager;
-
 void Chessboard::load_board_from_fen(const std::string& fen)
 {
     std::map<char, std::function<std::unique_ptr<Piece>()>> pieceCorrespondance = {
@@ -90,13 +88,10 @@ std::unique_ptr<Piece>& Chessboard::get_board_data(int i)
 Chessboard::Chessboard() : board_data(64)
 {}
 
-void Chessboard::move_piece(int from_position, int dest_position)
+bool Chessboard::move_piece(std::unique_ptr<Piece>& active_square, int dest_position)
 {
-    std::unique_ptr<Piece>& active_square = board_data[from_position];
     std::vector<int>        legal_moves   = active_square->get_moves(this->board_data);
 
-    if (game_manager.is_player_move(active_square->get_color()))
-    {
         // we check if the move is legal
         if (std::find(legal_moves.begin(), legal_moves.end(), dest_position) != legal_moves.end())
         {
@@ -109,12 +104,11 @@ void Chessboard::move_piece(int from_position, int dest_position)
 
             this->board_data[dest_position] = std::move(active_square);
 
-            game_manager.add_turn();
-            game_manager.display_move();
+            return true;
         }
         else
         {
             std::cout << "Illegal move!" << '\n';
+            return false;
         }
-    }
 }
