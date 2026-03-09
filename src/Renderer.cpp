@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
 #include "Chessboard.hpp"
 #include "GameManager.hpp"
@@ -77,9 +78,29 @@ void Renderer::draw(GameManager& game)
                         ImGui::Text("%s", ("Black to move"));
                     }
 
+                    const auto& moves = game.get_move_history();
+                    for (size_t i = 0; i < moves.size(); i++) {
+                        if (i % 2 == 0)
+                        {
+                            int full_move = i / 2 + 1; // we don't want the full move to change everytime, what we'll get with game.get_full_move
+
+                            ImGui::Text("%s", ("." + std::to_string(full_move)).c_str());
+                            ImGui::SameLine();
+                        }
+                        ImGui::Text("%c", (moves[i].first));
+                        ImGui::SameLine();
+                        ImGui::Text("%s", (std::to_string(moves[i].second)).c_str());
+
+                        if (i % 2 == 0)
+                        {
+                            ImGui::SameLine();
+                        }
+                    }
+
                     ImGui::End();
 
                     ImGui::Begin("Debug");
+
                     if (previous_square != nullptr) {
                         ImGui::Text("%s", ("Previous position: " + previous_square->get_alg_position()).c_str());
                     }
