@@ -91,7 +91,7 @@ void Renderer::draw(GameManager& game)
                         }
                         ImGui::Text("%c", (moves[i].first));
                         ImGui::SameLine();
-                        ImGui::Text("%s", (std::to_string(moves[i].second)).c_str());
+                        ImGui::Text("%s", (moves[i].second).c_str());
 
                         if (i % 2 == 0)
                         {
