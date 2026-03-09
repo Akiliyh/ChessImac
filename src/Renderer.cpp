@@ -118,8 +118,8 @@ void Renderer::draw(GameManager& game)
                     if (previous_square != nullptr)
                     {
                         ImGui::Text(
-                            "%s",
-                            ("Previous position: " + previous_square->get_alg_position()).c_str()
+                            "%s", ("Previous position: "
+                                   + game.board.to_alg_position(previous_square->get_position()))
                         );
                     }
 
