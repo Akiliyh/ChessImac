@@ -5,17 +5,20 @@
 
 class Chessboard {
   private:
-    int                 m_board_size{8}; // 8 so 8x8 = 64 squares
+    int                                 m_board_size{8}; // 8 so 8x8 = 64 squares
     std::vector<std::unique_ptr<Piece>> board_data{};
+    std::vector<std::unique_ptr<Piece>> dead_pieces{};
 
   public:
-    void                 get_board_date();
-    int                  get_board_size() const;
-    int                  get_size() const;
+    void                                 get_board_date();
+    int                                  get_board_size() const;
+    int                                  get_size() const;
     std::vector<std::unique_ptr<Piece>>& get_board_data();
     std::unique_ptr<Piece>&              get_board_data(int i);
-    void                 init_board();
-    void                 load_board_from_fen(const std::string& fen);
-    bool                 move_piece(std::unique_ptr<Piece>& active_square, int dest_position);
+    std::vector<std::unique_ptr<Piece>>& get_dead_pieces();
+    void                                 init_board();
+    void                                 load_board_from_fen(const std::string& fen);
+    bool move_piece(std::unique_ptr<Piece>& active_square, int dest_position);
+
     Chessboard();
 };

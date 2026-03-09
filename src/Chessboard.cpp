@@ -1,6 +1,7 @@
 #include "Chessboard.hpp"
 #include <algorithm>
 #include <cctype>
+#include <cstddef>
 #include <functional>
 #include <iostream>
 #include <map>
@@ -88,27 +89,44 @@ std::unique_ptr<Piece>& Chessboard::get_board_data(int i)
 Chessboard::Chessboard() : board_data(64)
 {}
 
+std::vector<std::unique_ptr<Piece>>& Chessboard::get_dead_pieces()
+{
+    return dead_pieces;
+}
+
 bool Chessboard::move_piece(std::unique_ptr<Piece>& active_square, int dest_position)
 {
-    std::vector<int>        legal_moves   = active_square->get_moves(this->board_data);
+    std::vector<int> legal_moves = active_square->get_moves(this->board_data);
 
-        // we check if the move is legal
-        if (std::find(legal_moves.begin(), legal_moves.end(), dest_position) != legal_moves.end())
+    // we check if the move is legal
+    if (std::find(legal_moves.begin(), legal_moves.end(), dest_position) != legal_moves.end())
+    {
+        active_square->update_position(dest_position);
+
+        if (active_square->is_first_move())
         {
-            active_square->update_position(dest_position);
-
-            if (active_square->is_first_move())
-            {
-                active_square->update_first_move(false);
-            }
-
-            this->board_data[dest_position] = std::move(active_square);
-
-            return true;
+            active_square->update_first_move(false);
         }
-        else
+
+        // We check if an ennemy piece is at the destination
+        if (this->board_data[dest_position] != nullptr)
         {
-            std::cout << "Illegal move!" << '\n';
-            return false;
+            // We save it in dead_pieces
+            dead_pieces.push_back(std::move(this->board_data[dest_position]));
+
+            // for (const auto& piece : get_dead_pieces())
+            // {
+            //     std::cout << piece->get_label() << '\n';
+            // }
         }
+
+        this->board_data[dest_position] = std::move(active_square);
+
+        return true;
+    }
+    else
+    {
+        std::cout << "Illegal move!" << '\n';
+        return false;
+    }
 }

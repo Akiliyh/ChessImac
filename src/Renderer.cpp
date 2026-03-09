@@ -15,7 +15,6 @@ void Renderer::display_possible_moves(
     std::vector<int>& possible_moves
 )
 {
-    
     if (current_square != nullptr)
     {
         if (current_square->is_on_focus())
@@ -79,10 +78,13 @@ void Renderer::draw(GameManager& game)
                     }
 
                     const auto& moves = game.get_move_history();
-                    for (size_t i = 0; i < moves.size(); i++) {
+                    for (size_t i = 0; i < moves.size(); i++)
+                    {
                         if (i % 2 == 0)
                         {
-                            int full_move = i / 2 + 1; // we don't want the full move to change everytime, what we'll get with game.get_full_move
+                            int full_move =
+                                i / 2 + 1; // we don't want the full move to change everytime, what
+                                           // we'll get with game.get_full_move
 
                             ImGui::Text("%s", ("." + std::to_string(full_move)).c_str());
                             ImGui::SameLine();
@@ -101,15 +103,20 @@ void Renderer::draw(GameManager& game)
 
                     ImGui::Begin("Debug");
 
-                    if (previous_square != nullptr) {
-                        ImGui::Text("%s", ("Previous position: " + previous_square->get_alg_position()).c_str());
+                    if (previous_square != nullptr)
+                    {
+                        ImGui::Text(
+                            "%s",
+                            ("Previous position: " + previous_square->get_alg_position()).c_str()
+                        );
                     }
-                    
+
                     for (int i = 0; i < possible_moves.size(); i++)
                     {
-                        ImGui::Text("%s", ("Possible moves: " + std::to_string(possible_moves[i])).c_str());
+                        ImGui::Text(
+                            "%s", ("Possible moves: " + std::to_string(possible_moves[i])).c_str()
+                        );
                     }
-                    
 
                     ImGui::End();
 
@@ -271,6 +278,12 @@ void Renderer::draw(GameManager& game)
 
                     ImGui::PopStyleVar();
                     ImGui::End();
+
+                    if (game.is_king_dead())
+                    {
+                        ImGui::Begin("Game end");
+                        ImGui::End();
+                    }
                 },
         }
     );

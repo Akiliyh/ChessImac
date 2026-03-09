@@ -1,5 +1,6 @@
 #include "GameManager.hpp"
 #include <iostream>
+#include "Chessboard.hpp"
 #include "Pieces.hpp"
 
 void GameManager::move_piece(int from_position, int dest_position)
@@ -14,7 +15,9 @@ void GameManager::move_piece(int from_position, int dest_position)
             display_full_move();
 
             // we add this to the move history
-            m_move_history.emplace_back( board.get_board_data()[dest_position]->get_label(), dest_position);
+            m_move_history.emplace_back(
+                board.get_board_data()[dest_position]->get_label(), dest_position
+            );
         }
     }
 };
@@ -55,22 +58,40 @@ bool GameManager::is_white_turn() const
 
 void GameManager::play_game()
 {
-    int test_move{0};
-    while (this->get_move() < 100)
+    // int test_move{0};
+    // while (this->get_move() < 100)
+    // {
+    //     if (this->is_white_turn())
+    //     {
+    //         std::cout << "White move :" << '\n';
+    //         std::cout << "turn :" << this->get_move() << '\n';
+    //         this->add_move();
+    //     }
+    //     else
+    //     {
+    //         std::cout << "Black move :" << '\n';
+    //         std::cout << "turn :" << this->get_move() << '\n';
+    //         this->add_move();
+    //     }
+    // }
+
+    // if (one_king_dead())
+    // {
+    //     game_win(who_king_dead());
+    // }
+}
+
+// Pass the actual game board into the function
+bool GameManager::is_king_dead()
+{
+    for (const auto& piece : board.get_dead_pieces())
     {
-        if (this->is_white_turn())
+        if (piece->get_label() == 'k' || piece->get_label() == 'K')
         {
-            std::cout << "White move :" << '\n';
-            std::cout << "turn :" << this->get_move() << '\n';
-            this->add_move();
-        }
-        else
-        {
-            std::cout << "Black move :" << '\n';
-            std::cout << "turn :" << this->get_move() << '\n';
-            this->add_move();
+            return true;
         }
     }
+    return false;
 }
 
 bool GameManager::is_player_move(const PieceColor& player_color) const
