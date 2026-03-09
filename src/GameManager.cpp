@@ -13,7 +13,7 @@ void GameManager::move_piece(int from_position, int dest_position)
             add_move();
             display_full_move();
 
-            std::string dest_alg_position = board.get_board_data()[dest_position]->get_alg_position();
+            std::string dest_alg_position = board.to_alg_position(dest_position);
 
             // we add this to the move history
             m_move_history.emplace_back( board.get_board_data()[dest_position]->get_label(), dest_alg_position);

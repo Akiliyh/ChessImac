@@ -112,3 +112,14 @@ bool Chessboard::move_piece(std::unique_ptr<Piece>& active_square, int dest_posi
             return false;
         }
 }
+
+std::string Chessboard::to_alg_position(int index) const
+{
+    int x = index % m_board_size;
+    int y = index / m_board_size;
+
+    char file = 'a' + x;
+    char rank = '1' + ((m_board_size - 1) - y);
+
+    return std::string{file, rank};
+}
