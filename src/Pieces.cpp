@@ -11,21 +11,6 @@ int Piece::get_position() const
     return m_position;
 }
 
-std::string Piece::get_alg_position() const
-{
-    int x = m_position % 8;
-    int y = m_position / 8;
-
-    char file = 'a' + x;
-    char rank = '1' + (7 - y);
-
-    std::string result;
-    result += file;
-    result += rank;
-
-    return result;
-}
-
 void Piece::update_position(int position)
 {
     this->m_position = position;

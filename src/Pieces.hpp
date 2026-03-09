@@ -33,7 +33,6 @@ class Piece {
     virtual ~Piece()               = default; // destructor
 
     int                get_position() const;
-    std::string get_alg_position() const;
     char               get_label() const;
     bool               is_on_focus() const;
     bool               is_first_move() const;

@@ -91,7 +91,7 @@ void Renderer::draw(GameManager& game)
                         }
                         ImGui::Text("%c", (moves[i].first));
                         ImGui::SameLine();
-                        ImGui::Text("%s", (std::to_string(moves[i].second)).c_str());
+                        ImGui::Text("%s", (moves[i].second).c_str());
 
                         if (i % 2 == 0)
                         {
@@ -100,6 +100,18 @@ void Renderer::draw(GameManager& game)
                     }
 
                     ImGui::End();
+
+                    // we want to deselect everything if we right click
+
+                    if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+                    {
+                        if (previous_square != nullptr)
+                        {
+                            previous_square->update_on_focus(false);
+                            previous_square = nullptr;
+                            possible_moves.clear();
+                        }
+                    }
 
                     ImGui::Begin("Debug");
 
