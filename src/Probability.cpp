@@ -3,7 +3,7 @@
 #include <iostream>
 #include <random>
 
-void Probability::simulationLoiExponentielle(int inter, double lambda)
+void Probability::simulateExpoLaw(int iter, double lambda)
 {
     // Generate rand()
     static std::random_device              rd;
@@ -13,7 +13,7 @@ void Probability::simulationLoiExponentielle(int inter, double lambda)
     double somme = 0.0; // LIGNE 1 : On crée une variable pour stocker le total avant la boucle
 
     // Interations
-    for (int i{0}; i < inter; i++)
+    for (int i{0}; i < iter; i++)
     {
         // 1. Tirage uniforme de U (entre 0 et 1)
         double U = distrib(gen);
@@ -38,5 +38,32 @@ void Probability::simulationLoiExponentielle(int inter, double lambda)
     }
 
     // LIGNE 3 : En dehors de la boucle, on calcule et on affiche la moyenne finale
-    std::cout << "\n---> Moyenne des " << inter << " tirages : " << somme / inter << '\n';
+    std::cout << "\n---> Moyenne des " << iter << " tirages : " << somme / iter << '\n';
+}
+
+void Probability::simulateUniformLaw(int iter)
+{
+    // Generate rand()
+    static std::random_device              rd;
+    static std::mt19937                    gen(rd());
+    std::uniform_real_distribution<double> distrib(0.0, 1.0);
+
+    double somme = 0.0; // LIGNE 1 : On crée une variable pour stocker le total avant la boucle
+
+    // Interations
+    for (int i{0}; i < iter; i++)
+    {
+        // 1. Tirage uniforme de U (entre 0 et 1)
+        double U = distrib(gen);
+
+        // 2. Inversion de la fonction de répartition : F^-1(U)
+        double X = 1-U;
+
+        std::cout << X << '\n';
+
+        somme += X; // LIGNE 2 : On ajoute la valeur générée au total à chaque tour
+    }
+
+    // LIGNE 3 : En dehors de la boucle, on calcule et on affiche la moyenne finale
+    std::cout << "\n---> Moyenne des " << iter << " tirages : " << somme / iter << '\n';
 }

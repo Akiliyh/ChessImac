@@ -15,7 +15,8 @@ int main()
     GameManager game{};
 
 
-    // Probability::simulationLoiExponentielle(100000, 0.5);
+    // Probability::simulateExpoLaw(100000, 0.1);
+    // Probability::simulateUniformLaw(100000);
 
     // board.load_board_from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 

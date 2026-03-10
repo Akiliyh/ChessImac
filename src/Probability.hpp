@@ -3,5 +3,6 @@
 class Probability {
   private:
   public:
-    static void simulationLoiExponentielle(int inter, double lambda);
+    static void simulateExpoLaw(int iter, double lambda);
+    static void simulateUniformLaw(int iter);
 };
