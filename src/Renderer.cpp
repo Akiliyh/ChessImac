@@ -290,6 +290,12 @@ void Renderer::draw(GameManager& game)
 
                     ImGui::PopStyleVar();
                     ImGui::End();
+
+                    if (game.is_king_dead())
+                    {
+                        ImGui::Begin("Game end");
+                        ImGui::End();
+                    }
                 },
         }
     );

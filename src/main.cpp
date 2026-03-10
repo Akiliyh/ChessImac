@@ -5,13 +5,17 @@
 #include "Chessboard.hpp"
 #include "GameManager.hpp"
 #include "Pieces.hpp"
+#include "Probability.hpp"
 #include "Renderer.hpp"
 
 int main()
 {
-    Renderer   renderer{};
-    Chessboard board{};
+    Renderer    renderer{};
+    Chessboard  board{};
     GameManager game{};
+
+
+    // Probability::simulationLoiExponentielle(100000, 0.5);
 
     // board.load_board_from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
