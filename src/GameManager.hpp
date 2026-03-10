@@ -25,11 +25,12 @@ struct GameManager {
     bool                                      is_white_turn() const;
     bool                                      is_player_move(const PieceColor& player_color) const;
     void                                      move_piece(int from_position, int dest_position);
+    void                                      load_game_from_fen(const std::string& fen);
 
     void play_game();
 
     GameManager()
     {
-        board.load_board_from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+        load_game_from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     }
 };

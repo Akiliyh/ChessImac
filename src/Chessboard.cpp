@@ -19,7 +19,7 @@ void Chessboard::init_board()
 // WE REALLY NEED TO USE UNIQUE PTR NOW LOL
 // Lilian : I'm not sure now
 
-void Chessboard::load_board_from_fen(const std::string& fen)
+void Chessboard::load_board_from_fen(const std::string& positionData)
 {
     std::map<char, std::function<std::unique_ptr<Piece>()>> pieceCorrespondance = {
         {'r', []() { return std::make_unique<Rook>(-1, -1, Black); }},
@@ -30,8 +30,6 @@ void Chessboard::load_board_from_fen(const std::string& fen)
         {'b', []() { return std::make_unique<Bishop>(-1, -1, Black); }},
     };
 
-    std::string space        = " ";
-    std::string positionData = fen.substr(0, fen.find(space)); // without castling and who to play
     std::vector<std::pair<int, char>> piecePositions{};
     int                               index{};
 

@@ -119,7 +119,7 @@ void Renderer::draw(GameManager& game)
                     {
                         ImGui::Text(
                             "%s",
-                            ("Previous position: " + previous_square->get_alg_position()).c_str()
+                            ("Previous position: " + game.board.to_alg_position(previous_square->get_position()))
                         );
                     }
 

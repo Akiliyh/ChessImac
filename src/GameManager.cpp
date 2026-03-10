@@ -80,3 +80,12 @@ bool GameManager::is_player_move(const PieceColor& player_color) const
     return (player_color == White && is_white_turn())
            || (player_color == Black && !is_white_turn());
 };
+
+void GameManager::load_game_from_fen(const std::string& fen) {
+    std::string space        = " ";
+    std::string positionData = fen.substr(0, fen.find(space)); // without castling and who to play
+    // if it's black to play we start with an odd m_move
+    if (fen.substr(fen.find(space) + 1, 1) == "b")
+        m_move++;
+    board.load_board_from_fen(positionData);
+};

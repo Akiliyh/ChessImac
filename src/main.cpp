@@ -13,7 +13,7 @@ int main()
     Chessboard board{};
     GameManager game{};
 
-    board.load_board_from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    // board.load_board_from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
     // Rook   rook_test(0, 0, White);
     // Bishop bishop_test(1, 0, White);
