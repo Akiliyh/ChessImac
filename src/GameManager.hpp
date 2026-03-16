@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <utility>
 #include <vector>
 #include "Chessboard.hpp"
@@ -25,9 +26,10 @@ struct GameManager {
     bool                                      is_white_turn() const;
     bool                                      is_player_move(const PieceColor& player_color) const;
     void                                      move_piece(int from_position, int dest_position);
+    std::optional<PieceColor>                 get_dead_king_color();
     bool                                      is_king_dead();
     // void                              game_win(PieceColor winner_color);
-    void                                      load_game_from_fen(const std::string& fen);
+    void load_game_from_fen(const std::string& fen);
 
     void play_game();
 

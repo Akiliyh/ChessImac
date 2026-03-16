@@ -1,5 +1,6 @@
 #include "GameManager.hpp"
 #include <iostream>
+#include <optional>
 #include "Chessboard.hpp"
 #include "Pieces.hpp"
 
@@ -59,41 +60,24 @@ bool GameManager::is_white_turn() const
 }
 
 void GameManager::play_game()
-{
-    // int test_move{0};
-    // while (this->get_move() < 100)
-    // {
-    //     if (this->is_white_turn())
-    //     {
-    //         std::cout << "White move :" << '\n';
-    //         std::cout << "turn :" << this->get_move() << '\n';
-    //         this->add_move();
-    //     }
-    //     else
-    //     {
-    //         std::cout << "Black move :" << '\n';
-    //         std::cout << "turn :" << this->get_move() << '\n';
-    //         this->add_move();
-    //     }
-    // }
+{}
 
-    // if (one_king_dead())
-    // {
-    //     game_win(who_king_dead());
-    // }
-}
-
-// Pass the actual game board into the function
-bool GameManager::is_king_dead()
+// Return nothing if no king is dead
+std::optional<PieceColor> GameManager::get_dead_king_color()
 {
     for (const auto& piece : board.get_dead_pieces())
     {
-        if (piece->get_label() == 'k' || piece->get_label() == 'K')
-        {
-            return true;
-        }
+        if (piece->get_label() == 'K')
+            return White;
+        if (piece->get_label() == 'k')
+            return Black;
     }
-    return false;
+    return std::nullopt;
+}
+
+bool GameManager::is_king_dead()
+{
+    return get_dead_king_color().has_value();
 }
 
 bool GameManager::is_player_move(const PieceColor& player_color) const
@@ -102,7 +86,8 @@ bool GameManager::is_player_move(const PieceColor& player_color) const
            || (player_color == Black && !is_white_turn());
 };
 
-void GameManager::load_game_from_fen(const std::string& fen) {
+void GameManager::load_game_from_fen(const std::string& fen)
+{
     std::string space        = " ";
     std::string positionData = fen.substr(0, fen.find(space)); // without castling and who to play
     // if it's black to play we start with an odd m_move

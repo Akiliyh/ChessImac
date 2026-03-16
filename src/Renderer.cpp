@@ -83,8 +83,8 @@ void Renderer::draw(GameManager& game)
                         if (i % 2 == 0)
                         {
                             int full_move =
-                                i / 2 + 1; // we don't want the full move to change everytime, what
-                                           // we'll get with game.get_full_move
+                                i / 2 + 1; // we don't want the full move to change everytime,
+                                           // what we'll get with game.get_full_move
 
                             ImGui::Text("%s", ("." + std::to_string(full_move)).c_str());
                             ImGui::SameLine();
@@ -118,8 +118,8 @@ void Renderer::draw(GameManager& game)
                     if (previous_square != nullptr)
                     {
                         ImGui::Text(
-                            "%s",
-                            ("Previous position: " + game.board.to_alg_position(previous_square->get_position()))
+                            "%s", ("Previous position: "
+                                   + game.board.to_alg_position(previous_square->get_position()))
                         );
                     }
 
@@ -294,6 +294,27 @@ void Renderer::draw(GameManager& game)
                     if (game.is_king_dead())
                     {
                         ImGui::Begin("Game end");
+                        if (game.get_dead_king_color() == White)
+                        {
+                            ImGui::Text("%s", ("Black win !"));
+                        }
+                        if (game.get_dead_king_color() == Black)
+                        {
+                            ImGui::Text("%s", ("White win !"));
+                        }
+
+                        if (ImGui::Button(("New Game"), ImVec2{70.f, 50.f}))
+                        {
+                            std::cout << "New Game button " << "\n";
+                        }
+
+                        ImGui::SameLine(0, 5.0f);
+
+                        if (ImGui::Button(("Exit Game"), ImVec2{70.f, 50.f}))
+                        {
+                            std::cout << "Exit Game button " << "\n";
+                        }
+
                         ImGui::End();
                     }
                 },
