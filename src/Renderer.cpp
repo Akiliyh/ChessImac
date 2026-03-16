@@ -10,46 +10,6 @@
 #include "Pieces.hpp"
 #include "quick_imgui/quick_imgui.hpp"
 
-void Renderer::display_possible_moves(
-    Chessboard& board, Piece* current_square, Piece* previous_square,
-    std::vector<int>& possible_moves
-)
-{
-    if (current_square != nullptr)
-    {
-        if (current_square->is_on_focus())
-        {
-            current_square->update_on_focus(false);
-            possible_moves.clear();
-        }
-        else
-        {
-            possible_moves.clear();
-            possible_moves = current_square->get_moves(board.get_board_data());
-            for (int possible_move : possible_moves)
-            {
-                std::cout << possible_move << '\n';
-            }
-            current_square->update_on_focus(true);
-
-            if (previous_square != nullptr)
-            {
-                previous_square->update_on_focus(false);
-            }
-        }
-
-        previous_square = current_square;
-    }
-    else
-    {
-        if (previous_square != nullptr)
-        {
-            previous_square->update_on_focus(false);
-        }
-        possible_moves.clear();
-    }
-}
-
 void Renderer::draw(GameManager& game)
 {
     quick_imgui::loop(
@@ -68,6 +28,10 @@ void Renderer::draw(GameManager& game)
                     ImGui::SetNextWindowSize({200, 200}, ImGuiCond_Once);
                     ImGui::Begin("Play history");
                     ImGui::Text("%s", ("Move: " + std::to_string(game.get_full_move())).c_str());
+
+                    const std::vector<int>& possible_moves = game.get_possible_moves();
+                    Piece* selected_square = game.get_selected_square();
+
                     if (game.is_white_turn())
                     {
                         ImGui::Text("%s", ("White to move"));
@@ -105,21 +69,16 @@ void Renderer::draw(GameManager& game)
 
                     if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
                     {
-                        if (previous_square != nullptr)
-                        {
-                            previous_square->update_on_focus(false);
-                            previous_square = nullptr;
-                            possible_moves.clear();
-                        }
+                        game.deselect_square();
                     }
 
                     ImGui::Begin("Debug");
 
-                    if (previous_square != nullptr)
+                    if (selected_square != nullptr)
                     {
                         ImGui::Text(
                             "%s",
-                            ("Previous position: " + game.board.to_alg_position(previous_square->get_position())).c_str()
+                            ("Previous position: " + game.board.to_alg_position(selected_square->get_position())).c_str()
                         );
                     }
 
@@ -189,48 +148,7 @@ void Renderer::draw(GameManager& game)
                         if (ImGui::Button(label.c_str(), ImVec2{50.f, 50.f}))
                         {
                             std::cout << "Clicked button " << i << "\n";
-
-                            if (previous_square != nullptr)
-                            { // when we selected a piece
-
-                                // here we want to update the current square
-                                // only if it was eaten by the previous piece
-
-                                int old_position = previous_square->get_position();
-                                game.move_piece(old_position, i);
-                                if (old_position != previous_square->get_position())
-                                { // we check if position changed
-                                    if (current_square != nullptr)
-                                    { // if we select a piece we eat it with the previous
-                                        current_square = previous_square;
-                                    }
-                                }
-                                // we deselect everything after eating
-                                previous_square->update_on_focus(false);
-                                previous_square = nullptr;
-                                possible_moves.clear();
-                            }
-
-                            if (current_square != nullptr)
-                            {
-                                if ((current_square->get_color() == PieceColor::White)
-                                        && game.is_white_turn()
-                                    || (current_square->get_color() == PieceColor::Black)
-                                           && !game.is_white_turn())
-                                {
-                                    Renderer::display_possible_moves(
-                                        game.board, current_square, previous_square, possible_moves
-                                    );
-                                    previous_square = current_square;
-                                }
-                            }
-                            else
-                            {
-                                Renderer::display_possible_moves(
-                                    game.board, current_square, previous_square, possible_moves
-                                );
-                                // previous_square = current_square;
-                            }
+                            game.on_square_clicked(i);
                         }
 
                         if (should_border)

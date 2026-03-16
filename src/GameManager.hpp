@@ -13,6 +13,9 @@ struct GameManager {
         m_move_history{}; // we store the type of piece and the square of destination
     // maybe later we could store if it is a capture, promotion or check eventually
 
+    Piece* selected_square = nullptr;
+    std::vector<int> possible_moves;
+
   public:
     Chessboard                                board{}; // let's put it in private once it works
     int                                       get_board() const;
@@ -30,6 +33,12 @@ struct GameManager {
     void                                      load_game_from_fen(const std::string& fen);
 
     void play_game();
+    void update_possible_moves(Piece* & current_square);
+    std::vector<int> get_possible_moves();
+    Piece* get_selected_square();
+    void clear_possible_moves();
+    void on_square_clicked(int i);
+    void deselect_square();
 
     GameManager()
     {
