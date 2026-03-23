@@ -8,7 +8,7 @@
 void GameManager::move_piece(int from_position, int dest_position)
 {
     std::unique_ptr<Piece>& active_square = board.get_board_data()[from_position];
-    if (is_player_move(active_square->get_color()))
+    if (is_player_move(active_square->get_color()) && !is_piece_promoting().has_value())
     {
         bool piece_moved = board.move_piece(active_square, dest_position);
         if (piece_moved)
@@ -229,7 +229,9 @@ void GameManager::on_square_clicked(int i)
     if (current_square != nullptr)
     {
         if ((current_square->get_color() == PieceColor::White) && is_white_turn()
-            || (current_square->get_color() == PieceColor::Black) && !is_white_turn())
+                && !is_piece_promoting().has_value()
+            || (current_square->get_color() == PieceColor::Black) && !is_white_turn()
+                   && !is_piece_promoting().has_value())
         {
             update_possible_moves(current_square);
             selected_square = current_square;
@@ -255,7 +257,7 @@ void GameManager::new_game()
 {
     clear_possible_moves();
     m_full_move = 0;
-    m_move = 0;
+    m_move      = 0;
     m_move_history.clear();
     load_game_from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 }
