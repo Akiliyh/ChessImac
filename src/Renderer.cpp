@@ -29,8 +29,8 @@ void Renderer::draw(GameManager& game)
                     ImGui::Begin("Play history");
                     ImGui::Text("%s", ("Move: " + std::to_string(game.get_full_move())).c_str());
 
-                    const std::vector<int>& possible_moves = game.get_possible_moves();
-                    Piece* selected_square = game.get_selected_square();
+                    const std::vector<int>& possible_moves  = game.get_possible_moves();
+                    Piece*                  selected_square = game.get_selected_square();
 
                     if (game.is_white_turn())
                     {
@@ -236,6 +236,43 @@ void Renderer::draw(GameManager& game)
                             std::exit(0);
                             // put glfwwindow close when we'll do 3d
                         }
+                        ImGui::End();
+                    }
+
+                    std::optional<int> promoting_pawn = game.is_piece_promoting();
+
+                    if (promoting_pawn.has_value())
+                    {
+                        int promote_pos = promoting_pawn.value();
+
+                        ImGui::Begin("Promote Piece");
+
+                        if (ImGui::Button(("Queen"), ImVec2{70.f, 50.f}))
+                        {
+                            game.promote_piece(promote_pos, 'Q');
+                        }
+
+                        ImGui::SameLine(0, 5.0f);
+
+                        if (ImGui::Button(("Rook"), ImVec2{70.f, 50.f}))
+                        {
+                            game.promote_piece(promote_pos, 'R');
+                        }
+
+                        ImGui::SameLine(0, 5.0f);
+
+                        if (ImGui::Button(("Bishop"), ImVec2{70.f, 50.f}))
+                        {
+                            game.promote_piece(promote_pos, 'B');
+                        }
+
+                        ImGui::SameLine(0, 5.0f);
+
+                        if (ImGui::Button(("Knight"), ImVec2{70.f, 50.f}))
+                        {
+                            game.promote_piece(promote_pos, 'N');
+                        }
+
                         ImGui::End();
                     }
                 },

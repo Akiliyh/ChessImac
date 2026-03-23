@@ -81,6 +81,61 @@ bool GameManager::is_king_dead()
     return get_dead_king_color().has_value();
 }
 
+std::optional<int> GameManager::is_piece_promoting()
+{
+    for (const auto& piece : board.get_board_data())
+    {
+        if (piece != nullptr)
+        {
+            // Si la position est un entier entre 0 et 63
+            int current_row = piece->get_position() / 8;
+
+            if ((piece->get_label() == 'P') && (current_row == 0))
+            {
+                return piece->get_position();
+            }
+            else if ((piece->get_label() == 'p') && (current_row == 7))
+            {
+                return piece->get_position();
+            }
+        }
+    }
+
+    return std::nullopt;
+}
+
+void GameManager::promote_piece(int from_position, char promote_to)
+{
+    std::unique_ptr<Piece>& active_square = board.get_board_data()[from_position];
+
+    if (active_square != nullptr)
+    {
+        // 1. On sauvegarde la couleur du pion avant de le détruire
+        PieceColor piece_color = active_square->get_color();
+
+        // 2. On calcule les coordonnées X et Y si votre constructeur les demande.
+        int x = from_position % 8;
+        int y = from_position / 8;
+
+        // 3. On remplace le pointeur par la nouvelle pièce selon le choix du joueur
+        switch (promote_to)
+        {
+        case 'Q':
+        case 'q': active_square = std::make_unique<Queen>(x, y, piece_color); break;
+        case 'R':
+        case 'r': active_square = std::make_unique<Rook>(x, y, piece_color); break;
+        case 'B':
+        case 'b': active_square = std::make_unique<Bishop>(x, y, piece_color); break;
+        case 'N':
+        case 'n': active_square = std::make_unique<Knight>(x, y, piece_color); break;
+        default:
+            // Si l'entrée est invalide, on donne une Reine par défaut
+            active_square = std::make_unique<Queen>(x, y, piece_color);
+            break;
+        }
+    }
+}
+
 bool GameManager::is_player_move(const PieceColor& player_color) const
 {
     return (player_color == White && is_white_turn())
@@ -134,7 +189,8 @@ std::vector<int> GameManager::get_possible_moves()
 {
     return possible_moves;
 }
-Piece* GameManager::get_selected_square() {
+Piece* GameManager::get_selected_square()
+{
     return selected_square;
 }
 
@@ -145,7 +201,8 @@ void GameManager::clear_possible_moves()
 
 void GameManager::on_square_clicked(int i)
 {
-    // selected square is previously selected square and current_square is the one active just now
+    // selected square is previously selected square and current_square is the one active just
+    // now
     Piece* current_square = board.get_board_data(i).get();
 
     if (selected_square != nullptr)

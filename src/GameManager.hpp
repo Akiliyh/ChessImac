@@ -32,6 +32,9 @@ struct GameManager {
     void                                      move_piece(int from_position, int dest_position);
     std::optional<PieceColor>                 get_dead_king_color();
     bool                                      is_king_dead();
+    std::optional<int>                        is_piece_promoting();
+    void                                      promote_piece(int from_position, char promote_to);
+
     // void                              game_win(PieceColor winner_color);
     void load_game_from_fen(const std::string& fen);
 
