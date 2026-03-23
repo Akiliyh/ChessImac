@@ -22,6 +22,11 @@ void Chessboard::init_board()
 
 void Chessboard::load_board_from_fen(const std::string& positionData)
 {
+    // first we reset the board here
+    board_data.clear();
+    board_data.resize(64);
+    dead_pieces.clear();
+
     std::map<char, std::function<std::unique_ptr<Piece>()>> pieceCorrespondance = {
         {'r', []() { return std::make_unique<Rook>(-1, -1, Black); }},
         {'p', []() { return std::make_unique<Pawn>(-1, -1, Black); }},

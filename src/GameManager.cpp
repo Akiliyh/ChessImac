@@ -193,3 +193,12 @@ void GameManager::deselect_square()
         clear_possible_moves();
     }
 }
+
+void GameManager::new_game()
+{
+    clear_possible_moves();
+    m_full_move = 0;
+    m_move = 0;
+    m_move_history.clear();
+    load_game_from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+}

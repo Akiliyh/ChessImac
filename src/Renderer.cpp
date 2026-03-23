@@ -225,6 +225,7 @@ void Renderer::draw(GameManager& game)
                         if (ImGui::Button(("New Game"), ImVec2{70.f, 50.f}))
                         {
                             std::cout << "New Game button " << "\n";
+                            game.new_game();
                         }
 
                         ImGui::SameLine(0, 5.0f);
@@ -232,8 +233,9 @@ void Renderer::draw(GameManager& game)
                         if (ImGui::Button(("Exit Game"), ImVec2{70.f, 50.f}))
                         {
                             std::cout << "Exit Game button " << "\n";
+                            std::exit(0);
+                            // put glfwwindow close when we'll do 3d
                         }
-
                         ImGui::End();
                     }
                 },
