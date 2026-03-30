@@ -6,6 +6,12 @@
 #include "Chessboard.hpp"
 #include "Pieces.hpp"
 
+enum class GameState {
+    MainMenu,
+    NormalGame,
+    ChaosGame,
+};
+
 struct GameManager {
   private:
     int m_full_move{0}; // full move is both color played capice? mamma miaaa
