@@ -11,7 +11,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 # You can set the name of your project here
-project(ImGuiTemplate)
+project(ChessImac)
 add_executable(${PROJECT_NAME})
 
 # Choose your C++ version
@@ -43,3 +43,20 @@ target_include_directories(${PROJECT_NAME} PRIVATE src)
 # Add quick-imgui library
 add_subdirectory(lib/quick_imgui)
 target_link_libraries(${PROJECT_NAME} PRIVATE quick_imgui::quick_imgui)
+
+# Ajout de la bibliothèque glimac
+add_subdirectory(lib/glimac)
+target_link_libraries(${PROJECT_NAME} PRIVATE glimac)
+
+include("../CMakeUtils/files_and_folders.cmake")
+Cool__target_copy_folder(${PROJECT_NAME} assets)
+
+# Cool__target_copy_folder(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/src/fonts ${CMAKE_BINARY_DIR}/fonts)
+# Cool__target_copy_folder(${PROJECT_NAME} src/fonts ${CMAKE_BINARY_DIR}/fonts)
+# Cool__target_copy_folder(${CMAKE_BINARY_DIR} src/fonts)
+# Cool__target_copy_folder(${OUTPUT} src/fonts)
+# Cool__target_copy_folder(${CMAKE_SOURCE_DIR} src/fonts)
+
+# target_compile_options(${PROJECT_NAME}
+# PRIVATE "-Ic:/Libs/Winlibs/include/c++/14.2.0"
+# )

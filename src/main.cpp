@@ -6,11 +6,12 @@
 #include "GameManager.hpp"
 #include "Pieces.hpp"
 #include "Probability.hpp"
-#include "Renderer.hpp"
+#include "Renderers/Renderer.hpp"
+#include "Renderers/3DRenderer.hpp"
 
-int main()
+int main(int argc, char *argv[])
 {
-    Renderer    renderer{};
+    Renderer_3D    renderer{};
     Chessboard  board{};
     GameManager game{};
 
