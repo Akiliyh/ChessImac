@@ -16,6 +16,7 @@
 #include <FilePath.hpp>
 #include <Program.hpp>
 #include <Sphere.hpp>
+#include <Cube.hpp>
 #include <getTime.hpp>
 #include <glm.hpp>
 #include <TrackballCamera.hpp>
@@ -28,7 +29,7 @@ bool is_panning = false;
 
 TrackballCamera camera;
 
-Sphere sphere(1, 32, 16);
+Cube board(0.05f, 1.0f, 1.0f);
 
 struct EarthProgram {
     Program m_Program;
@@ -227,13 +228,13 @@ int Renderer_3D::draw(GameManager& game)
     1.0f,-0.25f, 1.0f
 };
 
-  // const ShapeVertex *vertices = sphere.getDataPointer();
-  // const int nb_vertices = sphere.getVertexCount();
+  const ShapeVertex *vertices = board.getDataPointer();
+  const int nb_vertices = board.getVertexCount();
 
   // const ShapeVertex *vertices = sphere.getDataPointer();
   // const int nb_vertices = sphere.getVertexCount();
 
-  glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data,
+  glBufferData(GL_ARRAY_BUFFER, board.getVertexCount() * sizeof(ShapeVertex), vertices,
                GL_STATIC_DRAW);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -251,12 +252,12 @@ int Renderer_3D::draw(GameManager& game)
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glVertexAttribPointer(VERTEX_SHADER_POSITION, 3, GL_FLOAT, GL_FALSE,
-                        3 * sizeof(GLfloat), nullptr);
+                        sizeof(ShapeVertex), nullptr);
   glVertexAttribPointer(VERTEX_SHADER_NORMAL, 3, GL_FLOAT, GL_FALSE,
-                        3 * sizeof(GLfloat),
+                        sizeof(ShapeVertex),
                         nullptr);
   glVertexAttribPointer(VERTEX_SHADER_TEX_COORDS, 2, GL_FLOAT, GL_FALSE,
-                        3 * sizeof(GLfloat),
+                        sizeof(ShapeVertex),
                         nullptr);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -293,7 +294,7 @@ glActiveTexture(GL_TEXTURE1);
 glBindTexture(GL_TEXTURE_2D, cloudTexture);
 
 glBindVertexArray(vao);
-glDrawArrays(GL_TRIANGLES, 0, sizeof(g_vertex_buffer_data));
+glDrawArrays(GL_TRIANGLES, 0, board.getVertexCount());
 
     glBindVertexArray(0);
 
