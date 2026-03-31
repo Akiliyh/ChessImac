@@ -6,6 +6,12 @@
 #include "Chessboard.hpp"
 #include "Pieces.hpp"
 
+enum class GameState {
+    MainMenu,
+    NormalGame,
+    ChaosGame,
+};
+
 struct GameManager {
   private:
     int m_full_move{0}; // full move is both color played capice? mamma miaaa
@@ -32,6 +38,9 @@ struct GameManager {
     void                                      move_piece(int from_position, int dest_position);
     std::optional<PieceColor>                 get_dead_king_color();
     bool                                      is_king_dead();
+    std::optional<int>                        is_piece_promoting();
+    void                                      promote_piece(int from_position, char promote_to);
+
     // void                              game_win(PieceColor winner_color);
     void load_game_from_fen(const std::string& fen);
 

@@ -29,8 +29,8 @@ void Renderer::draw(GameManager& game)
                     ImGui::Begin("Play history");
                     ImGui::Text("%s", ("Move: " + std::to_string(game.get_full_move())).c_str());
 
-                    const std::vector<int>& possible_moves = game.get_possible_moves();
-                    Piece* selected_square = game.get_selected_square();
+                    const std::vector<int>& possible_moves  = game.get_possible_moves();
+                    Piece*                  selected_square = game.get_selected_square();
 
                     if (game.is_white_turn())
                     {
@@ -237,6 +237,87 @@ void Renderer::draw(GameManager& game)
                             // put glfwwindow close when we'll do 3d
                         }
                         ImGui::End();
+                    }
+
+                    std::optional<int> promoting_pawn = game.is_piece_promoting();
+
+                    if (promoting_pawn.has_value())
+                    {
+                        int promote_pos = promoting_pawn.value();
+
+                        ImGui::Begin("Promote Piece");
+
+                        if (ImGui::Button(("Queen"), ImVec2{70.f, 50.f}))
+                        {
+                            game.promote_piece(promote_pos, 'Q');
+                        }
+
+                        ImGui::SameLine(0, 5.0f);
+
+                        if (ImGui::Button(("Rook"), ImVec2{70.f, 50.f}))
+                        {
+                            game.promote_piece(promote_pos, 'R');
+                        }
+
+                        ImGui::SameLine(0, 5.0f);
+
+                        if (ImGui::Button(("Bishop"), ImVec2{70.f, 50.f}))
+                        {
+                            game.promote_piece(promote_pos, 'B');
+                        }
+
+                        ImGui::SameLine(0, 5.0f);
+
+                        if (ImGui::Button(("Knight"), ImVec2{70.f, 50.f}))
+                        {
+                            game.promote_piece(promote_pos, 'N');
+                        }
+
+                        ImGui::End();
+                    }
+                },
+        }
+    );
+}
+
+void Renderer::drawStart(GameManager& game)
+{
+    quick_imgui::loop(
+        "ChessImac",
+        {
+            .init = [&]() {},
+            .loop =
+
+                [&]() {
+                    ImGui::ShowDemoWindow(); // This opens a window which shows tons of examples of
+                                             // what you can do with ImGui. You should check it out!
+                                             // Also, you can use the "Item Picker" in the top menu
+                                             // of that demo window: then click on any widget and it
+                                             // will show you the corresponding code directly in
+                                             // your IDE!
+                    ImGui::SetNextWindowSize({200, 200}, ImGuiCond_Once);
+                    if (m_current_state == GameState::MainMenu)
+                    {
+                        if (ImGui::Button(("Normal Mode"), ImVec2{70.f, 50.f}))
+                        {
+                            m_current_state = GameState::NormalGame;
+                        }
+                        if (ImGui::Button(("Chaos Mode"), ImVec2{70.f, 50.f}))
+                        {
+                            m_current_state = GameState::NormalGame;
+                        }
+                        if (ImGui::Button("Exit Game", ImVec2{150.f, 50.f}))
+                        {
+                            std::exit(0);
+                        }
+                    }
+                    else if (m_current_state == GameState::NormalGame
+                             || m_current_state == GameState::ChaosGame)
+                    {
+                        if (ImGui::Button("Exit Game", ImVec2{150.f, 50.f}))
+                        {
+                            std::exit(0);
+                        }
                     }
                 },
         }
