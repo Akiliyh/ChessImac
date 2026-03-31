@@ -48,7 +48,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE quick_imgui::quick_imgui)
 add_subdirectory(lib/glimac)
 target_link_libraries(${PROJECT_NAME} PRIVATE glimac)
 
-include("../CMakeUtils/files_and_folders.cmake")
+include("./CMakeUtils/files_and_folders.cmake")
 Cool__target_copy_folder(${PROJECT_NAME} assets)
 
 # Cool__target_copy_folder(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/src/fonts ${CMAKE_BINARY_DIR}/fonts)
