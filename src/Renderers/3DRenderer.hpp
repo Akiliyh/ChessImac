@@ -10,9 +10,14 @@ class Renderer_3D {
     glimac::TrackballCamera camera;
     bool is_panning = false;
 
+    int width {800};
+    int height {800};
+
     // to improve and put inside a method, + dynamicity
-    double lastX = 800/2; //start mouse position, here center of screen
-    double lastY = 800/2;
+    double lastX = width/2; //start mouse position, here center of screen
+    double lastY = height/2;
+
+    
 
     Renderer_3D() = default;
 };

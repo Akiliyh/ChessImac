@@ -23,9 +23,6 @@
 
 using namespace glimac;
 
-int window_width = 800;
-int window_height = 800;
-
 Cube board(0.05f, 1.125f, 1.125f);
 Cube square(0.05f, 0.125f, 0.125f);
 
@@ -49,54 +46,15 @@ struct EarthProgram {
     }
 };
 
-static double lastX = window_width/2; //start mouse position, here center of screen
-static double lastY = window_height/2;
-
-// static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
-// {
-//   const double deltaX = xpos - lastX;
-//   const double deltaY = ypos - lastY;
-
-//   const float intensity = 0.1f;
-    
-//   if (is_panning) {
-//     camera.rotateLeft(deltaX * intensity);
-//     camera.rotateUp(deltaY * intensity);
-//   }
-  
-//   lastX = xpos;
-//   lastY = ypos;
-// }
-
-static void size_callback(GLFWwindow * /*window*/, int width, int height) {
-  window_width = width;
-  window_height = height;
-}
-
 int Renderer_3D::draw(int width, int height, GameManager& game)
 {
+  this->height = height;
+  this->width = width;
+
    /* Initialize the library */
   if (!glfwInit()) {
     return -1;
   }
-
-  /* Create a window and its OpenGL context */
-  // #ifdef __APPLE__
-  //     /* We need to explicitly ask for a 3.3 context on Mac */
-  //     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  //     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  //     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-  //     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  // #endif
-  // GLFWwindow *window =
-  //     glfwCreateWindow(window_width, window_height, "ChessImac", nullptr, nullptr);
-  // if (!window) {
-  //   glfwTerminate();
-  //   return -1;
-  // }
-
-  /* Make the window's context current */
-  // glfwMakeContextCurrent(window);
 
   glViewport(0, 0, width, height);
 
@@ -104,13 +62,6 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
     return -1;
   }
-
-  /* Hook input callbacks */
-  // glfwSetKeyCallback(window, &key_callback);
-  // glfwSetMouseButtonCallback(window, &mouse_button_callback);
-  // glfwSetScrollCallback(window, &scroll_callback);
-  // glfwSetCursorPosCallback(window, &cursor_position_callback);
-  // glfwSetWindowSizeCallback(window, &size_callback);
 
   /*********************************
    * HERE SHOULD COME THE INITIALIZATION CODE
@@ -191,8 +142,6 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
 
   glBindVertexArray(0);
 
-  // glfwSetKeyCallback(window, key_callback);
-
   /* Loop until the user closes the window */
   // while (!glfwWindowShouldClose(window)) {
     glClearColor(0.1f, 0.f, 0.1f, 1.f);
@@ -258,14 +207,6 @@ glBindTexture(GL_TEXTURE_2D, cloudTexture);
     glDrawArrays(GL_TRIANGLES, 0, square.getVertexCount());
 
     glBindVertexArray(0);
-
-    /* Swap front and back buffers */
-    // glfwSwapBuffers(window);
-    // /* Poll for and process events */
-    // glfwPollEvents();
-  // }
-
-  // glfwTerminate();
 
   glDeleteBuffers(1, &vbo);
   glDeleteVertexArrays(1, &vao);

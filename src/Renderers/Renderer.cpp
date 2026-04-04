@@ -29,12 +29,11 @@ void Renderer::draw(GameManager& game)
 
                 [&]() {
                     renderer_2d.draw(game);
-                    ImGui::Begin("3D View");
+
 
                     int width  = 800;
                     int height = 800;
                     renderer_3d.draw(width, height, game);
-                    ImGui::End();
                 },
 
             .key_callback =
@@ -75,22 +74,6 @@ void Renderer::draw(GameManager& game)
                 },
             .scroll_callback = [&](double xoffset,
                                    double yoffset) { renderer_3d.camera.moveFront(-yoffset); },
-
-            // static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
-            // {
-            //   const double deltaX = xpos - lastX;
-            //   const double deltaY = ypos - lastY;
-
-            //   const float intensity = 0.1f;
-
-            //   if (is_panning) {
-            //     camera.rotateLeft(deltaX * intensity);
-            //     camera.rotateUp(deltaY * intensity);
-            //   }
-
-            //   lastX = xpos;
-            //   lastY = ypos;
-            // }
         }
 
     );
