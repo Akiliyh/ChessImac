@@ -16,23 +16,21 @@
 void Renderer::draw(GameManager& game)
 {
     GLFWwindow* window = nullptr;
+    const int width {800};
+    const int height {800};
 
     quick_imgui::loop(
         "ChessImac",
         {
             .init =
                 [&]() {
-                    // renderer_3d.init();
+                    renderer_3d.init(width,height);
                     window = glfwGetCurrentContext();
                 },
             .loop =
 
                 [&]() {
                     renderer_2d.draw(game);
-
-
-                    int width  = 800;
-                    int height = 800;
                     renderer_3d.draw(width, height, game);
                 },
 
@@ -77,6 +75,7 @@ void Renderer::draw(GameManager& game)
         }
 
     );
+    renderer_3d.terminate(); // here we debind everything
 }
 
 void Renderer::drawStart(GameManager& game)

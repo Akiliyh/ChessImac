@@ -26,42 +26,12 @@ using namespace glimac;
 Cube board(0.05f, 1.125f, 1.125f);
 Cube square(0.05f, 0.125f, 0.125f);
 
-struct EarthProgram {
-    Program m_Program;
-
-    GLint uMVPMatrix;
-    GLint uMVMatrix;
-    GLint uNormalMatrix;
-    GLint uEarthTexture;
-    GLint uCloudTexture;
-
-    EarthProgram(const FilePath& applicationPath):
-        m_Program(loadProgram(applicationPath.dirPath() + "./assets/shaders/3D.vs.glsl",
-                              applicationPath.dirPath() + "./assets/shaders/multiTex3D.fs.glsl")) {
-        uMVPMatrix = glGetUniformLocation(m_Program.getGLId(), "uMVPMatrix");
-        uMVMatrix = glGetUniformLocation(m_Program.getGLId(), "uMVMatrix");
-        uNormalMatrix = glGetUniformLocation(m_Program.getGLId(), "uNormalMatrix");
-        uEarthTexture = glGetUniformLocation(m_Program.getGLId(), "uEarthTexture");
-        uCloudTexture = glGetUniformLocation(m_Program.getGLId(), "uCloudTexture");
-    }
-};
-
-int Renderer_3D::draw(int width, int height, GameManager& game)
+int Renderer_3D::init(int width, int height) 
 {
   this->height = height;
   this->width = width;
 
-   /* Initialize the library */
-  if (!glfwInit()) {
-    return -1;
-  }
-
   glViewport(0, 0, width, height);
-
-  /* Intialize glad (loads the OpenGL functions) */
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    return -1;
-  }
 
   /*********************************
    * HERE SHOULD COME THE INITIALIZATION CODE
@@ -70,8 +40,6 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
   auto earthImage = glimac::loadImage("./assets/textures/EarthMap.jpg");
   auto cloudImage = glimac::loadImage("./assets/textures/CloudMap.jpg");
 
-  GLuint earthTexture;
-  GLuint cloudTexture;
   glGenTextures(1, &earthTexture);
   glGenTextures(1, &cloudTexture);
 
@@ -94,10 +62,10 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  glimac::FilePath applicationPath("color2D.vs.glsl");
-  EarthProgram earthProgram(applicationPath);
+  FilePath applicationPath("color2D.vs.glsl");
+  this->earthProgram = std::make_unique<EarthProgram>(applicationPath);
 
-  glm::mat4 ProjMatrix =
+  ProjMatrix =
       glm::perspective(glm::radians(70.f), 1.0f, 0.1f, 100.f);
   glm::mat4 MVMatrix =
       glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
@@ -106,7 +74,6 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
 
   glEnable(GL_DEPTH_TEST);
 
-  GLuint vbo;
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
@@ -117,7 +84,6 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
                GL_STATIC_DRAW);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-  GLuint vao;
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
 
@@ -131,16 +97,25 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glVertexAttribPointer(VERTEX_SHADER_POSITION, 3, GL_FLOAT, GL_FALSE,
-                        sizeof(ShapeVertex), nullptr);
+                        sizeof(ShapeVertex), (const GLvoid*)0);
   glVertexAttribPointer(VERTEX_SHADER_NORMAL, 3, GL_FLOAT, GL_FALSE,
                         sizeof(ShapeVertex),
-                        nullptr);
+                        (const GLvoid*)offsetof(ShapeVertex, normal));
   glVertexAttribPointer(VERTEX_SHADER_TEX_COORDS, 2, GL_FLOAT, GL_FALSE,
                         sizeof(ShapeVertex),
-                        nullptr);
+                        (const GLvoid*)offsetof(ShapeVertex, texCoords));
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
   glBindVertexArray(0);
+
+  
+  return 0;
+}
+
+int Renderer_3D::draw(int width, int height, GameManager& game)
+{
+  earthProgram->m_Program.use();
+  glViewport(0, 0, width, height);
 
   /* Loop until the user closes the window */
   // while (!glfwWindowShouldClose(window)) {
@@ -150,19 +125,17 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
      * HERE SHOULD COME THE RENDERING CODE
      *********************************/
 
-     earthProgram.m_Program.use();
-
-    glUniform1i(earthProgram.uEarthTexture, 0);
-    glUniform1i(earthProgram.uCloudTexture, 1);
+    glUniform1i(earthProgram->uEarthTexture, 0);
+    glUniform1i(earthProgram->uCloudTexture, 1);
 
     glm::mat4 globalMVMatrix = camera.getViewMatrix();
 
     glm::mat4 earthMVMatrix = globalMVMatrix;
-glUniformMatrix4fv(earthProgram.uMVMatrix, 1, GL_FALSE, 
+glUniformMatrix4fv(earthProgram->uMVMatrix, 1, GL_FALSE, 
 	glm::value_ptr(earthMVMatrix));
-glUniformMatrix4fv(earthProgram.uNormalMatrix, 1, GL_FALSE, 
+glUniformMatrix4fv(earthProgram->uNormalMatrix, 1, GL_FALSE, 
 	glm::value_ptr(glm::transpose(glm::inverse(earthMVMatrix))));
-glUniformMatrix4fv(earthProgram.uMVPMatrix, 1, GL_FALSE, 
+glUniformMatrix4fv(earthProgram->uMVPMatrix, 1, GL_FALSE, 
 	glm::value_ptr(ProjMatrix * earthMVMatrix));
 
 glActiveTexture(GL_TEXTURE0);
@@ -191,11 +164,11 @@ glBindTexture(GL_TEXTURE_2D, cloudTexture);
       glm::mat3 moonNormalMatrix =
           glm::transpose(glm::inverse(glm::mat3(moonMVMatrix)));
 
-      glUniformMatrix4fv(earthProgram.uMVPMatrix, 1, GL_FALSE,
+      glUniformMatrix4fv(earthProgram->uMVPMatrix, 1, GL_FALSE,
                          glm::value_ptr(moonMVPMatrix));
-      glUniformMatrix4fv(earthProgram.uMVMatrix, 1, GL_FALSE,
+      glUniformMatrix4fv(earthProgram->uMVMatrix, 1, GL_FALSE,
                          glm::value_ptr(moonMVMatrix));
-      glUniformMatrix3fv(earthProgram.uNormalMatrix, 1, GL_FALSE,
+      glUniformMatrix3fv(earthProgram->uNormalMatrix, 1, GL_FALSE,
                          glm::value_ptr(moonNormalMatrix));
       glBindVertexArray(vao);
     
@@ -206,9 +179,12 @@ glBindTexture(GL_TEXTURE_2D, cloudTexture);
     glBindTexture(GL_TEXTURE_2D, 0);
     glDrawArrays(GL_TRIANGLES, 0, square.getVertexCount());
 
-    glBindVertexArray(0);
+  return 0;
+}
 
+void Renderer_3D::terminate()
+{
+  glBindVertexArray(0);
   glDeleteBuffers(1, &vbo);
   glDeleteVertexArrays(1, &vao);
-  return 0;
 }
