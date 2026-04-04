@@ -20,7 +20,6 @@
 #include <getTime.hpp>
 #include <glm.hpp>
 
-
 using namespace glimac;
 
 Cube board(0.05f, 1.125f, 1.125f);
@@ -36,6 +35,10 @@ int Renderer_3D::init(int width, int height)
   /*********************************
    * HERE SHOULD COME THE INITIALIZATION CODE
    *********************************/
+
+   // deal with obj here
+
+  pawnOBJ.load("./assets/models/pawn.obj");
 
   auto earthImage = glimac::loadImage("./assets/textures/EarthMap.jpg");
   auto cloudImage = glimac::loadImage("./assets/textures/CloudMap.jpg");
@@ -178,6 +181,12 @@ glBindTexture(GL_TEXTURE_2D, cloudTexture);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, 0);
     glDrawArrays(GL_TRIANGLES, 0, square.getVertexCount());
+
+    pawnOBJ.draw();
+
+  
+// setup attributes like before
+glBindVertexArray(0);
 
   return 0;
 }

@@ -4,6 +4,8 @@
 #include <TrackballCamera.hpp>
 #include <Program.hpp>
 #include <FilePath.hpp>
+#include <tiny_obj_loader.h>
+#include <OBJModel.hpp>
 
 struct EarthProgram {
     glimac::Program m_Program;
@@ -35,6 +37,7 @@ class Renderer_3D {
     void moveFront(float delta);
     glimac::TrackballCamera camera;
     bool is_panning = false;
+    glimac::OBJModel pawnOBJ;
 
     int width {800};
     int height {800};
