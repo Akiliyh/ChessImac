@@ -1,6 +1,7 @@
 #pragma once
-
-#include "common.hpp"
+#include <cmath>
+#include <vector>
+#include "glm.hpp"
 
 namespace glimac {
 

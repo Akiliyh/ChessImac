@@ -11,25 +11,23 @@
 #include <vector>
 #define GLFW_INCLUDE_NONE
 #include "common.hpp"
-#include <GLFW/glfw3.h>
-#include <glad/glad.h>
+// #include <GLFW/glfw3.h>
+// #include <glad/glad.h>
 #include <FilePath.hpp>
 #include <Program.hpp>
 #include <Sphere.hpp>
 #include <Cube.hpp>
 #include <getTime.hpp>
 #include <glm.hpp>
-#include <TrackballCamera.hpp>
+
 
 using namespace glimac;
 
 int window_width = 800;
 int window_height = 800;
-bool is_panning = false;
 
-TrackballCamera camera;
-
-Cube board(0.05f, 1.0f, 1.0f);
+Cube board(0.05f, 1.125f, 1.125f);
+Cube square(0.05f, 0.125f, 0.125f);
 
 struct EarthProgram {
     Program m_Program;
@@ -51,61 +49,31 @@ struct EarthProgram {
     }
 };
 
-static void key_callback(GLFWwindow *window, int key, int scancode, int action,
-                         int mods) {
-  if (key == GLFW_KEY_A && action == GLFW_PRESS)
-    glfwSetWindowShouldClose(window, GLFW_TRUE);
-  if (key == GLFW_KEY_Q && action == GLFW_PRESS)
-    camera.moveFront(1.0f);
-
-  if (key == GLFW_KEY_H && action == GLFW_PRESS)
-    camera.rotateLeft(1.0f);
-}
-
-static void mouse_button_callback(GLFWwindow *window, int button,
-                                  int action, int mods) 
-{
-  if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-  {
-    is_panning = !is_panning;
-  } else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
-    is_panning = false;
-  }
-}
-
-
-
-static void scroll_callback(GLFWwindow * window, double xoffset,
-                            double yoffset) 
-  {
-    camera.moveFront(-yoffset);
-  }
-
 static double lastX = window_width/2; //start mouse position, here center of screen
 static double lastY = window_height/2;
 
-static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
-{
-  const double deltaX = xpos - lastX;
-  const double deltaY = ypos - lastY;
+// static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
+// {
+//   const double deltaX = xpos - lastX;
+//   const double deltaY = ypos - lastY;
 
-  const float intensity = 0.1f;
+//   const float intensity = 0.1f;
     
-  if (is_panning) {
-    camera.rotateLeft(deltaX * intensity);
-    camera.rotateUp(deltaY * intensity);
-  }
+//   if (is_panning) {
+//     camera.rotateLeft(deltaX * intensity);
+//     camera.rotateUp(deltaY * intensity);
+//   }
   
-  lastX = xpos;
-  lastY = ypos;
-}
+//   lastX = xpos;
+//   lastY = ypos;
+// }
 
 static void size_callback(GLFWwindow * /*window*/, int width, int height) {
   window_width = width;
   window_height = height;
 }
 
-int Renderer_3D::draw(GameManager& game)
+int Renderer_3D::draw(int width, int height, GameManager& game)
 {
    /* Initialize the library */
   if (!glfwInit()) {
@@ -120,15 +88,17 @@ int Renderer_3D::draw(GameManager& game)
   //     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   //     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   // #endif
-  GLFWwindow *window =
-      glfwCreateWindow(window_width, window_height, "ChessImac", nullptr, nullptr);
-  if (!window) {
-    glfwTerminate();
-    return -1;
-  }
+  // GLFWwindow *window =
+  //     glfwCreateWindow(window_width, window_height, "ChessImac", nullptr, nullptr);
+  // if (!window) {
+  //   glfwTerminate();
+  //   return -1;
+  // }
 
   /* Make the window's context current */
-  glfwMakeContextCurrent(window);
+  // glfwMakeContextCurrent(window);
+
+  glViewport(0, 0, width, height);
 
   /* Intialize glad (loads the OpenGL functions) */
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -136,11 +106,11 @@ int Renderer_3D::draw(GameManager& game)
   }
 
   /* Hook input callbacks */
-  glfwSetKeyCallback(window, &key_callback);
-  glfwSetMouseButtonCallback(window, &mouse_button_callback);
-  glfwSetScrollCallback(window, &scroll_callback);
-  glfwSetCursorPosCallback(window, &cursor_position_callback);
-  glfwSetWindowSizeCallback(window, &size_callback);
+  // glfwSetKeyCallback(window, &key_callback);
+  // glfwSetMouseButtonCallback(window, &mouse_button_callback);
+  // glfwSetScrollCallback(window, &scroll_callback);
+  // glfwSetCursorPosCallback(window, &cursor_position_callback);
+  // glfwSetWindowSizeCallback(window, &size_callback);
 
   /*********************************
    * HERE SHOULD COME THE INITIALIZATION CODE
@@ -189,50 +159,8 @@ int Renderer_3D::draw(GameManager& game)
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-  static const GLfloat g_vertex_buffer_data[] = {
-    -1.0f,-0.25f,-1.0f, // triangle 1 : begin
-    -1.0f,-0.25f, 1.0f,
-    -1.0f, 0.25f, 1.0f, // triangle 1 : end
-    1.0f, 0.25f,-1.0f, // triangle 2 : begin
-    -1.0f,-0.25f,-1.0f,
-    -1.0f, 0.25f,-1.0f, // triangle 2 : end
-    1.0f,-0.25f, 1.0f,
-    -1.0f,-0.25f,-1.0f,
-    1.0f,-0.25f,-1.0f,
-    1.0f, 0.25f,-1.0f,
-    1.0f,-0.25f,-1.0f,
-    -1.0f,-0.25f,-1.0f,
-    -1.0f,-0.25f,-1.0f,
-    -1.0f, 0.25f, 1.0f,
-    -1.0f, 0.25f,-1.0f,
-    1.0f,-0.25f, 1.0f,
-    -1.0f,-0.25f, 1.0f,
-    -1.0f,-0.25f,-1.0f,
-    -1.0f, 0.25f, 1.0f,
-    -1.0f,-0.25f, 1.0f,
-    1.0f,-0.25f, 1.0f,
-    1.0f, 0.25f, 1.0f,
-    1.0f,-0.25f,-1.0f,
-    1.0f, 0.25f,-1.0f,
-    1.0f,-0.25f,-1.0f,
-    1.0f, 0.25f, 1.0f,
-    1.0f,-0.25f, 1.0f,
-    1.0f, 0.25f, 1.0f,
-    1.0f, 0.25f,-1.0f,
-    -1.0f, 0.25f,-1.0f,
-    1.0f, 0.25f, 1.0f,
-    -1.0f, 0.25f,-1.0f,
-    -1.0f, 0.25f, 1.0f,
-    1.0f, 0.25f, 1.0f,
-    -1.0f, 0.25f, 1.0f,
-    1.0f,-0.25f, 1.0f
-};
-
   const ShapeVertex *vertices = board.getDataPointer();
   const int nb_vertices = board.getVertexCount();
-
-  // const ShapeVertex *vertices = sphere.getDataPointer();
-  // const int nb_vertices = sphere.getVertexCount();
 
   glBufferData(GL_ARRAY_BUFFER, board.getVertexCount() * sizeof(ShapeVertex), vertices,
                GL_STATIC_DRAW);
@@ -263,10 +191,10 @@ int Renderer_3D::draw(GameManager& game)
 
   glBindVertexArray(0);
 
-  glfwSetKeyCallback(window, key_callback);
+  // glfwSetKeyCallback(window, key_callback);
 
   /* Loop until the user closes the window */
-  while (!glfwWindowShouldClose(window)) {
+  // while (!glfwWindowShouldClose(window)) {
     glClearColor(0.1f, 0.f, 0.1f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     /*********************************
@@ -289,22 +217,55 @@ glUniformMatrix4fv(earthProgram.uMVPMatrix, 1, GL_FALSE,
 	glm::value_ptr(ProjMatrix * earthMVMatrix));
 
 glActiveTexture(GL_TEXTURE0);
-glBindTexture(GL_TEXTURE_2D, earthTexture);
+glBindTexture(GL_TEXTURE_2D, 0);
 glActiveTexture(GL_TEXTURE1);
 glBindTexture(GL_TEXTURE_2D, cloudTexture);
 
-glBindVertexArray(vao);
-glDrawArrays(GL_TRIANGLES, 0, board.getVertexCount());
+    glBindVertexArray(vao);
+    glDrawArrays(GL_TRIANGLES, 0, board.getVertexCount());
+
+    glBindVertexArray(0);
+
+    glm::mat4 moonMVMatrix =
+         globalMVMatrix;// Translation
+      moonMVMatrix = glm::translate(
+          moonMVMatrix,
+          glm::vec3(1, 0.05,
+                    0)); // Translation * Rotation * Rotation * Translation
+      moonMVMatrix = glm::scale(
+          moonMVMatrix,
+          glm::vec3(
+              0.125, 0.125,
+              0.125)); // Translation * Rotation * Rotation * Translation * Scale
+
+      glm::mat4 moonMVPMatrix = ProjMatrix * moonMVMatrix;
+      glm::mat3 moonNormalMatrix =
+          glm::transpose(glm::inverse(glm::mat3(moonMVMatrix)));
+
+      glUniformMatrix4fv(earthProgram.uMVPMatrix, 1, GL_FALSE,
+                         glm::value_ptr(moonMVPMatrix));
+      glUniformMatrix4fv(earthProgram.uMVMatrix, 1, GL_FALSE,
+                         glm::value_ptr(moonMVMatrix));
+      glUniformMatrix3fv(earthProgram.uNormalMatrix, 1, GL_FALSE,
+                         glm::value_ptr(moonNormalMatrix));
+      glBindVertexArray(vao);
+    
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, earthTexture);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glDrawArrays(GL_TRIANGLES, 0, square.getVertexCount());
 
     glBindVertexArray(0);
 
     /* Swap front and back buffers */
-    glfwSwapBuffers(window);
-    /* Poll for and process events */
-    glfwPollEvents();
-  }
+    // glfwSwapBuffers(window);
+    // /* Poll for and process events */
+    // glfwPollEvents();
+  // }
 
-  glfwTerminate();
+  // glfwTerminate();
 
   glDeleteBuffers(1, &vbo);
   glDeleteVertexArrays(1, &vao);

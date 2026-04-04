@@ -7,11 +7,10 @@
 #include "Pieces.hpp"
 #include "Probability.hpp"
 #include "Renderers/Renderer.hpp"
-#include "Renderers/3DRenderer.hpp"
 
 int main(int argc, char *argv[])
 {
-    Renderer_3D    renderer{};
+    Renderer    renderer{};
     Chessboard  board{};
     GameManager game{};
 
@@ -101,4 +100,5 @@ int main(int argc, char *argv[])
     // board.move_piece(queen_test.get_position(), 27);
 
     renderer.draw(game);
+    // renderer.drawStart(game);
 }

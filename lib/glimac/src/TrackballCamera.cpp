@@ -1,7 +1,4 @@
-#include <cmath>
-#include <vector>
 #include <iostream>
-#include "common.hpp"
 #include "glm/trigonometric.hpp"
 #include "TrackballCamera.hpp"
 
