@@ -141,6 +141,7 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
      *********************************/
 
     glUniform1i(chessProgram->uBoardTexture, 0);
+    glUniform1i(chessProgram->uUseTexture, 1);
 
     glm::mat4 globalMVMatrix = camera.getViewMatrix();
 
@@ -201,6 +202,7 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
         glBindTexture(GL_TEXTURE_2D, woodTexture);
 
         glUniform3f(chessProgram->uColor, 0.1f, 0.6f, 0.8f);
+        glUniform1i(chessProgram->uUseTexture, 1);
 
         glDrawArrays(GL_TRIANGLES, 0, square.getVertexCount());
 
@@ -218,6 +220,9 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
         glUniformMatrix3fv(
             chessProgram->uNormalMatrix, 1, GL_FALSE, glm::value_ptr(pieceNormalMatrix)
         );
+
+        glUniform1i(chessProgram->uUseTexture, 0); // we only color for now as textures dont work yet
+        glUniform3f(chessProgram->uColor, 1.0f, 0.0f, 0.0f);
 
         pawnOBJ.draw(); // for now it has no texture cause no texcoords or all 0,0, to fix later
     }

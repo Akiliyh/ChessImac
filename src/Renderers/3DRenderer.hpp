@@ -14,6 +14,7 @@ struct ChessProgram {
     GLint uMVMatrix;
     GLint uNormalMatrix;
     GLint uBoardTexture;
+    GLint uUseTexture;
 
     GLint uColor;
 
@@ -25,6 +26,7 @@ struct ChessProgram {
         uNormalMatrix = glGetUniformLocation(m_Program.getGLId(), "uNormalMatrix");
         uBoardTexture = glGetUniformLocation(m_Program.getGLId(), "uBoardTexture");
         uColor = glGetUniformLocation(m_Program.getGLId(), "uColor");
+        uUseTexture = glGetUniformLocation(m_Program.getGLId(), "uUseTexture");
     }
 
     ChessProgram() = default;

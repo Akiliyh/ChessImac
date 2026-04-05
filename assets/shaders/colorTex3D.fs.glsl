@@ -6,9 +6,14 @@ out vec4 FragColor;
 
 uniform sampler2D uEarthTexture;
 uniform vec3 uColor;
+uniform bool uUseTexture;
 
 void main() {
 
-    vec3 texColor = texture(uEarthTexture, vTexCoords).rgb;
-    FragColor = vec4(texColor * uColor, 1.0);
+    if(uUseTexture) {
+        vec3 texColor = texture(uEarthTexture, vTexCoords).rgb;
+        FragColor = vec4(texColor * uColor, 1.0);
+    } else {
+        FragColor = vec4(uColor, 1.0);
+    }
 }
