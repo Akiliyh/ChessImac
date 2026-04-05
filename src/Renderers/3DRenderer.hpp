@@ -7,27 +7,27 @@
 #include <tiny_obj_loader.h>
 #include <OBJModel.hpp>
 
-struct EarthProgram {
+struct ChessProgram {
     glimac::Program m_Program;
 
     GLint uMVPMatrix;
     GLint uMVMatrix;
     GLint uNormalMatrix;
-    GLint uEarthTexture;
+    GLint uBoardTexture;
 
     GLint uColor;
 
-    EarthProgram(const glimac::FilePath& applicationPath):
+    ChessProgram(const glimac::FilePath& applicationPath):
         m_Program(loadProgram(applicationPath.dirPath() + "./assets/shaders/3D.vs.glsl",
-                              applicationPath.dirPath() + "./assets/shaders/multiTex3D.fs.glsl")) {
+                              applicationPath.dirPath() + "./assets/shaders/colorTex3D.fs.glsl")) {
         uMVPMatrix = glGetUniformLocation(m_Program.getGLId(), "uMVPMatrix");
         uMVMatrix = glGetUniformLocation(m_Program.getGLId(), "uMVMatrix");
         uNormalMatrix = glGetUniformLocation(m_Program.getGLId(), "uNormalMatrix");
-        uEarthTexture = glGetUniformLocation(m_Program.getGLId(), "uEarthTexture");
+        uBoardTexture = glGetUniformLocation(m_Program.getGLId(), "uBoardTexture");
         uColor = glGetUniformLocation(m_Program.getGLId(), "uColor");
     }
 
-    EarthProgram() = default;
+    ChessProgram() = default;
 };
 
 class Renderer_3D {
@@ -46,10 +46,9 @@ class Renderer_3D {
     GLuint vbo;
     GLuint vao;
 
-    GLuint earthTexture;
-    GLuint cloudTexture;
+    GLuint woodTexture;
 
-    std::unique_ptr<EarthProgram> earthProgram;
+    std::unique_ptr<ChessProgram> chessProgram;
 
     glm::mat4 ProjMatrix;
 

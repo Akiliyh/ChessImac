@@ -42,21 +42,21 @@ int Renderer_3D::init(int width, int height)
 
     pawnOBJ.load("./assets/models/pawn.obj");
 
-    auto earthImage = glimac::loadImage("./assets/textures/EarthMap.jpg");
+    auto woodImage = glimac::loadImage("./assets/textures/BoardWood.jpg");
 
-    glGenTextures(1, &earthTexture);
+    glGenTextures(1, &woodTexture);
 
-    glBindTexture(GL_TEXTURE_2D, earthTexture);
+    glBindTexture(GL_TEXTURE_2D, woodTexture);
     glTexImage2D(
-        GL_TEXTURE_2D, 0, GL_RGBA, earthImage->getWidth(), earthImage->getHeight(), 0, GL_RGBA,
-        GL_FLOAT, earthImage->getPixels()
+        GL_TEXTURE_2D, 0, GL_RGBA, woodImage->getWidth(), woodImage->getHeight(), 0, GL_RGBA,
+        GL_FLOAT, woodImage->getPixels()
     );
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     FilePath applicationPath("color2D.vs.glsl");
-    this->earthProgram = std::make_unique<EarthProgram>(applicationPath);
+    this->chessProgram = std::make_unique<ChessProgram>(applicationPath);
 
     ProjMatrix             = glm::perspective(glm::radians(70.f), 1.0f, 0.1f, 100.f);
     glm::mat4 MVMatrix     = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
@@ -108,7 +108,7 @@ int Renderer_3D::init(int width, int height)
 
 int Renderer_3D::draw(int width, int height, GameManager& game)
 {
-    earthProgram->m_Program.use();
+    chessProgram->m_Program.use();
     glViewport(0, 0, width, height);
 
     /* Loop until the user closes the window */
@@ -119,25 +119,25 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
      * HERE SHOULD COME THE RENDERING CODE
      *********************************/
 
-    glUniform1i(earthProgram->uEarthTexture, 0);
+    glUniform1i(chessProgram->uBoardTexture, 0);
 
     glm::mat4 globalMVMatrix = camera.getViewMatrix();
 
-    glm::mat4 earthMVMatrix = globalMVMatrix;
-    glUniformMatrix4fv(earthProgram->uMVMatrix, 1, GL_FALSE, glm::value_ptr(earthMVMatrix));
+    glm::mat4 chessMVMatrix = globalMVMatrix;
+    glUniformMatrix4fv(chessProgram->uMVMatrix, 1, GL_FALSE, glm::value_ptr(chessMVMatrix));
     glUniformMatrix4fv(
-        earthProgram->uNormalMatrix, 1, GL_FALSE,
-        glm::value_ptr(glm::transpose(glm::inverse(earthMVMatrix)))
+        chessProgram->uNormalMatrix, 1, GL_FALSE,
+        glm::value_ptr(glm::transpose(glm::inverse(chessMVMatrix)))
     );
     glUniformMatrix4fv(
-        earthProgram->uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * earthMVMatrix)
+        chessProgram->uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * chessMVMatrix)
     );
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, earthTexture);
+    glBindTexture(GL_TEXTURE_2D, woodTexture);
 
     glBindVertexArray(vao);
-    glUniform3f(earthProgram->uColor, 0.6f, 0.4f, 0.2f);
+    glUniform3f(chessProgram->uColor, 0.6f, 0.4f, 0.2f);
     glDrawArrays(GL_TRIANGLES, 0, board.getVertexCount());
 
     glBindVertexArray(0);
@@ -159,23 +159,23 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
     glm::mat4 moonMVPMatrix    = ProjMatrix * moonMVMatrix;
     glm::mat3 moonNormalMatrix = glm::transpose(glm::inverse(glm::mat3(moonMVMatrix)));
 
-    glUniformMatrix4fv(earthProgram->uMVPMatrix, 1, GL_FALSE, glm::value_ptr(moonMVPMatrix));
-    glUniformMatrix4fv(earthProgram->uMVMatrix, 1, GL_FALSE, glm::value_ptr(moonMVMatrix));
-    glUniformMatrix3fv(earthProgram->uNormalMatrix, 1, GL_FALSE, glm::value_ptr(moonNormalMatrix));
+    glUniformMatrix4fv(chessProgram->uMVPMatrix, 1, GL_FALSE, glm::value_ptr(moonMVPMatrix));
+    glUniformMatrix4fv(chessProgram->uMVMatrix, 1, GL_FALSE, glm::value_ptr(moonMVMatrix));
+    glUniformMatrix3fv(chessProgram->uNormalMatrix, 1, GL_FALSE, glm::value_ptr(moonNormalMatrix));
     glBindVertexArray(vao);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, earthTexture);
+    glBindTexture(GL_TEXTURE_2D, woodTexture);
 
-    glUniform3f(earthProgram->uColor, 0.1f, 0.6f, 0.8f);
+    glUniform3f(chessProgram->uColor, 0.1f, 0.6f, 0.8f);
 
     glDrawArrays(GL_TRIANGLES, 0, square.getVertexCount());
 
-    glUniform3f(earthProgram->uColor, 1.0f, 1.0f, 1.0f);
+    glUniform3f(chessProgram->uColor, 1.0f, 1.0f, 1.0f);
 
     glActiveTexture(GL_TEXTURE0);
-glBindTexture(GL_TEXTURE_2D, earthTexture);
-glUniform1i(earthProgram->uEarthTexture, 0);
+glBindTexture(GL_TEXTURE_2D, woodTexture);
+glUniform1i(chessProgram->uBoardTexture, 0);
 
     pawnOBJ.draw(); // for now it has no texture cause no texcoords or all 0,0, to fix later
 
