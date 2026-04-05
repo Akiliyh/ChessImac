@@ -8,6 +8,10 @@ namespace glimac {
 
 void Cube::build(GLfloat height, GLfloat width, GLfloat depth) {
 
+    m_depth = depth;
+    m_height = height;
+    m_width = width;
+
     // here we put the uv also in this one, for each vertice we set the uv
     // if u want to reverse the texture just reverse each u and v coord
     GLfloat g_vertex_buffer_data[] = {
@@ -78,6 +82,21 @@ void Cube::build(GLfloat height, GLfloat width, GLfloat depth) {
     }
 
     m_nVertexCount = m_Vertices.size();
+}
+
+float Cube::getHeight()
+{
+    return m_height;
+}
+
+float Cube::getWidth()
+{
+    return m_width;
+}
+
+float Cube::getDepth()
+{
+    return m_depth;
 }
 
 }  // namespace glimac

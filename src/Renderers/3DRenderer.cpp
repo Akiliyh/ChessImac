@@ -21,11 +21,10 @@
 #include <getTime.hpp>
 #include <glm.hpp>
 
-
 using namespace glimac;
 
 Cube board(0.05f, 1.125f, 1.125f);
-Cube square(0.05f, 0.125f, 0.125f);
+Cube square(0.0125f, 0.125f, 0.125f);
 
 int Renderer_3D::init(int width, int height)
 {
@@ -65,8 +64,8 @@ int Renderer_3D::init(int width, int height)
 
     glEnable(GL_DEPTH_TEST);
 
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glGenBuffers(1, &boardVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, boardVbo);
 
     const ShapeVertex* vertices    = board.getDataPointer();
     const int          nb_vertices = board.getVertexCount();
@@ -76,8 +75,8 @@ int Renderer_3D::init(int width, int height)
     );
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    glGenVertexArrays(1, &boardVao);
+    glBindVertexArray(boardVao);
 
     const GLuint VERTEX_SHADER_POSITION   = 0;
     const GLuint VERTEX_SHADER_NORMAL     = 1;
@@ -87,7 +86,7 @@ int Renderer_3D::init(int width, int height)
     glEnableVertexAttribArray(VERTEX_SHADER_NORMAL);
     glEnableVertexAttribArray(VERTEX_SHADER_TEX_COORDS);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, boardVbo);
     glVertexAttribPointer(
         VERTEX_SHADER_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(ShapeVertex), (const GLvoid*)0
     );
@@ -101,6 +100,28 @@ int Renderer_3D::init(int width, int height)
     );
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+    glBindVertexArray(0);
+    
+    glGenBuffers(1, &squareVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, squareVbo);
+
+    glBufferData(
+        GL_ARRAY_BUFFER, square.getVertexCount() * sizeof(ShapeVertex), square.getDataPointer(), GL_STATIC_DRAW
+    );
+    
+    glGenVertexArrays(1, &squareVao);
+    glBindVertexArray(squareVao);
+    
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
+    
+    
+    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,sizeof(ShapeVertex),(const GLvoid*)0);
+    glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,sizeof(ShapeVertex),(const GLvoid*)offsetof(ShapeVertex, normal));
+    glVertexAttribPointer(2,2,GL_FLOAT,GL_FALSE,sizeof(ShapeVertex),(const GLvoid*)offsetof(ShapeVertex, texCoords));
+    
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
     return 0;
@@ -136,51 +157,71 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, woodTexture);
 
-    glBindVertexArray(vao);
+    glBindVertexArray(boardVao);
     glUniform3f(chessProgram->uColor, 0.6f, 0.4f, 0.2f);
     glDrawArrays(GL_TRIANGLES, 0, board.getVertexCount());
 
     glBindVertexArray(0);
 
-    glm::mat4 moonMVMatrix = globalMVMatrix; // Translation
-    moonMVMatrix           = glm::translate(
-        moonMVMatrix, glm::vec3(
-                          1, 0.05,
-                          0
-                      )
-    ); // Translation * Rotation * Rotation * Translation
-    moonMVMatrix = glm::scale(
-        moonMVMatrix, glm::vec3(
-                          0.125, 0.125,
-                          0.125
-                      )
-    ); // Translation * Rotation * Rotation * Translation * Scale
+    float square_width = square.getWidth();
+    float square_height = square.getHeight();
+    float square_depth = square.getDepth();
 
-    glm::mat4 moonMVPMatrix    = ProjMatrix * moonMVMatrix;
-    glm::mat3 moonNormalMatrix = glm::transpose(glm::inverse(glm::mat3(moonMVMatrix)));
+    float board_width = board.getWidth();
 
-    glUniformMatrix4fv(chessProgram->uMVPMatrix, 1, GL_FALSE, glm::value_ptr(moonMVPMatrix));
-    glUniformMatrix4fv(chessProgram->uMVMatrix, 1, GL_FALSE, glm::value_ptr(moonMVMatrix));
-    glUniformMatrix3fv(chessProgram->uNormalMatrix, 1, GL_FALSE, glm::value_ptr(moonNormalMatrix));
-    glBindVertexArray(vao);
+    glm::mat4 squareMVMatrix = globalMVMatrix; // Translation
+    squareMVMatrix           = glm::translate(
+            squareMVMatrix, glm::vec3(
+                                -1, square_height*5,
+                                -1 + (board_width/8.0f)
+                            )
+        );
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, woodTexture);
+    for (size_t i = 0; i < 8; i++)
+    {
+        
+        squareMVMatrix           = glm::translate(
+            squareMVMatrix, glm::vec3(
+                                (i != 0) ? square_width*2 : board_width/8.0, 0,
+                                0
+                            )
+        );
 
-    glUniform3f(chessProgram->uColor, 0.1f, 0.6f, 0.8f);
+        glm::mat4 squareMVPMatrix    = ProjMatrix * squareMVMatrix;
+        glm::mat3 squareNormalMatrix = glm::transpose(glm::inverse(glm::mat3(squareMVMatrix)));
 
-    glDrawArrays(GL_TRIANGLES, 0, square.getVertexCount());
+        glUniformMatrix4fv(chessProgram->uMVPMatrix, 1, GL_FALSE, glm::value_ptr(squareMVPMatrix));
+        glUniformMatrix4fv(chessProgram->uMVMatrix, 1, GL_FALSE, glm::value_ptr(squareMVMatrix));
+        glUniformMatrix3fv(
+            chessProgram->uNormalMatrix, 1, GL_FALSE, glm::value_ptr(squareNormalMatrix)
+        );
+        glBindVertexArray(squareVao);
 
-    glUniform3f(chessProgram->uColor, 1.0f, 1.0f, 1.0f);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, woodTexture);
 
-    glActiveTexture(GL_TEXTURE0);
-glBindTexture(GL_TEXTURE_2D, woodTexture);
-glUniform1i(chessProgram->uBoardTexture, 0);
+        glUniform3f(chessProgram->uColor, 0.1f, 0.6f, 0.8f);
 
-    pawnOBJ.draw(); // for now it has no texture cause no texcoords or all 0,0, to fix later
+        glDrawArrays(GL_TRIANGLES, 0, square.getVertexCount());
 
-    // setup attributes like before
-    glBindVertexArray(0);
+        // deal with pawn here
+        // for now all squares has a pawn on it
+        
+        glm::mat4 pieceMVMatrix = glm::translate(squareMVMatrix, glm::vec3(square_width * 0.15f, square_height, 0.0f));
+        pieceMVMatrix = glm::scale(pieceMVMatrix, glm::vec3(0.075, 0.075, 0.075));
+        
+        glm::mat4 pieceMVPMatrix    = ProjMatrix * pieceMVMatrix;
+        glm::mat4 pieceNormalMatrix = glm::transpose(glm::inverse(glm::mat3(pieceMVMatrix)));
+        
+        glUniformMatrix4fv(chessProgram->uMVPMatrix, 1, GL_FALSE, glm::value_ptr(pieceMVPMatrix));
+        glUniformMatrix4fv(chessProgram->uMVMatrix, 1, GL_FALSE, glm::value_ptr(pieceMVMatrix));
+        glUniformMatrix3fv(
+            chessProgram->uNormalMatrix, 1, GL_FALSE, glm::value_ptr(pieceNormalMatrix)
+        );
+
+        pawnOBJ.draw(); // for now it has no texture cause no texcoords or all 0,0, to fix later
+    }
+
 
     return 0;
 }
@@ -188,6 +229,8 @@ glUniform1i(chessProgram->uBoardTexture, 0);
 void Renderer_3D::terminate()
 {
     glBindVertexArray(0);
-    glDeleteBuffers(1, &vbo);
-    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &squareVbo);
+    glDeleteVertexArrays(1, &squareVao);
+    glDeleteBuffers(1, &boardVbo);
+    glDeleteVertexArrays(1, &boardVao);
 }

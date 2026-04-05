@@ -43,8 +43,10 @@ class Renderer_3D {
     int width {800};
     int height {800};
 
-    GLuint vbo;
-    GLuint vao;
+    GLuint boardVbo;
+    GLuint squareVbo;
+    GLuint boardVao;
+    GLuint squareVao;
 
     GLuint woodTexture;
 

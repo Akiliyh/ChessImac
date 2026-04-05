@@ -28,9 +28,16 @@ public:
         return m_nVertexCount;
     }
 
+    float getHeight();
+    float getWidth();
+    float getDepth();
+
 private:
     std::vector<ShapeVertex> m_Vertices;
     GLsizei m_nVertexCount; // Nombre de sommets
+    float m_height;
+    float m_width;
+    float m_depth;
 };
     
-}
+}  // namespace glimac
