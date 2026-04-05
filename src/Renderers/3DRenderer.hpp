@@ -14,7 +14,8 @@ struct EarthProgram {
     GLint uMVMatrix;
     GLint uNormalMatrix;
     GLint uEarthTexture;
-    GLint uCloudTexture;
+
+    GLint uColor;
 
     EarthProgram(const glimac::FilePath& applicationPath):
         m_Program(loadProgram(applicationPath.dirPath() + "./assets/shaders/3D.vs.glsl",
@@ -23,7 +24,7 @@ struct EarthProgram {
         uMVMatrix = glGetUniformLocation(m_Program.getGLId(), "uMVMatrix");
         uNormalMatrix = glGetUniformLocation(m_Program.getGLId(), "uNormalMatrix");
         uEarthTexture = glGetUniformLocation(m_Program.getGLId(), "uEarthTexture");
-        uCloudTexture = glGetUniformLocation(m_Program.getGLId(), "uCloudTexture");
+        uColor = glGetUniformLocation(m_Program.getGLId(), "uColor");
     }
 
     EarthProgram() = default;

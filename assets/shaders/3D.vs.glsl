@@ -11,6 +11,7 @@ uniform mat4 uNormalMatrix;
 out vec3 vPosition_vs;
 out vec3 vNormal_vs;
 out vec2 vTexCoords;
+out vec3 vColors;
 
 void main() {
     vec4 vertexPosition = vec4(aVertexPosition, 1);
