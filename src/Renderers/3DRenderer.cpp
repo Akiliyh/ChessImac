@@ -181,6 +181,9 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
 
     glm::mat4 baseSquareMVMatrix = squareMVMatrix;
 
+    int piece_position{};
+    int const game_board_size  = game.board.get_size();
+
     for (size_t row = 0; row < 8; row++)
     {
         // at the start of the loop we wanna go back to the left of the board
@@ -190,6 +193,8 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
 
         for (size_t col = 0; col < 8; col++)
         {
+            piece_position = col + (row * game_board_size);
+
             squareMVMatrix = glm::translate(
                 squareMVMatrix, glm::vec3((col != 0) ? square_width * 2 : board_width / 8.0, 0, 0)
             );
@@ -224,6 +229,11 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
             // deal with pawn here
             // for now all squares has a pawn on it
 
+            // we want to display a piece only if it exists in the game board
+
+            if (game.board.get_board_data(piece_position)) {
+            
+
             glm::mat4 pieceMVMatrix = glm::translate(
                 squareMVMatrix, glm::vec3(square_width * 0.15f, square_height, 0.0f)
             );
@@ -246,6 +256,7 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
             glUniform3f(chessProgram->uColor, 1.0f, 0.0f, 0.0f);
 
             pawnOBJ.draw(); // for now it has no texture cause no texcoords or all 0,0, to fix later
+            }
         }
     }
 

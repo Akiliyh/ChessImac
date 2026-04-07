@@ -11,7 +11,6 @@ class Chessboard {
     std::vector<std::unique_ptr<Piece>> dead_pieces{};
 
   public:
-    int                                  get_board_size() const;
     int                                  get_size() const;
     std::vector<std::unique_ptr<Piece>>& get_board_data();
     std::unique_ptr<Piece>&              get_board_data(int i);
