@@ -211,7 +211,12 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, woodTexture);
 
-            glUniform3f(chessProgram->uColor, 0.1f, 0.6f, 0.8f);
+            bool isDark = (row + col) % 2 == 1;
+
+            isDark ? 
+                glUniform3f(chessProgram->uColor, 0.f, 0.f, 0.f) 
+                : glUniform3f(chessProgram->uColor, 1.f, 1.f, 1.f);
+            
             glUniform1i(chessProgram->uUseTexture, 1);
 
             glDrawArrays(GL_TRIANGLES, 0, square.getVertexCount());
