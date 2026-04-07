@@ -3,6 +3,7 @@
 #include <vector>
 #include "GameManager.hpp"
 #include "Image.hpp"
+#include "Pieces.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_float4x4.hpp"
 #include "glm/ext/matrix_transform.hpp"
@@ -169,20 +170,23 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
 
     glBindVertexArray(0);
 
-    float square_width  = square.getWidth();
-    float square_height = square.getHeight();
-    float square_depth  = square.getDepth();
+    float const square_width  = square.getWidth();
+    float const square_height = square.getHeight();
+    float const square_depth  = square.getDepth();
 
-    float board_width = board.getWidth();
+    float const board_width = board.getWidth();
+
+    int piece_position{};
+    int const game_board_size  = game.board.get_size();
+
+    Piece*      current_square = nullptr;
+    
 
     glm::mat4 squareMVMatrix = globalMVMatrix; // Translation
     squareMVMatrix =
         glm::translate(squareMVMatrix, glm::vec3(-1, square_height * 5, -1 + (board_width / 8.0f)));
 
     glm::mat4 baseSquareMVMatrix = squareMVMatrix;
-
-    int piece_position{};
-    int const game_board_size  = game.board.get_size();
 
     for (size_t row = 0; row < 8; row++)
     {
@@ -193,7 +197,6 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
 
         for (size_t col = 0; col < 8; col++)
         {
-            piece_position = col + (row * game_board_size);
 
             squareMVMatrix = glm::translate(
                 squareMVMatrix, glm::vec3((col != 0) ? square_width * 2 : board_width / 8.0, 0, 0)
@@ -231,7 +234,10 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
 
             // we want to display a piece only if it exists in the game board
 
-            if (game.board.get_board_data(piece_position)) {
+            piece_position = col + (row * game_board_size);
+            current_square = game.board.get_board_data(piece_position).get();
+
+            if (current_square) {
             
 
             glm::mat4 pieceMVMatrix = glm::translate(
@@ -253,7 +259,10 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
             glUniform1i(
                 chessProgram->uUseTexture, 0
             ); // we only color for now as textures dont work yet
-            glUniform3f(chessProgram->uColor, 1.0f, 0.0f, 0.0f);
+
+            (current_square->get_color() == White) 
+            ?   glUniform3f(chessProgram->uColor, 1.0f, 1.0f, 1.0f) 
+            :   glUniform3f(chessProgram->uColor, 0.2f, 0.1f, 0.1f);
 
             pawnOBJ.draw(); // for now it has no texture cause no texcoords or all 0,0, to fix later
             }

@@ -6,6 +6,7 @@
 #include <FilePath.hpp>
 #include <tiny_obj_loader.h>
 #include <OBJModel.hpp>
+#include "Pieces.hpp"
 
 struct ChessProgram {
     glimac::Program m_Program;
