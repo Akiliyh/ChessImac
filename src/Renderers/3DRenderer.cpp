@@ -41,6 +41,11 @@ int Renderer_3D::init(int width, int height)
     // deal with obj here
 
     pawnOBJ.load("./assets/models/pawn.obj");
+    bishopOBJ.load("./assets/models/bishop.obj");
+    kingOBJ.load("./assets/models/king.obj");
+    queenOBJ.load("./assets/models/queen.obj");
+    rookOBJ.load("./assets/models/rook.obj");
+    knightOBJ.load("./assets/models/knight.obj");
 
     auto woodImage = glimac::loadImage("./assets/textures/BoardWood.jpg");
 
@@ -264,7 +269,34 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
             ?   glUniform3f(chessProgram->uColor, 1.0f, 1.0f, 1.0f) 
             :   glUniform3f(chessProgram->uColor, 0.2f, 0.1f, 0.1f);
 
-            pawnOBJ.draw(); // for now it has no texture cause no texcoords or all 0,0, to fix later
+            // here we choose which model to draw
+
+            switch (std::tolower(current_square->get_label())) {
+                case 'b':
+                    bishopOBJ.draw();
+                break;
+
+                case 'k':
+                    kingOBJ.draw();
+                break;
+
+                case 'q':
+                    queenOBJ.draw();
+                break;
+
+                case 'r':
+                    rookOBJ.draw();
+                break;
+
+                case 'n':
+                    knightOBJ.draw();
+                break;
+
+                default:
+                    pawnOBJ.draw(); // for now it has no texture cause no texcoords or all 0,0, to fix later
+            }
+
+            
             }
         }
     }

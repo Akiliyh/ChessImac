@@ -42,6 +42,11 @@ class Renderer_3D {
     glimac::TrackballCamera camera;
     bool is_panning = false;
     glimac::OBJModel pawnOBJ;
+    glimac::OBJModel bishopOBJ;
+    glimac::OBJModel kingOBJ;
+    glimac::OBJModel queenOBJ;
+    glimac::OBJModel rookOBJ;
+    glimac::OBJModel knightOBJ;
 
     int width {800};
     int height {800};
