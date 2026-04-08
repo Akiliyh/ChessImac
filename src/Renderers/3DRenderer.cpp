@@ -27,6 +27,8 @@ using namespace glimac;
 Cube board(0.05f, 1.125f, 1.125f);
 Cube square(0.0125f, 0.125f, 0.125f);
 
+const float texture_clipping_delta {0.001f};
+
 int Renderer_3D::init(int width, int height)
 {
     this->height = height;
@@ -203,6 +205,9 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
         for (size_t col = 0; col < 8; col++)
         {
 
+            piece_position = col + (row * game_board_size);
+            const std::vector<int>& possible_moves  = game.get_possible_moves();
+
             squareMVMatrix = glm::translate(
                 squareMVMatrix, glm::vec3((col != 0) ? square_width * 2 : board_width / 8.0, 0, 0)
             );
@@ -230,7 +235,23 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
                 glUniform3f(chessProgram->uColor, 0.f, 0.f, 0.f) 
                 : glUniform3f(chessProgram->uColor, 1.f, 1.f, 1.f);
             
-            glUniform1i(chessProgram->uUseTexture, 1);
+            // we wanna display possible moves
+
+            glUniform1i(chessProgram->uUseTexture, 0);
+            bool is_possible_square = false;
+
+            for (const int& move : possible_moves) {
+                if (move == piece_position) {
+                    glUniform3f(chessProgram->uColor, 0.5f, 0.5f, 1.f);
+                    is_possible_square = true;
+                    break;
+                }
+            }
+                
+            if (!is_possible_square) {
+                glUniform1i(chessProgram->uUseTexture, 1);
+            }
+            
 
             glDrawArrays(GL_TRIANGLES, 0, square.getVertexCount());
 
@@ -239,14 +260,18 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
 
             // we want to display a piece only if it exists in the game board
 
-            piece_position = col + (row * game_board_size);
+            
             current_square = game.board.get_board_data(piece_position).get();
+
+            
 
             if (current_square) {
             
 
             glm::mat4 pieceMVMatrix = glm::translate(
-                squareMVMatrix, glm::vec3(square_width * 0.15f, square_height, 0.0f)
+                squareMVMatrix, glm::vec3(square_width * 0.15f, 
+                    square_height + texture_clipping_delta, // to avoid texture clipping
+                    0.0f)
             );
             pieceMVMatrix = glm::scale(pieceMVMatrix, glm::vec3(0.075, 0.075, 0.075));
 

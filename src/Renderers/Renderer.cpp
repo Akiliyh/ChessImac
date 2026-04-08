@@ -39,7 +39,7 @@ void Renderer::draw(GameManager& game)
                     if (key == GLFW_KEY_A && action == GLFW_PRESS)
                         glfwSetWindowShouldClose(window, GLFW_TRUE);
                     if (key == GLFW_KEY_Q && action == GLFW_PRESS)
-                        renderer_3d.camera.moveFront(1.0f);
+                        renderer_3d.camera.moveFront(0.5f);
                     if (key == GLFW_KEY_H && action == GLFW_PRESS)
                         renderer_3d.camera.rotateLeft(1.0f);
                 },
@@ -71,7 +71,7 @@ void Renderer::draw(GameManager& game)
                     renderer_3d.lastY = ypos;
                 },
             .scroll_callback = [&](double xoffset,
-                                   double yoffset) { renderer_3d.camera.moveFront(-yoffset); },
+                                   double yoffset) { renderer_3d.camera.moveFront(-(yoffset/5.0)); },
         }
 
     );
