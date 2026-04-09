@@ -53,8 +53,11 @@ class Renderer_3D {
 
     GLuint boardVbo;
     GLuint squareVbo;
+    GLuint cylinderVbo;
+    
     GLuint boardVao;
     GLuint squareVao;
+    GLuint cylinderVao;
 
     GLuint woodTexture;
 

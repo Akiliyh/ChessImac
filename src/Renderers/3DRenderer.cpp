@@ -1,6 +1,7 @@
 #include "3DRenderer.hpp"
 #include <cstddef>
 #include <vector>
+#include "Cylinder.hpp"
 #include "GameManager.hpp"
 #include "Image.hpp"
 #include "Pieces.hpp"
@@ -16,18 +17,21 @@
 // #include <GLFW/glfw3.h>
 // #include <glad/glad.h>
 #include <Cube.hpp>
+#include <Cylinder.hpp>
 #include <FilePath.hpp>
 #include <Program.hpp>
 #include <Sphere.hpp>
 #include <getTime.hpp>
 #include <glm.hpp>
 
+
 using namespace glimac;
 
-Cube board(0.05f, 1.125f, 1.125f);
-Cube square(0.0125f, 0.125f, 0.125f);
+Cube     board(0.05f, 1.125f, 1.125f);
+Cube     square(0.0125f, 0.125f, 0.125f);
+Cylinder cylinder(0.1f, 0.02f, 20, 20);
 
-const float texture_clipping_delta {0.001f};
+const float texture_clipping_delta{0.001f};
 
 int Renderer_3D::init(int width, int height)
 {
@@ -137,6 +141,33 @@ int Renderer_3D::init(int width, int height)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    glGenBuffers(1, &cylinderVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, cylinderVbo);
+
+    glBufferData(
+        GL_ARRAY_BUFFER, cylinder.getVertexCount() * sizeof(ShapeVertex), cylinder.getDataPointer(),
+        GL_STATIC_DRAW
+    );
+
+    glGenVertexArrays(1, &cylinderVao);
+    glBindVertexArray(cylinderVao);
+
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ShapeVertex), (const GLvoid*)0);
+    glVertexAttribPointer(
+        1, 3, GL_FLOAT, GL_FALSE, sizeof(ShapeVertex), (const GLvoid*)offsetof(ShapeVertex, normal)
+    );
+    glVertexAttribPointer(
+        2, 2, GL_FLOAT, GL_FALSE, sizeof(ShapeVertex),
+        (const GLvoid*)offsetof(ShapeVertex, texCoords)
+    );
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
     return 0;
 }
 
@@ -183,11 +214,10 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
 
     float const board_width = board.getWidth();
 
-    int piece_position{};
-    int const game_board_size  = game.board.get_size();
+    int       piece_position{};
+    int const game_board_size = game.board.get_size();
 
-    Piece*      current_square = nullptr;
-    
+    Piece* current_square = nullptr;
 
     glm::mat4 squareMVMatrix = globalMVMatrix; // Translation
     squareMVMatrix =
@@ -204,9 +234,8 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
 
         for (size_t col = 0; col < 8; col++)
         {
-
-            piece_position = col + (row * game_board_size);
-            const std::vector<int>& possible_moves  = game.get_possible_moves();
+            piece_position                         = col + (row * game_board_size);
+            const std::vector<int>& possible_moves = game.get_possible_moves();
 
             squareMVMatrix = glm::translate(
                 squareMVMatrix, glm::vec3((col != 0) ? square_width * 2 : board_width / 8.0, 0, 0)
@@ -231,97 +260,127 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
 
             bool isDark = (row + col) % 2 == 1;
 
-            isDark ? 
-                glUniform3f(chessProgram->uColor, 0.f, 0.f, 0.f) 
-                : glUniform3f(chessProgram->uColor, 1.f, 1.f, 1.f);
-            
+            isDark ? glUniform3f(chessProgram->uColor, 0.f, 0.f, 0.f)
+                   : glUniform3f(chessProgram->uColor, 1.f, 1.f, 1.f);
+
+            glUniformMatrix4fv(
+                    chessProgram->uMVPMatrix, 1, GL_FALSE, glm::value_ptr(squareMVPMatrix)
+                );
+                glUniformMatrix4fv(
+                    chessProgram->uMVMatrix, 1, GL_FALSE, glm::value_ptr(squareMVMatrix)
+                );
+                glUniformMatrix3fv(
+                    chessProgram->uNormalMatrix, 1, GL_FALSE, glm::value_ptr(squareNormalMatrix)
+                );
+
+            glUniform1i(chessProgram->uUseTexture, 1);
+
+            glBindVertexArray(squareVao);
+            glDrawArrays(GL_TRIANGLES, 0, square.getVertexCount());
+
             // we wanna display possible moves
 
             glUniform1i(chessProgram->uUseTexture, 0);
             bool is_possible_square = false;
 
-            for (const int& move : possible_moves) {
-                if (move == piece_position) {
+            for (const int& move : possible_moves)
+            {
+                if (move == piece_position)
+                {
                     glUniform3f(chessProgram->uColor, 0.5f, 0.5f, 1.f);
                     is_possible_square = true;
                     break;
                 }
             }
-                
-            if (!is_possible_square) {
-                glUniform1i(chessProgram->uUseTexture, 1);
-            }
-            
 
-            glDrawArrays(GL_TRIANGLES, 0, square.getVertexCount());
+            if (!is_possible_square)
+            {
+                glUniform1i(chessProgram->uUseTexture, 1);
+
+            } else {
+                glBindVertexArray(cylinderVao);
+                glm::mat4 possible_moveMVMatrix = squareMVMatrix;
+
+                possible_moveMVMatrix = glm::translate(
+                squareMVMatrix, glm::vec3(0, square_height + texture_clipping_delta, 0)
+                );
+
+                glm::mat4 possible_moveMVPMatrix = ProjMatrix * possible_moveMVMatrix;
+                glm::mat4 possible_moveNormalMatrix =
+                    glm::transpose(glm::inverse(glm::mat3(possible_moveMVMatrix)));
+
+                glUniformMatrix4fv(
+                    chessProgram->uMVPMatrix, 1, GL_FALSE, glm::value_ptr(possible_moveMVPMatrix)
+                );
+                glUniformMatrix4fv(
+                    chessProgram->uMVMatrix, 1, GL_FALSE, glm::value_ptr(possible_moveMVMatrix)
+                );
+                glUniformMatrix3fv(
+                    chessProgram->uNormalMatrix, 1, GL_FALSE, glm::value_ptr(possible_moveNormalMatrix)
+                );
+
+                glDrawArrays(GL_TRIANGLES, 0, cylinder.getVertexCount());
+            }
 
             // deal with pawn here
             // for now all squares has a pawn on it
 
             // we want to display a piece only if it exists in the game board
 
-            
             current_square = game.board.get_board_data(piece_position).get();
 
-            
+            if (current_square)
+            {
+                glm::mat4 pieceMVMatrix = glm::translate(
+                    squareMVMatrix,
+                    glm::vec3(
+                        square_width * 0.15f,
+                        square_height + texture_clipping_delta, // to avoid texture clipping
+                        0.0f
+                    )
+                );
+                pieceMVMatrix = glm::scale(pieceMVMatrix, glm::vec3(0.075, 0.075, 0.075));
 
-            if (current_square) {
-            
+                glm::mat4 pieceMVPMatrix = ProjMatrix * pieceMVMatrix;
+                glm::mat4 pieceNormalMatrix =
+                    glm::transpose(glm::inverse(glm::mat3(pieceMVMatrix)));
 
-            glm::mat4 pieceMVMatrix = glm::translate(
-                squareMVMatrix, glm::vec3(square_width * 0.15f, 
-                    square_height + texture_clipping_delta, // to avoid texture clipping
-                    0.0f)
-            );
-            pieceMVMatrix = glm::scale(pieceMVMatrix, glm::vec3(0.075, 0.075, 0.075));
+                glUniformMatrix4fv(
+                    chessProgram->uMVPMatrix, 1, GL_FALSE, glm::value_ptr(pieceMVPMatrix)
+                );
+                glUniformMatrix4fv(
+                    chessProgram->uMVMatrix, 1, GL_FALSE, glm::value_ptr(pieceMVMatrix)
+                );
+                glUniformMatrix3fv(
+                    chessProgram->uNormalMatrix, 1, GL_FALSE, glm::value_ptr(pieceNormalMatrix)
+                );
 
-            glm::mat4 pieceMVPMatrix    = ProjMatrix * pieceMVMatrix;
-            glm::mat4 pieceNormalMatrix = glm::transpose(glm::inverse(glm::mat3(pieceMVMatrix)));
+                glUniform1i(
+                    chessProgram->uUseTexture, 0
+                ); // we only color for now as textures dont work yet
 
-            glUniformMatrix4fv(
-                chessProgram->uMVPMatrix, 1, GL_FALSE, glm::value_ptr(pieceMVPMatrix)
-            );
-            glUniformMatrix4fv(chessProgram->uMVMatrix, 1, GL_FALSE, glm::value_ptr(pieceMVMatrix));
-            glUniformMatrix3fv(
-                chessProgram->uNormalMatrix, 1, GL_FALSE, glm::value_ptr(pieceNormalMatrix)
-            );
+                (current_square->get_color() == White)
+                    ? glUniform3f(chessProgram->uColor, 1.0f, 1.0f, 1.0f)
+                    : glUniform3f(chessProgram->uColor, 0.2f, 0.1f, 0.1f);
 
-            glUniform1i(
-                chessProgram->uUseTexture, 0
-            ); // we only color for now as textures dont work yet
+                // here we choose which model to draw
 
-            (current_square->get_color() == White) 
-            ?   glUniform3f(chessProgram->uColor, 1.0f, 1.0f, 1.0f) 
-            :   glUniform3f(chessProgram->uColor, 0.2f, 0.1f, 0.1f);
+                switch (std::tolower(current_square->get_label()))
+                {
+                case 'b': bishopOBJ.draw(); break;
 
-            // here we choose which model to draw
+                case 'k': kingOBJ.draw(); break;
 
-            switch (std::tolower(current_square->get_label())) {
-                case 'b':
-                    bishopOBJ.draw();
-                break;
+                case 'q': queenOBJ.draw(); break;
 
-                case 'k':
-                    kingOBJ.draw();
-                break;
+                case 'r': rookOBJ.draw(); break;
 
-                case 'q':
-                    queenOBJ.draw();
-                break;
-
-                case 'r':
-                    rookOBJ.draw();
-                break;
-
-                case 'n':
-                    knightOBJ.draw();
-                break;
+                case 'n': knightOBJ.draw(); break;
 
                 default:
-                    pawnOBJ.draw(); // for now it has no texture cause no texcoords or all 0,0, to fix later
-            }
-
-            
+                    pawnOBJ.draw(); // for now it has no texture cause no texcoords or all 0,0, to
+                                    // fix later
+                }
             }
         }
     }
