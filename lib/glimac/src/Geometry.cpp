@@ -2,6 +2,8 @@
 #include "tiny_obj_loader.h"
 #include <iostream>
 #include <algorithm>
+#include <glad/glad.h>
+#include <glm/glm.hpp>
 
 namespace glimac {
 
@@ -167,7 +169,57 @@ bool Geometry::loadOBJ(const FilePath& filepath, const FilePath& mtlBasePath, bo
         indexOffset += shapes[i].mesh.indices.size();
     }
 
+    glGenVertexArrays(1, &m_VAO);
+    glGenBuffers(1, &m_VBO);
+    glGenBuffers(1, &m_EBO);
+
+    glBindVertexArray(m_VAO);
+
+    // VBO
+    glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+    glBufferData(GL_ARRAY_BUFFER,
+                 m_VertexBuffer.size() * sizeof(Vertex),
+                 m_VertexBuffer.data(),
+                 GL_STATIC_DRAW);
+
+    // EBO
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 m_IndexBuffer.size() * sizeof(unsigned int),
+                 m_IndexBuffer.data(),
+                 GL_STATIC_DRAW);
+
+    // Attributes
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                          (void*)offsetof(Vertex, m_Position));
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                          (void*)offsetof(Vertex, m_Normal));
+
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                          (void*)offsetof(Vertex, m_TexCoords));
+
+    glBindVertexArray(0);
+
     return true;
+}
+
+void Geometry::draw() const {
+    glBindVertexArray(m_VAO);
+
+    for (const Mesh& mesh : m_MeshBuffer) {
+        glDrawElements(
+            GL_TRIANGLES,
+            mesh.m_nIndexCount,
+            GL_UNSIGNED_INT,
+            (void*)(mesh.m_nIndexOffset * sizeof(unsigned int))
+        );
+    }
+
+    glBindVertexArray(0);
 }
 
 }

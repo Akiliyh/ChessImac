@@ -46,12 +46,12 @@ int Renderer_3D::init(int width, int height)
 
     // deal with obj here
 
-    pawnOBJ.load("./assets/models/pawn.obj");
-    bishopOBJ.load("./assets/models/bishop.obj");
-    kingOBJ.load("./assets/models/king.obj");
-    queenOBJ.load("./assets/models/queen.obj");
-    rookOBJ.load("./assets/models/rook.obj");
-    knightOBJ.load("./assets/models/knight.obj");
+    pawnOBJ.loadOBJ("./assets/models/pawn_body.obj", "./assets/models/pawn_body.mtl", true);
+    bishopOBJ.loadOBJ("./assets/models/bishop_body.obj", "./assets/models/bishop_body.mtl", true);
+    kingOBJ.loadOBJ("./assets/models/king_body.obj", "./assets/models/king_body.mtl", true);
+    queenOBJ.loadOBJ("./assets/models/queen_body.obj", "./assets/models/queen_body.mtl", true);
+    rookOBJ.loadOBJ("./assets/models/rook_body.obj", "./assets/models/rook_body.mtl", true);
+    knightOBJ.loadOBJ("./assets/models/knight_body.obj", "./assets/models/knight_body.mtl", true);
 
     auto woodImage = glimac::loadImage("./assets/textures/BoardWood.jpg");
 
@@ -334,12 +334,17 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
                 glm::mat4 pieceMVMatrix = glm::translate(
                     squareMVMatrix,
                     glm::vec3(
-                        square_width * 0.15f,
+                        0,
                         square_height + texture_clipping_delta, // to avoid texture clipping
                         0.0f
                     )
                 );
-                pieceMVMatrix = glm::scale(pieceMVMatrix, glm::vec3(0.075, 0.075, 0.075));
+                pieceMVMatrix = glm::scale(pieceMVMatrix, glm::vec3(0.0625, 0.0625, 0.0625));
+
+                (current_square->get_color() == White)
+                    ? pieceMVMatrix = glm::rotate(pieceMVMatrix, 3.f * glm::pi<float>() * .5f, glm::vec3(0, 1, 0))
+                    : pieceMVMatrix = glm::rotate(pieceMVMatrix, glm::pi<float>() * .5f, glm::vec3(0, 1, 0));
+                
 
                 glm::mat4 pieceMVPMatrix = ProjMatrix * pieceMVMatrix;
                 glm::mat4 pieceNormalMatrix =
@@ -357,7 +362,7 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
 
                 glUniform1i(
                     chessProgram->uUseTexture, 0
-                ); // we only color for now as textures dont work yet
+                );
 
                 (current_square->get_color() == White)
                     ? glUniform3f(chessProgram->uColor, 1.0f, 1.0f, 1.0f)

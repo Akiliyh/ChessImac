@@ -1,10 +1,10 @@
-# Blender 4.2.1 LTS MTL File: 'pieces.blend'
+# Blender 5.0.0 MTL File: 'piece.blend'
 # www.blender.org
 
-newmtl default
+newmtl BlackPeiceUnshade.004
 Ns 250.000000
 Ka 1.000000 1.000000 1.000000
-Kd 0.800000 0.800000 0.800000
+Kd 0.063700 0.114100 0.141400
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.500000

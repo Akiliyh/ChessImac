@@ -1,5 +1,6 @@
 #pragma once
 
+#include <glfw/src/internal.h>
 #include <glm/glm.hpp>
 #include <vector>
 #include <string>
@@ -50,6 +51,10 @@ private:
     std::vector<Material> m_Materials;
     BBox3f m_BBox;
 
+    GLuint m_VAO = 0;
+    GLuint m_VBO = 0;
+    GLuint m_EBO = 0;
+
     void generateNormals(unsigned int meshIndex);
 
 public:
@@ -78,6 +83,8 @@ public:
     }
 
     bool loadOBJ(const FilePath& filepath, const FilePath& mtlBasePath, bool loadTextures = true);
+
+    void draw() const;
 
     const BBox3f& getBoundingBox() const {
         return m_BBox;
