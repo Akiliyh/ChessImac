@@ -33,6 +33,36 @@ Cylinder cylinder(0.1f, 0.02f, 20, 20);
 
 const float texture_clipping_delta{0.001f};
 
+void Renderer_3D::initVertexObject(const ShapeVertex* data, size_t count, GLuint& vbo, GLuint& vao)
+{
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+    glBufferData(
+        GL_ARRAY_BUFFER, count * sizeof(ShapeVertex), data,
+        GL_STATIC_DRAW
+    );
+
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ShapeVertex), (const GLvoid*)0);
+    glVertexAttribPointer(
+        1, 3, GL_FLOAT, GL_FALSE, sizeof(ShapeVertex), (const GLvoid*)offsetof(ShapeVertex, normal)
+    );
+    glVertexAttribPointer(
+        2, 2, GL_FLOAT, GL_FALSE, sizeof(ShapeVertex),
+        (const GLvoid*)offsetof(ShapeVertex, texCoords)
+    );
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+}
+
 int Renderer_3D::init(int width, int height)
 {
     this->height = height;
@@ -76,97 +106,9 @@ int Renderer_3D::init(int width, int height)
 
     glEnable(GL_DEPTH_TEST);
 
-    glGenBuffers(1, &boardVbo);
-    glBindBuffer(GL_ARRAY_BUFFER, boardVbo);
-
-    const ShapeVertex* vertices    = board.getDataPointer();
-    const int          nb_vertices = board.getVertexCount();
-
-    glBufferData(
-        GL_ARRAY_BUFFER, board.getVertexCount() * sizeof(ShapeVertex), vertices, GL_STATIC_DRAW
-    );
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    glGenVertexArrays(1, &boardVao);
-    glBindVertexArray(boardVao);
-
-    const GLuint VERTEX_SHADER_POSITION   = 0;
-    const GLuint VERTEX_SHADER_NORMAL     = 1;
-    const GLuint VERTEX_SHADER_TEX_COORDS = 2;
-
-    glEnableVertexAttribArray(VERTEX_SHADER_POSITION);
-    glEnableVertexAttribArray(VERTEX_SHADER_NORMAL);
-    glEnableVertexAttribArray(VERTEX_SHADER_TEX_COORDS);
-
-    glBindBuffer(GL_ARRAY_BUFFER, boardVbo);
-    glVertexAttribPointer(
-        VERTEX_SHADER_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(ShapeVertex), (const GLvoid*)0
-    );
-    glVertexAttribPointer(
-        VERTEX_SHADER_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(ShapeVertex),
-        (const GLvoid*)offsetof(ShapeVertex, normal)
-    );
-    glVertexAttribPointer(
-        VERTEX_SHADER_TEX_COORDS, 2, GL_FLOAT, GL_FALSE, sizeof(ShapeVertex),
-        (const GLvoid*)offsetof(ShapeVertex, texCoords)
-    );
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    glBindVertexArray(0);
-
-    glGenBuffers(1, &squareVbo);
-    glBindBuffer(GL_ARRAY_BUFFER, squareVbo);
-
-    glBufferData(
-        GL_ARRAY_BUFFER, square.getVertexCount() * sizeof(ShapeVertex), square.getDataPointer(),
-        GL_STATIC_DRAW
-    );
-
-    glGenVertexArrays(1, &squareVao);
-    glBindVertexArray(squareVao);
-
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    glEnableVertexAttribArray(2);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ShapeVertex), (const GLvoid*)0);
-    glVertexAttribPointer(
-        1, 3, GL_FLOAT, GL_FALSE, sizeof(ShapeVertex), (const GLvoid*)offsetof(ShapeVertex, normal)
-    );
-    glVertexAttribPointer(
-        2, 2, GL_FLOAT, GL_FALSE, sizeof(ShapeVertex),
-        (const GLvoid*)offsetof(ShapeVertex, texCoords)
-    );
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-
-    glGenBuffers(1, &cylinderVbo);
-    glBindBuffer(GL_ARRAY_BUFFER, cylinderVbo);
-
-    glBufferData(
-        GL_ARRAY_BUFFER, cylinder.getVertexCount() * sizeof(ShapeVertex), cylinder.getDataPointer(),
-        GL_STATIC_DRAW
-    );
-
-    glGenVertexArrays(1, &cylinderVao);
-    glBindVertexArray(cylinderVao);
-
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    glEnableVertexAttribArray(2);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ShapeVertex), (const GLvoid*)0);
-    glVertexAttribPointer(
-        1, 3, GL_FLOAT, GL_FALSE, sizeof(ShapeVertex), (const GLvoid*)offsetof(ShapeVertex, normal)
-    );
-    glVertexAttribPointer(
-        2, 2, GL_FLOAT, GL_FALSE, sizeof(ShapeVertex),
-        (const GLvoid*)offsetof(ShapeVertex, texCoords)
-    );
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    initVertexObject(board.getDataPointer(), board.getVertexCount(), boardVbo, boardVao);
+    initVertexObject(square.getDataPointer(), square.getVertexCount(), squareVbo, squareVao);
+    initVertexObject(cylinder.getDataPointer(), cylinder.getVertexCount(), cylinderVbo, cylinderVao);
 
     return 0;
 }
@@ -383,8 +325,7 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
                 case 'n': knightOBJ.draw(); break;
 
                 default:
-                    pawnOBJ.draw(); // for now it has no texture cause no texcoords or all 0,0, to
-                                    // fix later
+                    pawnOBJ.draw();
                 }
             }
         }

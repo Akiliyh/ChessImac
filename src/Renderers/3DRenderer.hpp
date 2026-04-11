@@ -7,6 +7,7 @@
 #include <tiny_obj_loader.h>
 #include "Geometry.hpp"
 #include "Pieces.hpp"
+#include "common.hpp"
 
 struct ChessProgram {
     glimac::Program m_Program;
@@ -36,6 +37,7 @@ struct ChessProgram {
 class Renderer_3D {
   public:
     int init(int width, int height);
+    void initVertexObject(const glimac::ShapeVertex* data, size_t count, GLuint& vbo, GLuint& vao);
     int draw(int width, int height, GameManager& game);
     void terminate();
     void move_front(float delta);
