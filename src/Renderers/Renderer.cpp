@@ -24,21 +24,21 @@ void Renderer::draw(GameManager& game)
         {
             .init =
                 [&]() {
-                    renderer_3d.init(width, height);
+                    m_renderer_3d.init(width, height);
                     window = glfwGetCurrentContext();
                 },
             .loop =
 
                 [&]() {
-                    renderer_2d.draw(game);
+                    m_renderer_2d.draw(game);
 
                     ImGui::Begin("3D Controls");
                     ImGui::Text("Camera");
-                    ImGui::SliderFloat("FOV", &renderer_3d.fov, 10.f, 100.0f);
-                    ImGui::Checkbox("Panning", &renderer_3d.is_panning);
+                    ImGui::SliderFloat("FOV", &m_renderer_3d.fov, 10.f, 100.0f);
+                    ImGui::Checkbox("Panning", &m_renderer_3d.is_panning);
                     ImGui::End();
 
-                    renderer_3d.draw(width, height, game);
+                    m_renderer_3d.draw(width, height, game);
                 },
 
             .key_callback =
@@ -46,44 +46,44 @@ void Renderer::draw(GameManager& game)
                     if (key == GLFW_KEY_A && action == GLFW_PRESS)
                         glfwSetWindowShouldClose(window, GLFW_TRUE);
                     if (key == GLFW_KEY_Q && action == GLFW_PRESS)
-                        renderer_3d.camera.moveFront(0.5f);
+                        m_renderer_3d.camera.moveFront(0.5f);
                     if (key == GLFW_KEY_H && action == GLFW_PRESS)
-                        renderer_3d.camera.rotateLeft(1.0f);
+                        m_renderer_3d.camera.rotateLeft(1.0f);
                 },
             .mouse_button_callback =
                 [&](int button, int action, int mods) {
                     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
                     {
-                        renderer_3d.is_panning = !renderer_3d.is_panning;
+                        m_renderer_3d.is_panning = !m_renderer_3d.is_panning;
                     }
                     else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
                     {
-                        renderer_3d.is_panning = false;
+                        m_renderer_3d.is_panning = false;
                     }
                 },
             .cursor_position_callback =
                 [&](double xpos, double ypos) {
-                    const double deltaX = xpos - renderer_3d.lastX;
-                    const double deltaY = ypos - renderer_3d.lastY;
+                    const double deltaX = xpos - m_renderer_3d.lastX;
+                    const double deltaY = ypos - m_renderer_3d.lastY;
 
                     const float intensity = 0.1f;
 
-                    if (renderer_3d.is_panning)
+                    if (m_renderer_3d.is_panning)
                     {
-                        renderer_3d.camera.rotateLeft(deltaX * intensity);
-                        renderer_3d.camera.rotateUp(deltaY * intensity);
+                        m_renderer_3d.camera.rotateLeft(deltaX * intensity);
+                        m_renderer_3d.camera.rotateUp(deltaY * intensity);
                     }
 
-                    renderer_3d.lastX = xpos;
-                    renderer_3d.lastY = ypos;
+                    m_renderer_3d.lastX = xpos;
+                    m_renderer_3d.lastY = ypos;
                 },
             .scroll_callback = [&](
                                    double xoffset, double yoffset
-                               ) { renderer_3d.camera.moveFront(-(yoffset / 5.0)); },
+                               ) { m_renderer_3d.camera.moveFront(-(yoffset / 5.0)); },
         }
 
     );
-    renderer_3d.terminate(); // here we debind everything
+    m_renderer_3d.terminate(); // here we debind everything
 }
 
 void Renderer::drawStart(GameManager& game)
