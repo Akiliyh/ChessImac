@@ -69,7 +69,7 @@ int Renderer_3D::init(int width, int height)
     FilePath applicationPath("color2D.vs.glsl");
     this->chessProgram = std::make_unique<ChessProgram>(applicationPath);
 
-    ProjMatrix             = glm::perspective(glm::radians(70.f), 1.0f, 0.1f, 100.f);
+    ProjMatrix             = glm::perspective(glm::radians(fov), 1.0f, 0.1f, 100.f);
     glm::mat4 MVMatrix     = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
     glm::mat4 NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
     glm::mat4 MVPMatrix    = ProjMatrix * MVMatrix;
@@ -173,6 +173,7 @@ int Renderer_3D::init(int width, int height)
 
 int Renderer_3D::draw(int width, int height, GameManager& game)
 {
+    ProjMatrix             = glm::perspective(glm::radians(fov), 1.0f, 0.1f, 100.f);
     chessProgram->m_Program.use();
     glViewport(0, 0, width, height);
 
@@ -323,7 +324,6 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
             }
 
             // deal with pawn here
-            // for now all squares has a pawn on it
 
             // we want to display a piece only if it exists in the game board
 

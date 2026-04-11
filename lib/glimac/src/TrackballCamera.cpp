@@ -9,6 +9,11 @@ void TrackballCamera::moveFront(float delta)
     m_fDistance+=delta;
 }
 
+void TrackballCamera::moveTo(float distance)
+{
+    m_fDistance = distance;
+}
+
 void TrackballCamera::rotateLeft(float degrees)
 {
     m_fAngleX+=degrees;

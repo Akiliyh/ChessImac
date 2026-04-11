@@ -5,7 +5,6 @@
 #include <Program.hpp>
 #include <FilePath.hpp>
 #include <tiny_obj_loader.h>
-#include <OBJModel.hpp>
 #include "Geometry.hpp"
 #include "Pieces.hpp"
 
@@ -39,9 +38,12 @@ class Renderer_3D {
     int init(int width, int height);
     int draw(int width, int height, GameManager& game);
     void terminate();
-    void moveFront(float delta);
+    void move_front(float delta);
     glimac::TrackballCamera camera;
+
     bool is_panning = false;
+    float fov = 70.f;
+
     glimac::Geometry pawnOBJ;
     glimac::Geometry bishopOBJ;
     glimac::Geometry kingOBJ;

@@ -16,21 +16,28 @@
 void Renderer::draw(GameManager& game)
 {
     GLFWwindow* window = nullptr;
-    const int width {800};
-    const int height {800};
+    const int   width{800};
+    const int   height{800};
 
     quick_imgui::loop(
         "ChessImac",
         {
             .init =
                 [&]() {
-                    renderer_3d.init(width,height);
+                    renderer_3d.init(width, height);
                     window = glfwGetCurrentContext();
                 },
             .loop =
 
                 [&]() {
                     renderer_2d.draw(game);
+
+                    ImGui::Begin("3D Controls");
+                    ImGui::Text("Camera");
+                    ImGui::SliderFloat("FOV", &renderer_3d.fov, 10.f, 100.0f);
+                    ImGui::Checkbox("Panning", &renderer_3d.is_panning);
+                    ImGui::End();
+
                     renderer_3d.draw(width, height, game);
                 },
 
@@ -70,8 +77,9 @@ void Renderer::draw(GameManager& game)
                     renderer_3d.lastX = xpos;
                     renderer_3d.lastY = ypos;
                 },
-            .scroll_callback = [&](double xoffset,
-                                   double yoffset) { renderer_3d.camera.moveFront(-(yoffset/5.0)); },
+            .scroll_callback = [&](
+                                   double xoffset, double yoffset
+                               ) { renderer_3d.camera.moveFront(-(yoffset / 5.0)); },
         }
 
     );
