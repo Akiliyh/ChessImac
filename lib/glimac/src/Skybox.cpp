@@ -61,7 +61,7 @@ void Skybox::init(const glimac::FilePath& appPath, const std::vector<std::string
     glBindBuffer(GL_ARRAY_BUFFER, m_skybox_VBO);
 
     glBufferData(
-        GL_ARRAY_BUFFER, m_cube.getVertexCount() * sizeof(ShapeVertex), m_cube.getDataPointer(),
+        GL_ARRAY_BUFFER, cube.getVertexCount() * sizeof(ShapeVertex), cube.getDataPointer(),
         GL_STATIC_DRAW
     );
 
