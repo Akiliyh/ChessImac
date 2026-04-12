@@ -7,6 +7,7 @@
 #include <tiny_obj_loader.h>
 #include "Geometry.hpp"
 #include "Pieces.hpp"
+#include "Skybox.hpp"
 #include "Shader.hpp"
 #include "common.hpp"
 
@@ -57,6 +58,7 @@ struct SkyboxProgram {
 };
 
 class Renderer_3D {
+
   public:
     int init(int width, int height);
     void initVertexObject(const glimac::ShapeVertex* data, size_t count, GLuint& vbo, GLuint& vao);
@@ -64,6 +66,7 @@ class Renderer_3D {
     void terminate();
     void move_front(float delta);
     glimac::TrackballCamera camera;
+    std::unique_ptr<glimac::Skybox> skybox;
 
     bool is_panning = false;
     bool is_skybox_active = true;
@@ -92,10 +95,10 @@ class Renderer_3D {
 
     std::unique_ptr<ChessProgram> chessProgram;
 
-    std::unique_ptr<SkyboxProgram> skyboxProgram;
-    GLuint skyboxVAO;
-    GLuint skyboxVBO;
-    GLuint cubemapTexture;
+    // std::unique_ptr<SkyboxProgram> skyboxProgram;
+    // GLuint skyboxVAO;
+    // GLuint skyboxVBO;
+    // GLuint cubemapTexture;
 
     glm::mat4 ProjMatrix;
 
