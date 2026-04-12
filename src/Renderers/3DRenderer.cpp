@@ -403,6 +403,12 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
         }
     }
 
+    // render skybox
+
+    if (!is_skybox_active) {
+        return 0;
+    }
+
     glDepthFunc(GL_LEQUAL); // important
 
     skyboxProgram->m_Program.use();

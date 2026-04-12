@@ -36,6 +36,7 @@ void Renderer::draw(GameManager& game)
                     ImGui::Text("Camera");
                     ImGui::SliderFloat("FOV", &m_renderer_3d.fov, 10.f, 100.0f);
                     ImGui::Checkbox("Panning", &m_renderer_3d.is_panning);
+                    ImGui::Checkbox("Skybox", &m_renderer_3d.is_skybox_active);
                     ImGui::End();
 
                     m_renderer_3d.draw(width, height, game);

@@ -66,6 +66,7 @@ class Renderer_3D {
     glimac::TrackballCamera camera;
 
     bool is_panning = false;
+    bool is_skybox_active = true;
     float fov = 70.f;
 
     glimac::Geometry pawnOBJ;
