@@ -24,7 +24,6 @@
 #include <getTime.hpp>
 #include <glm.hpp>
 
-
 using namespace glimac;
 
 Cube     board(0.05f, 1.125f, 1.125f);
@@ -33,15 +32,30 @@ Cylinder cylinder(0.1f, 0.02f, 20, 20);
 
 const float texture_clipping_delta{0.001f};
 
+float skyboxVertices[] = {-1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f,
+                          1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f,
+
+                          -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f,
+                          -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,
+
+                          1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,
+                          1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f,
+
+                          -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,
+                          1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,
+
+                          -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,
+                          1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f,
+
+                          -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f,
+                          1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f};
+
 void Renderer_3D::initVertexObject(const ShapeVertex* data, size_t count, GLuint& vbo, GLuint& vao)
 {
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-    glBufferData(
-        GL_ARRAY_BUFFER, count * sizeof(ShapeVertex), data,
-        GL_STATIC_DRAW
-    );
+    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ShapeVertex), data, GL_STATIC_DRAW);
 
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
@@ -61,6 +75,38 @@ void Renderer_3D::initVertexObject(const ShapeVertex* data, size_t count, GLuint
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+}
+
+GLuint loadCubemap(const std::vector<std::string>& faces)
+{
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+    for (unsigned int i = 0; i < faces.size(); i++)
+    {
+        auto image = glimac::loadImage(faces[i]);
+
+        if (image)
+        {
+            glTexImage2D(
+                GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA, image->getWidth(),
+                image->getHeight(), 0, GL_RGBA, GL_FLOAT, image->getPixels()
+            );
+        }
+        else
+        {
+            std::cerr << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+        }
+    }
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    return textureID;
 }
 
 int Renderer_3D::init(int width, int height)
@@ -108,14 +154,39 @@ int Renderer_3D::init(int width, int height)
 
     initVertexObject(board.getDataPointer(), board.getVertexCount(), boardVbo, boardVao);
     initVertexObject(square.getDataPointer(), square.getVertexCount(), squareVbo, squareVao);
-    initVertexObject(cylinder.getDataPointer(), cylinder.getVertexCount(), cylinderVbo, cylinderVao);
+    initVertexObject(
+        cylinder.getDataPointer(), cylinder.getVertexCount(), cylinderVbo, cylinderVao
+    );
+
+    this->skyboxProgram = std::make_unique<SkyboxProgram>(applicationPath);
+
+    std::vector<std::string> faces = {
+        "./assets/textures/skybox/right.jpg", "./assets/textures/skybox/left.jpg",
+        "./assets/textures/skybox/top.jpg",   "./assets/textures/skybox/bottom.jpg",
+        "./assets/textures/skybox/front.jpg", "./assets/textures/skybox/back.jpg"
+    };
+
+    cubemapTexture = loadCubemap(faces);
+
+    glGenVertexArrays(1, &skyboxVAO);
+    glGenBuffers(1, &skyboxVBO);
+
+    glBindVertexArray(skyboxVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+
+    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), skyboxVertices, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+    glBindVertexArray(0);
 
     return 0;
 }
 
 int Renderer_3D::draw(int width, int height, GameManager& game)
 {
-    ProjMatrix             = glm::perspective(glm::radians(fov), 1.0f, 0.1f, 100.f);
+    ProjMatrix = glm::perspective(glm::radians(fov), 1.0f, 0.1f, 100.f);
     chessProgram->m_Program.use();
     glViewport(0, 0, width, height);
 
@@ -207,14 +278,14 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
                    : glUniform3f(chessProgram->uColor, 1.f, 1.f, 1.f);
 
             glUniformMatrix4fv(
-                    chessProgram->uMVPMatrix, 1, GL_FALSE, glm::value_ptr(squareMVPMatrix)
-                );
-                glUniformMatrix4fv(
-                    chessProgram->uMVMatrix, 1, GL_FALSE, glm::value_ptr(squareMVMatrix)
-                );
-                glUniformMatrix3fv(
-                    chessProgram->uNormalMatrix, 1, GL_FALSE, glm::value_ptr(squareNormalMatrix)
-                );
+                chessProgram->uMVPMatrix, 1, GL_FALSE, glm::value_ptr(squareMVPMatrix)
+            );
+            glUniformMatrix4fv(
+                chessProgram->uMVMatrix, 1, GL_FALSE, glm::value_ptr(squareMVMatrix)
+            );
+            glUniformMatrix3fv(
+                chessProgram->uNormalMatrix, 1, GL_FALSE, glm::value_ptr(squareNormalMatrix)
+            );
 
             glUniform1i(chessProgram->uUseTexture, 1);
 
@@ -239,13 +310,14 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
             if (!is_possible_square)
             {
                 glUniform1i(chessProgram->uUseTexture, 1);
-
-            } else {
+            }
+            else
+            {
                 glBindVertexArray(cylinderVao);
                 glm::mat4 possible_moveMVMatrix = squareMVMatrix;
 
                 possible_moveMVMatrix = glm::translate(
-                squareMVMatrix, glm::vec3(0, square_height + texture_clipping_delta, 0)
+                    squareMVMatrix, glm::vec3(0, square_height + texture_clipping_delta, 0)
                 );
 
                 glm::mat4 possible_moveMVPMatrix = ProjMatrix * possible_moveMVMatrix;
@@ -259,7 +331,8 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
                     chessProgram->uMVMatrix, 1, GL_FALSE, glm::value_ptr(possible_moveMVMatrix)
                 );
                 glUniformMatrix3fv(
-                    chessProgram->uNormalMatrix, 1, GL_FALSE, glm::value_ptr(possible_moveNormalMatrix)
+                    chessProgram->uNormalMatrix, 1, GL_FALSE,
+                    glm::value_ptr(possible_moveNormalMatrix)
                 );
 
                 glDrawArrays(GL_TRIANGLES, 0, cylinder.getVertexCount());
@@ -284,9 +357,11 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
                 pieceMVMatrix = glm::scale(pieceMVMatrix, glm::vec3(0.0625, 0.0625, 0.0625));
 
                 (current_square->get_color() == White)
-                    ? pieceMVMatrix = glm::rotate(pieceMVMatrix, 3.f * glm::pi<float>() * .5f, glm::vec3(0, 1, 0))
-                    : pieceMVMatrix = glm::rotate(pieceMVMatrix, glm::pi<float>() * .5f, glm::vec3(0, 1, 0));
-                
+                    ? pieceMVMatrix = glm::rotate(
+                          pieceMVMatrix, 3.f * glm::pi<float>() * .5f, glm::vec3(0, 1, 0)
+                      )
+                    : pieceMVMatrix =
+                          glm::rotate(pieceMVMatrix, glm::pi<float>() * .5f, glm::vec3(0, 1, 0));
 
                 glm::mat4 pieceMVPMatrix = ProjMatrix * pieceMVMatrix;
                 glm::mat4 pieceNormalMatrix =
@@ -302,9 +377,7 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
                     chessProgram->uNormalMatrix, 1, GL_FALSE, glm::value_ptr(pieceNormalMatrix)
                 );
 
-                glUniform1i(
-                    chessProgram->uUseTexture, 0
-                );
+                glUniform1i(chessProgram->uUseTexture, 0);
 
                 (current_square->get_color() == White)
                     ? glUniform3f(chessProgram->uColor, 1.0f, 1.0f, 1.0f)
@@ -324,12 +397,31 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
 
                 case 'n': knightOBJ.draw(); break;
 
-                default:
-                    pawnOBJ.draw();
+                default: pawnOBJ.draw();
                 }
             }
         }
     }
+
+    glDepthFunc(GL_LEQUAL); // important
+
+    skyboxProgram->m_Program.use();
+
+    // remove translation from camera
+    glm::mat4 view = glm::mat4(glm::mat3(camera.getViewMatrix()));
+
+    glUniformMatrix4fv(skyboxProgram->uView, 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(skyboxProgram->uProjection, 1, GL_FALSE, glm::value_ptr(ProjMatrix));
+
+    glBindVertexArray(skyboxVAO);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    glBindVertexArray(0);
+
+    glDepthFunc(GL_LESS);
 
     return 0;
 }

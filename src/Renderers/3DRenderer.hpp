@@ -7,6 +7,7 @@
 #include <tiny_obj_loader.h>
 #include "Geometry.hpp"
 #include "Pieces.hpp"
+#include "Shader.hpp"
 #include "common.hpp"
 
 struct ChessProgram {
@@ -32,6 +33,27 @@ struct ChessProgram {
     }
 
     ChessProgram() = default;
+};
+
+struct SkyboxProgram {
+    glimac::Program m_Program;
+
+    GLint uView;
+    GLint uProjection;
+    GLint uSkybox;
+
+    SkyboxProgram(const glimac::FilePath& appPath)
+        : m_Program(loadProgram(
+            appPath.dirPath() + "./assets/shaders/skybox.vs.glsl",
+            appPath.dirPath() + "./assets/shaders/skybox.fs.glsl"
+        )) 
+    {
+        uView = glGetUniformLocation(m_Program.getGLId(), "view");
+        uProjection = glGetUniformLocation(m_Program.getGLId(), "projection");
+        uSkybox = glGetUniformLocation(m_Program.getGLId(), "skybox");
+    }
+
+    SkyboxProgram() = default;
 };
 
 class Renderer_3D {
@@ -68,6 +90,11 @@ class Renderer_3D {
     GLuint woodTexture;
 
     std::unique_ptr<ChessProgram> chessProgram;
+
+    std::unique_ptr<SkyboxProgram> skyboxProgram;
+    GLuint skyboxVAO;
+    GLuint skyboxVBO;
+    GLuint cubemapTexture;
 
     glm::mat4 ProjMatrix;
 
