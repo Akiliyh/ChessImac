@@ -63,6 +63,24 @@ void Cube::build(GLfloat height, GLfloat width, GLfloat depth) {
          width, -height, -depth, 1.f, 1.f,
         -width, -height, -depth, 0.f, 1.f
     };
+
+    //here we set the normals for each vertex
+
+    GLfloat g_normal_buffer_data[] = {
+    // back
+    0,0,-1,  0,0,-1,  0,0,-1,  0,0,-1,  0,0,-1,  0,0,-1,
+    // front
+    0,0,1,   0,0,1,   0,0,1,   0,0,1,   0,0,1,   0,0,1,
+    // left
+    -1,0,0,  -1,0,0,  -1,0,0,  -1,0,0,  -1,0,0,  -1,0,0,
+    // right
+    1,0,0,   1,0,0,   1,0,0,   1,0,0,   1,0,0,   1,0,0,
+    // top
+    0,1,0,   0,1,0,   0,1,0,   0,1,0,   0,1,0,   0,1,0,
+    // bot
+    0,-1,0,  0,-1,0,  0,-1,0,  0,-1,0,  0,-1,0,  0,-1,0,
+    };
+
     // pour chaque vertex de triangle on set une position etc
     for(GLsizei i = 0; i < 12 * 3; ++i) { // 12 triangles x 3 vertices
         ShapeVertex vertex;
@@ -70,8 +88,9 @@ void Cube::build(GLfloat height, GLfloat width, GLfloat depth) {
         vertex.position.y = g_vertex_buffer_data[i*5 + 1];
         vertex.position.z = g_vertex_buffer_data[i*5 + 2];
 
-        vertex.normal = vertex.position;
-        // to normalize later
+        vertex.normal.x = g_normal_buffer_data[i*3 + 0];
+        vertex.normal.y = g_normal_buffer_data[i*3 + 1];
+        vertex.normal.z = g_normal_buffer_data[i*3 + 2];
 
         vertex.texCoords.x = g_vertex_buffer_data[i*5 + 3];
         vertex.texCoords.y = g_vertex_buffer_data[i*5 + 4];
