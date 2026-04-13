@@ -33,4 +33,4 @@ glm::mat4 TrackballCamera::getViewMatrix() const
     return ViewMatrix;
 }
 
-}
+}  // namespace glimac

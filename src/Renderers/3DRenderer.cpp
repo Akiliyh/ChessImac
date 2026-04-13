@@ -126,6 +126,16 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
 {
     ProjMatrix = glm::perspective(glm::radians(fov), 1.0f, 0.1f, 100.f);
     chessProgram->m_Program.use();
+
+        // lighting params
+
+    glm::vec3 lightColor = glm::vec3(1.0f, .0f, .0f);
+	glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
+
+    lightPos = glm::vec3(camera.getViewMatrix() * glm::vec4(lightPos, 1.0));
+    glUniform3f(chessProgram->uLightColor, lightColor.r, lightColor.g, lightColor.b);
+    glUniform3f(chessProgram->uLightPos, lightPos.x, lightPos.y, lightPos.z);
+
     glViewport(0, 0, width, height);
 
     /* Loop until the user closes the window */
@@ -138,6 +148,7 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
 
     glUniform1i(chessProgram->uBoardTexture, 0);
     glUniform1i(chessProgram->uUseTexture, 1);
+    glUniform3f(chessProgram->uCamPos, 0.0f, 0.0f, 0.0f);
 
     glm::mat4 globalMVMatrix = camera.getViewMatrix();
 

@@ -20,6 +20,10 @@ struct ChessProgram {
     GLint uBoardTexture;
     GLint uUseTexture;
 
+    GLint uLightPos;
+    GLint uLightColor;
+    GLint uCamPos;
+
     GLint uColor;
 
     ChessProgram(const glimac::FilePath& applicationPath):
@@ -31,6 +35,9 @@ struct ChessProgram {
         uBoardTexture = glGetUniformLocation(m_Program.getGLId(), "uBoardTexture");
         uColor = glGetUniformLocation(m_Program.getGLId(), "uColor");
         uUseTexture = glGetUniformLocation(m_Program.getGLId(), "uUseTexture");
+        uLightColor = glGetUniformLocation(m_Program.getGLId(), "uLightColor");
+        uLightPos = glGetUniformLocation(m_Program.getGLId(), "uLightPos");
+        uCamPos = glGetUniformLocation(m_Program.getGLId(), "uCamPos");
     }
 
     ChessProgram() = default;
