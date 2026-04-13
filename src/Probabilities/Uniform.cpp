@@ -12,7 +12,6 @@ Uniform::Uniform(int min, int max) : min_val(min), max_val(max)
     lcg_state     = seed;
 }
 
-// L'implementation de la nouvelle methode
 void Uniform::setRange(int min, int max)
 {
     min_val = min;

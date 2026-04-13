@@ -60,7 +60,6 @@ std::string Chess960Permutation::generateWithLibrary()
 {
     std::vector<char> currentRank = basePieces;
 
-    // Remplacement du do-while par un while(true)
     while (true)
     {
         std::shuffle(currentRank.begin(), currentRank.end(), rng);
@@ -77,7 +76,6 @@ std::string Chess960Permutation::generateFromScratch()
 {
     std::vector<char> currentRank = basePieces;
 
-    // Remplacement du do-while par un while(true)
     while (true)
     {
         customFisherYatesShuffle(currentRank);
