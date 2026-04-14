@@ -134,7 +134,7 @@ bool Chessboard::move_piece(
             // 1. On gère la collision s'il y a un ennemi
             if (this->board_data[dest_position] != nullptr)
             {
-                double    p = 0.8; // 80% de chance que l'attaque réussisse
+                double    p = 0.75; // 75% de chance que l'attaque réussisse
                 Bernoulli random_dodge(p);
 
                 if (!random_dodge.generate_scratch()) // Si ça renvoie false, la pièce a esquivé
