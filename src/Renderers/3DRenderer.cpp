@@ -128,19 +128,23 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
     ProjMatrix = glm::perspective(glm::radians(fov), 1.0f, 0.1f, 100.f);
     chessProgram->m_Program.use();
 
-        // lighting params
+    const bool is_white_turn = game.is_white_turn();
+    is_white_turn ? is_alternative_light_active = false : is_alternative_light_active = true;
+
+    // lighting params
 
     glm::vec3 lightColor = light_color;
 	glm::vec3 lightPos = light_pos;
 
     glm::vec3 lightColor2 = glm::vec3(.0f, .0f, 1.0f);
-	glm::vec3 lightPos2 = glm::vec3(0.0f, 1.f, 1.0f);
+    const float rotation_speed = 5.0f;
+	glm::vec3 lightPos2 = glm::vec3(glm::cos(getTime() * rotation_speed), 1.f, glm::sin(getTime() * rotation_speed));
 
     lightPos = glm::vec3(camera.getViewMatrix() * glm::vec4(lightPos, 1.0));
     lightPos2 = glm::vec3(camera.getViewMatrix() * glm::vec4(lightPos2, 1.0));
     glUniform3f(chessProgram->uLightColor, lightColor.r, lightColor.g, lightColor.b);
     glUniform3f(chessProgram->uLightPos, lightPos.x, lightPos.y, lightPos.z);
-    glUniform1i(chessProgram->uIsSecondLightActive, is_second_light_active);
+    glUniform1i(chessProgram->uIsSecondLightActive, is_alternative_light_active);
 
     glUniform3f(chessProgram->uLightColor2, lightColor2.r, lightColor2.g, lightColor2.b);
     glUniform3f(chessProgram->uLightPos2, lightPos2.x, lightPos2.y, lightPos2.z);

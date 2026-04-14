@@ -83,9 +83,12 @@ class Renderer_3D {
 
     bool is_panning = false;
     bool is_skybox_active = true;
-    bool is_second_light_active = false;
+    bool is_alternative_light_active = false;
     glm::vec3 light_pos = glm::vec3(0.0,2.0,0.0);
     glm::vec3 light_color = glm::vec3(1.0,1.0,1.0);
+    glm::vec3 light_color2 = glm::vec3(.0f, .0f, 1.0f);
+	glm::vec3 light_pos2 = glm::vec3(0.0f, 1.f, 1.0f);
+
     float fov = 70.f;
 
     glimac::Geometry pawnOBJ;
