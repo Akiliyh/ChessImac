@@ -35,7 +35,16 @@ void Renderer::draw(GameManager& game)
                     ImGui::Begin("3D Controls");
                     ImGui::Text("Camera");
                     ImGui::SliderFloat("FOV", &m_renderer_3d.fov, 10.f, 100.0f);
+                    ImGui::SliderFloat("Light Postion x", &m_renderer_3d.light_pos.x, -10.f, 10.0f);
+                    ImGui::SliderFloat("Light Postion y", &m_renderer_3d.light_pos.y, -10.f, 10.0f);
+                    ImGui::SliderFloat("Light Postion z", &m_renderer_3d.light_pos.z, -10.f, 10.0f);
+
+                    ImGui::PushItemWidth(100);
+                    ImGui::ColorPicker3("Light Color", &m_renderer_3d.light_color[0]);
+                    ImGui::PopItemWidth();
+
                     ImGui::Checkbox("Panning", &m_renderer_3d.is_panning);
+                    ImGui::Checkbox("Second Light", &m_renderer_3d.is_second_light_active);
                     ImGui::Checkbox("Skybox", &m_renderer_3d.is_skybox_active);
                     ImGui::End();
 

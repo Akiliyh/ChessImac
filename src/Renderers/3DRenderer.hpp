@@ -22,7 +22,10 @@ struct ChessProgram {
 
     GLint uLightPos;
     GLint uLightColor;
+    GLint uLightPos2;
+    GLint uLightColor2;
     GLint uCamPos;
+    GLint uIsSecondLightActive;
 
     GLint uColor;
 
@@ -37,7 +40,10 @@ struct ChessProgram {
         uUseTexture = glGetUniformLocation(m_Program.getGLId(), "uUseTexture");
         uLightColor = glGetUniformLocation(m_Program.getGLId(), "uLightColor");
         uLightPos = glGetUniformLocation(m_Program.getGLId(), "uLightPos");
+        uLightColor2 = glGetUniformLocation(m_Program.getGLId(), "uLightColor2");
+        uLightPos2 = glGetUniformLocation(m_Program.getGLId(), "uLightPos2");
         uCamPos = glGetUniformLocation(m_Program.getGLId(), "uCamPos");
+        uIsSecondLightActive = glGetUniformLocation(m_Program.getGLId(), "uIsSecondLightActive");
     }
 
     ChessProgram() = default;
@@ -77,6 +83,9 @@ class Renderer_3D {
 
     bool is_panning = false;
     bool is_skybox_active = true;
+    bool is_second_light_active = false;
+    glm::vec3 light_pos = glm::vec3(0.0,2.0,0.0);
+    glm::vec3 light_color = glm::vec3(1.0,1.0,1.0);
     float fov = 70.f;
 
     glimac::Geometry pawnOBJ;

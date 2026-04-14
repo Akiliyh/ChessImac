@@ -5,6 +5,7 @@
 #include "GameManager.hpp"
 #include "Image.hpp"
 #include "Pieces.hpp"
+#include "Shader.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_float4x4.hpp"
 #include "glm/ext/matrix_transform.hpp"
@@ -129,12 +130,20 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
 
         // lighting params
 
-    glm::vec3 lightColor = glm::vec3(1.0f, .0f, .0f);
-	glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
+    glm::vec3 lightColor = light_color;
+	glm::vec3 lightPos = light_pos;
+
+    glm::vec3 lightColor2 = glm::vec3(.0f, .0f, 1.0f);
+	glm::vec3 lightPos2 = glm::vec3(0.0f, 1.f, 1.0f);
 
     lightPos = glm::vec3(camera.getViewMatrix() * glm::vec4(lightPos, 1.0));
+    lightPos2 = glm::vec3(camera.getViewMatrix() * glm::vec4(lightPos2, 1.0));
     glUniform3f(chessProgram->uLightColor, lightColor.r, lightColor.g, lightColor.b);
     glUniform3f(chessProgram->uLightPos, lightPos.x, lightPos.y, lightPos.z);
+    glUniform1i(chessProgram->uIsSecondLightActive, is_second_light_active);
+
+    glUniform3f(chessProgram->uLightColor2, lightColor2.r, lightColor2.g, lightColor2.b);
+    glUniform3f(chessProgram->uLightPos2, lightPos2.x, lightPos2.y, lightPos2.z);
 
     glViewport(0, 0, width, height);
 
@@ -223,7 +232,7 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
 
             bool isDark = (row + col) % 2 == 1;
 
-            isDark ? glUniform3f(chessProgram->uColor, 0.f, 0.f, 0.f)
+            isDark ? glUniform3f(chessProgram->uColor, 0.1f, 0.1f, 0.1f)
                    : glUniform3f(chessProgram->uColor, 1.f, 1.f, 1.f);
 
             glUniformMatrix4fv(
@@ -330,7 +339,7 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
 
                 (current_square->get_color() == White)
                     ? glUniform3f(chessProgram->uColor, 1.0f, 1.0f, 1.0f)
-                    : glUniform3f(chessProgram->uColor, 0.2f, 0.1f, 0.1f);
+                    : glUniform3f(chessProgram->uColor, 0.3f, 0.2f, 0.2f);
 
                 // here we choose which model to draw
 

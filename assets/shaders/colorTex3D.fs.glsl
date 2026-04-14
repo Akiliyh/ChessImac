@@ -12,21 +12,25 @@ uniform bool uUseTexture;
 
 uniform vec3 uLightPos;
 uniform vec3 uLightColor;
+
+uniform vec3 uLightPos2;
+uniform vec3 uLightColor2;
 uniform vec3 uCamPos;
+
+uniform bool uIsSecondLightActive;
 
 // thank you victor gordan man
 
-vec4 pointLight(vec3 texColor)
+vec3 pointLight(vec3 lightPos, vec3 lightColor)
 {	
 	// used in two variables so I calculate it here to not have to do it twice
-	vec3 lightVec = uLightPos - vPosition_vs;;
+	vec3 lightVec = lightPos - vPosition_vs;
 
 	// intensity of light with respect to distance
 	float dist = length(lightVec);
-	float a = 3.0;
-	float b = 0.7;
+	float a = 0.2;
+	float b = 0.1;
 	float inten = 1.0f / (a * dist * dist + b * dist + 1.0f);
-	// float inten = 1.0f;
 
 	// ambient lighting
 	float ambient = 0.20f;
@@ -47,9 +51,10 @@ vec4 pointLight(vec3 texColor)
 		specular = specAmount * specularLight;
 	};
 
-    vec3 result = texColor * (ambient + diffuse * inten) + specular * inten * uLightColor;
+   		vec3 result = (ambient + diffuse * inten) * lightColor 
+            + specular * inten * lightColor;
 
-    return vec4(result, 1.0);
+    return result;
 }
 
 vec4 direcLight(vec3 texColor)
@@ -121,9 +126,15 @@ void main() {
 
     if(uUseTexture) {
         vec3 texColor = texture(uEarthTexture, vTexCoords).rgb;
-        FragColor = pointLight(texColor * uColor);
+		vec3 result = pointLight(uLightPos, uLightColor);
+		if (uIsSecondLightActive)
+			result += pointLight(uLightPos2, uLightColor2);
+        FragColor = vec4(result * (texColor * uColor), 1.0);
     } else {
-        FragColor = pointLight(uColor);
+		vec3 result = pointLight(uLightPos, uLightColor);
+		if (uIsSecondLightActive)
+			result +=  pointLight(uLightPos2, uLightColor2);
+        FragColor = vec4(result * uColor, 1.0);
     }
 
     
