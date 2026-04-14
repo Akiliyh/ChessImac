@@ -5,12 +5,11 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "2DRenderer.hpp"
 #include "Chessboard.hpp"
 #include "GameManager.hpp"
 #include "Pieces.hpp"
-#include "2DRenderer.hpp"
 #include "quick_imgui/quick_imgui.hpp"
-
 
 void Renderer_2D::draw(GameManager& game)
 {
@@ -213,7 +212,7 @@ void Renderer_2D::draw(GameManager& game)
         if (ImGui::Button(("New Game"), ImVec2{70.f, 50.f}))
         {
             std::cout << "New Game button " << "\n";
-            game.new_game();
+            game.new_game(game);
         }
 
         ImGui::SameLine(0, 5.0f);

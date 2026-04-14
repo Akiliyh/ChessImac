@@ -32,6 +32,30 @@ void Renderer::draw(GameManager& game)
                 [&]() {
                     m_renderer_2d.draw(game);
 
+                    // --- Mode Modal ---
+                    ImGui::Begin("Game Settings");
+                    ImGui::Text("Sélectionnez le mode de jeu :");
+
+                    if (ImGui::Button("Mode Classique"))
+                    {
+                        game.setMode(GameMode::Classic);
+                        game.new_game(game);
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("Mode Chaos"))
+                    {
+                        game.setMode(GameMode::Chaos);
+                        game.new_game(game);
+                    }
+
+                    ImGui::Separator();
+                    ImGui::Text(
+                        "Mode Actuel : %s",
+                        (game.getMode() == GameMode::Classic) ? "Classique" : "Chaos"
+                    );
+                    ImGui::End();
+                    // ----------------------------------------------
+
                     ImGui::Begin("3D Controls");
                     ImGui::Text("Camera");
                     ImGui::SliderFloat("FOV", &m_renderer_3d.fov, 10.f, 100.0f);
@@ -93,48 +117,4 @@ void Renderer::draw(GameManager& game)
 
     );
     m_renderer_3d.terminate(); // here we debind everything
-}
-
-void Renderer::drawStart(GameManager& game)
-{
-    quick_imgui::loop(
-        "ChessImac",
-        {
-            .init = [&]() {},
-            .loop =
-
-                [&]() {
-                    ImGui::ShowDemoWindow(); // This opens a window which shows tons of examples
-                                             // of what you can do with ImGui. You should check
-                                             // it out! Also, you can use the "Item Picker" in
-                                             // the top menu of that demo window: then click on
-                                             // any widget and it will show you the
-                                             // corresponding code directly in your IDE!
-                    ImGui::SetNextWindowSize({200, 200}, ImGuiCond_Once);
-                    if (m_current_state == GameState::MainMenu)
-                    {
-                        if (ImGui::Button(("Normal Mode"), ImVec2{70.f, 50.f}))
-                        {
-                            m_current_state = GameState::NormalGame;
-                        }
-                        if (ImGui::Button(("Chaos Mode"), ImVec2{70.f, 50.f}))
-                        {
-                            m_current_state = GameState::NormalGame;
-                        }
-                        if (ImGui::Button("Exit Game", ImVec2{150.f, 50.f}))
-                        {
-                            std::exit(0);
-                        }
-                    }
-                    else if (m_current_state == GameState::NormalGame
-                             || m_current_state == GameState::ChaosGame)
-                    {
-                        if (ImGui::Button("Exit Game", ImVec2{150.f, 50.f}))
-                        {
-                            std::exit(0);
-                        }
-                    }
-                },
-        }
-    );
 }
