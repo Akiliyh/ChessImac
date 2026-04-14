@@ -1,6 +1,7 @@
 #include "Chessboard.hpp"
 #include <algorithm>
 #include <cctype>
+#include <cmath>
 #include <cstddef>
 #include <functional>
 #include <iostream>
@@ -10,6 +11,7 @@
 #include <vector>
 #include "GameManager.hpp"
 #include "Pieces.hpp"
+#include "Probabilities/Bernoulli.hpp"
 
 void Chessboard::init_board()
 {
@@ -97,41 +99,78 @@ std::vector<std::unique_ptr<Piece>>& Chessboard::get_dead_pieces()
     return dead_pieces;
 }
 
-bool Chessboard::move_piece(std::unique_ptr<Piece>& active_square, int dest_position)
+bool Chessboard::move_piece(
+    std::unique_ptr<Piece>& active_square, int dest_position, GameManager& game
+)
 {
     std::vector<int> legal_moves = active_square->get_moves(this->board_data);
 
-    // we check if the move is legal
+    // On vérifie si le mouvement est légal
     if (std::find(legal_moves.begin(), legal_moves.end(), dest_position) != legal_moves.end())
     {
-        active_square->update_position(dest_position);
-
-        if (active_square->is_first_move())
+        if (game.get_mode() == GameMode::Classic)
         {
-            active_square->update_first_move(false);
+            active_square->update_position(dest_position);
+
+            if (active_square->is_first_move())
+            {
+                active_square->update_first_move(false);
+            }
+
+            // On vérifie si une pièce ennemie est à la destination
+            if (this->board_data[dest_position] != nullptr)
+            {
+                // On la sauvegarde dans dead_pieces
+                dead_pieces.push_back(std::move(this->board_data[dest_position]));
+            }
+
+            this->board_data[dest_position] = std::move(active_square);
+
+            return true;
         }
 
-        // We check if an ennemy piece is at the destination
-        if (this->board_data[dest_position] != nullptr)
+        if (game.get_mode() == GameMode::Chaos)
         {
-            // We save it in dead_pieces
-            dead_pieces.push_back(std::move(this->board_data[dest_position]));
+            // 1. On gère la collision s'il y a un ennemi
+            if (this->board_data[dest_position] != nullptr)
+            {
+                double    p = 0.8; // 80% de chance que l'attaque réussisse
+                Bernoulli random_dodge(p);
 
-            // for (const auto& piece : get_dead_pieces())
-            // {
-            //     std::cout << piece->get_label() << '\n';
-            // }
+                if (!random_dodge.generate_scratch()) // Si ça renvoie false, la pièce a esquivé
+                {
+                    std::cout << "Esquive ! Pas de chance." << std::endl;
+                    // On retourne true car l'action a été validée (le tour est joué),
+                    // mais la pièce attaquante reste à sa place d'origine.
+                    return true;
+                }
+
+                // Si l'attaque a réussi, on capture la pièce ennemie
+                dead_pieces.push_back(std::move(this->board_data[dest_position]));
+            }
+
+            // 2. On met à jour les états internes de la pièce AVANT le std::move
+            active_square->update_position(dest_position);
+
+            if (active_square->is_first_move())
+            {
+                active_square->update_first_move(false);
+            }
+
+            // 3. On déplace finalement la pièce sur le plateau
+            // (Ceci s'exécute si l'attaque a réussi OU si la case était vide)
+            this->board_data[dest_position] = std::move(active_square);
+
+            return true;
         }
-
-        this->board_data[dest_position] = std::move(active_square);
-
-        return true;
     }
     else
     {
         std::cout << "Illegal move!" << '\n';
         return false;
     }
+
+    return false; // Sécurité de fin de fonction
 }
 
 std::string Chessboard::to_alg_position(int index) const
