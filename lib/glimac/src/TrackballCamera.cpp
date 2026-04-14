@@ -21,7 +21,7 @@ void TrackballCamera::rotateLeft(float degrees)
 
 void TrackballCamera::rotateUp(float degrees)
 {/*
-    // we don't want to see below the board ⠀⠀⠀⠀⠀⠀⠀⠀
+    // you don't want to see what's below the board ⠀⠀⠀⠀⠀⠀⠀⠀
     //     ⣀⣤⣶⣾⡧⠀⠀⠀⠀⠀⠀⠀⣾⣷⣶⣤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠰⠿⠟⣋⡭⠒⠉⠉⠀⠀⠀⠀⠀⠀⠈⠉⠛⠿⣿⡿⠆⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⡠⠒⠅⢁⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣀⡈⢳⣄⠀⠀⠀⠀⠀⠀
