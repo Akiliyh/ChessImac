@@ -11,6 +11,16 @@ int Piece::get_position() const
     return m_position;
 }
 
+int Piece::get_move_count() const
+{
+    return m_move_counter;
+}
+
+void Piece::up_move_count()
+{
+    m_move_counter++;
+}
+
 void Piece::update_position(int position)
 {
     this->m_position = position;

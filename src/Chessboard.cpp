@@ -12,6 +12,7 @@
 #include "GameManager.hpp"
 #include "Pieces.hpp"
 #include "Probabilities/Bernoulli.hpp"
+#include "Probabilities/WeibullEvolution.hpp"
 
 void Chessboard::init_board()
 {
@@ -110,22 +111,15 @@ bool Chessboard::move_piece(
     {
         if (game.get_mode() == GameMode::Classic)
         {
+            // ... (Ton code Classic inchangé) ...
             active_square->update_position(dest_position);
-
             if (active_square->is_first_move())
-            {
                 active_square->update_first_move(false);
-            }
-
-            // On vérifie si une pièce ennemie est à la destination
             if (this->board_data[dest_position] != nullptr)
             {
-                // On la sauvegarde dans dead_pieces
                 dead_pieces.push_back(std::move(this->board_data[dest_position]));
             }
-
             this->board_data[dest_position] = std::move(active_square);
-
             return true;
         }
 
@@ -137,15 +131,13 @@ bool Chessboard::move_piece(
                 double    p = 0.75; // 75% de chance que l'attaque réussisse
                 Bernoulli random_dodge(p);
 
-                if (!random_dodge.generate_scratch()) // Si ça renvoie false, la pièce a esquivé
+                if (!random_dodge.generate_scratch()) // L'ennemi esquive
                 {
                     std::cout << "Esquive ! Pas de chance." << std::endl;
-                    // On retourne true car l'action a été validée (le tour est joué),
-                    // mais la pièce attaquante reste à sa place d'origine.
                     return true;
                 }
 
-                // Si l'attaque a réussi, on capture la pièce ennemie
+                // L'attaque réussit
                 dead_pieces.push_back(std::move(this->board_data[dest_position]));
             }
 
@@ -157,9 +149,63 @@ bool Chessboard::move_piece(
                 active_square->update_first_move(false);
             }
 
+            // On incrémente le compteur de mouvement tant qu'on a encore le pointeur
+            active_square->up_move_count();
+
+            // On calcule si elle va évoluer (toujours avec l'ancien pointeur)
+            WeibullEvolution chessEvolution(2.0, 3.0);
+            Bernoulli        random_evolution(
+                chessEvolution.getProbabilityScratch(active_square->get_move_count())
+            );
+            bool will_evolve = random_evolution.generate_scratch();
+
             // 3. On déplace finalement la pièce sur le plateau
-            // (Ceci s'exécute si l'attaque a réussi OU si la case était vide)
             this->board_data[dest_position] = std::move(active_square);
+            // ATTENTION : À partir d'ici, active_square est nullptr !
+
+            // 4. Gestion de l'évolution
+            if (will_evolve)
+            {
+                std::cout << "Mutation Chaos ! La piece evolue !" << std::endl;
+
+                // 4.1 On récupère la couleur (PieceColor) de la pièce actuelle
+                PieceColor current_color = this->board_data[dest_position]->get_color();
+
+                // 4.2 On calcule x et y à partir de dest_position
+                int dest_x = dest_position % 8;
+                int dest_y = dest_position / 8;
+
+                // 4.3 Remplacement par un Fou (Pour l'instant, comme tu l'as demandé)
+                // this->board_data[dest_position] =
+                //     std::make_unique<Bishop>(dest_x, dest_y, current_color);
+
+                // ---------------------------------------------------------
+                // BONUS : Quand tu voudras que ce soit VRAIMENT aléatoire :
+                // ---------------------------------------------------------
+
+                int random_type = std::rand() % 4; // Un nombre entre 0 et 3
+
+                switch (random_type)
+                {
+                case 0:
+                    this->board_data[dest_position] =
+                        std::make_unique<Queen>(dest_x, dest_y, current_color);
+                    break;
+                case 1:
+                    this->board_data[dest_position] =
+                        std::make_unique<Rook>(dest_x, dest_y, current_color);
+                    break;
+                case 2:
+                    this->board_data[dest_position] =
+                        std::make_unique<Bishop>(dest_x, dest_y, current_color);
+                    break;
+                case 3:
+                    this->board_data[dest_position] =
+                        std::make_unique<Knight>(dest_x, dest_y, current_color);
+                    break;
+                    // On évite de la transformer en Roi pour ne pas casser le jeu !
+                }
+            }
 
             return true;
         }
@@ -170,7 +216,7 @@ bool Chessboard::move_piece(
         return false;
     }
 
-    return false; // Sécurité de fin de fonction
+    return false;
 }
 
 std::string Chessboard::to_alg_position(int index) const
