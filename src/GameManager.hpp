@@ -6,11 +6,7 @@
 #include "Chessboard.hpp"
 #include "Pieces.hpp"
 
-enum class GameState {
-    MainMenu,
-    NormalGame,
-    ChaosGame,
-};
+enum class GameMode { Classic, Chaos };
 
 struct GameManager {
   private:
@@ -22,6 +18,8 @@ struct GameManager {
 
     Piece*           selected_square = nullptr;
     std::vector<int> possible_moves;
+
+    GameMode m_current_mode{GameMode::Classic};
 
   public:
     Chessboard                                board{}; // let's put it in private once it works
@@ -52,10 +50,19 @@ struct GameManager {
     void             on_square_clicked(int i);
     void             deselect_square();
 
-    void new_game();
+    void new_game(GameManager& game);
 
     GameManager()
     {
         load_game_from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    }
+
+    void setMode(GameMode mode)
+    {
+        m_current_mode = mode; /* Logique de reset/init du board ici */
+    }
+    GameMode getMode() const
+    {
+        return m_current_mode;
     }
 };

@@ -4,6 +4,7 @@
 #include <vector>
 #include "Chessboard.hpp"
 #include "Pieces.hpp"
+#include "Probabilities/Chess960Permutation.hpp"
 
 void GameManager::move_piece(int from_position, int dest_position)
 {
@@ -253,11 +254,21 @@ void GameManager::deselect_square()
     }
 }
 
-void GameManager::new_game()
+void GameManager::new_game(GameManager& game)
 {
     clear_possible_moves();
     m_full_move = 0;
     m_move      = 0;
     m_move_history.clear();
-    load_game_from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
+    if (game.getMode() == GameMode::Classic)
+    {
+        load_game_from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    }
+
+    if (game.getMode() == GameMode::Chaos)
+    {
+        Chess960Permutation generator;
+        load_game_from_fen(generator.generateFromScratch());
+    }
 }
