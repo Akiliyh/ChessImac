@@ -128,12 +128,12 @@ void main() {
         vec3 texColor = texture(uEarthTexture, vTexCoords).rgb;
 		vec3 result = pointLight(uLightPos, uLightColor);
 		if (uIsSecondLightActive)
-			result += pointLight(uLightPos2, uLightColor2);
+			result = pointLight(uLightPos2, uLightColor2) + pointLight(-uLightPos2, vec3(1.0,.0,.0));
         FragColor = vec4(result * (texColor * uColor), 1.0);
     } else {
 		vec3 result = pointLight(uLightPos, uLightColor);
 		if (uIsSecondLightActive)
-			result +=  pointLight(uLightPos2, uLightColor2);
+			result = pointLight(uLightPos2, uLightColor2) + pointLight(-uLightPos2, vec3(1.0,.0,.0));
         FragColor = vec4(result * uColor, 1.0);
     }
 

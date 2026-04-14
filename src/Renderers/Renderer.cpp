@@ -68,7 +68,6 @@ void Renderer::draw(GameManager& game)
                     ImGui::PopItemWidth();
 
                     ImGui::Checkbox("Panning", &m_renderer_3d.is_panning);
-                    ImGui::Checkbox("Second Light", &m_renderer_3d.is_second_light_active);
                     ImGui::Checkbox("Skybox", &m_renderer_3d.is_skybox_active);
                     ImGui::End();
 
