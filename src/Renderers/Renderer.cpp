@@ -51,7 +51,7 @@ void Renderer::draw(GameManager& game)
                     ImGui::Separator();
                     ImGui::Text(
                         "Mode Actuel : %s",
-                        (game.getMode() == GameMode::Classic) ? "Classique" : "Chaos"
+                        (game.get_mode() == GameMode::Classic) ? "Classique" : "Chaos"
                     );
                     ImGui::End();
                     // ----------------------------------------------

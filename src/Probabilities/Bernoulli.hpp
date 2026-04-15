@@ -3,16 +3,14 @@
 
 class Bernoulli {
   private:
-    double                                 probability_p;
-    std::mt19937                           generator;
-    std::bernoulli_distribution            std_bernoulli;
-    std::uniform_real_distribution<double> uniform_dist;
+    double                                 m_probability_var;
+    std::mt19937                           m_generator;
+    std::bernoulli_distribution            m_std_bernoulli;
+    std::uniform_real_distribution<double> m_uniform_dist;
 
   public:
-    // Constructor
     Bernoulli(double p);
 
-    // Methods
     bool generate_std();
     bool generate_scratch();
     void compare(int n);

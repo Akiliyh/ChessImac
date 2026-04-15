@@ -13,13 +13,14 @@ class Piece {
   private:
     int        m_position;
     char       m_label;
+    int        m_move_counter;
     bool       on_focus; // we wanna display possible moves only when clicked
     bool       first_move{true};
     PieceColor m_color;
 
   public:
     Piece(const int x, const int y, PieceColor color, char m_label)
-        : m_position(at(x, y)), m_color(color), on_focus(false), m_label(m_label)
+        : m_position(at(x, y)), m_color(color), on_focus(false), m_label(m_label), m_move_counter(0)
     {}
 
     Piece(const std::string& alg_notation, PieceColor color, char m_label)
@@ -32,18 +33,20 @@ class Piece {
     Piece& operator=(Piece&&)      = default; // move assignment
     virtual ~Piece()               = default; // destructor
 
-    int                get_position() const;
-    char               get_label() const;
-    bool               is_on_focus() const;
-    bool               is_first_move() const;
-    PieceColor         get_color();
-    int                movement();
+    int        get_position() const;
+    int        get_move_count() const;
+    char       get_label() const;
+    bool       is_on_focus() const;
+    bool       is_first_move() const;
+    PieceColor get_color();
+    int        movement();
 
     void update_position(int position);
     void update_label(char label);
     void update_on_focus(bool is_on_focus);
     void update_first_move(bool is_first_move);
     void update_color(PieceColor color);
+    void up_move_count();
 
     virtual std::vector<int> get_moves(std::vector<std::unique_ptr<Piece>>& board) = 0;
 

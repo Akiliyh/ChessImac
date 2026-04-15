@@ -6,12 +6,12 @@
 #include "Pieces.hpp"
 #include "Probabilities/Chess960Permutation.hpp"
 
-void GameManager::move_piece(int from_position, int dest_position)
+void GameManager::move_piece(int from_position, int dest_position, GameManager& game)
 {
     std::unique_ptr<Piece>& active_square = board.get_board_data()[from_position];
     if (is_player_move(active_square->get_color()) && !is_piece_promoting().has_value())
     {
-        bool piece_moved = board.move_piece(active_square, dest_position);
+        bool piece_moved = board.move_piece(active_square, dest_position, game);
         if (piece_moved)
         {
             add_move();
@@ -205,7 +205,7 @@ void GameManager::clear_possible_moves()
     possible_moves.clear();
 }
 
-void GameManager::on_square_clicked(int i)
+void GameManager::on_square_clicked(int i, GameManager& game)
 {
     // selected square is previously selected square and current_square is the one active just
     // now
@@ -218,7 +218,7 @@ void GameManager::on_square_clicked(int i)
         // only if it was eaten by the previous piece
 
         int old_position = selected_square->get_position();
-        move_piece(old_position, i);
+        move_piece(old_position, i, game);
         if (old_position != selected_square->get_position())
         { // we check if position changed
             if (current_square != nullptr)
@@ -266,12 +266,12 @@ void GameManager::new_game(GameManager& game)
     m_move      = 0;
     m_move_history.clear();
 
-    if (game.getMode() == GameMode::Classic)
+    if (game.get_mode() == GameMode::Classic)
     {
         load_game_from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     }
 
-    if (game.getMode() == GameMode::Chaos)
+    if (game.get_mode() == GameMode::Chaos)
     {
         Chess960Permutation generator;
         load_game_from_fen(generator.generateFromScratch());

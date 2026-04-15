@@ -3,27 +3,26 @@
 #include <iomanip>
 #include <iostream>
 
-// Constructor implementation
-Bernoulli::Bernoulli(double p) : probability_p(p), std_bernoulli(p), uniform_dist(0.0, 1.0)
+Bernoulli::Bernoulli(double p) : m_probability_var(p), m_std_bernoulli(p), m_uniform_dist(0.0, 1.0)
 {
     std::random_device rd;
-    generator = std::mt19937(rd());
+    m_generator = std::mt19937(rd());
 }
 
-// Method 1 implementation
+// Implementation using std
 bool Bernoulli::generate_std()
 {
-    return std_bernoulli(generator);
+    return m_std_bernoulli(m_generator);
 }
 
-// Method 2 implementation
+// Implementation from scratch
 bool Bernoulli::generate_scratch()
 {
-    double u = uniform_dist(generator);
-    return u < probability_p;
+    double u = m_uniform_dist(m_generator);
+    return u < m_probability_var;
 }
 
-// Method 3 implementation
+// Compare implementations
 void Bernoulli::compare(int n)
 {
     int success_std     = 0;
@@ -40,11 +39,12 @@ void Bernoulli::compare(int n)
     double p_empirical_std     = static_cast<double>(success_std) / n;
     double p_empirical_scratch = static_cast<double>(success_scratch) / n;
 
-    double error_std     = std::abs(p_empirical_std - probability_p);
-    double error_scratch = std::abs(p_empirical_scratch - probability_p);
+    double error_std     = std::abs(p_empirical_std - m_probability_var);
+    double error_scratch = std::abs(p_empirical_scratch - m_probability_var);
 
     std::cout << std::fixed << std::setprecision(6);
-    std::cout << "=== Comparaison sur " << n << " iterations (p = " << probability_p << ") ===\n";
+    std::cout << "=== Comparaison sur " << n << " iterations (p = " << m_probability_var
+              << ") ===\n";
 
     std::cout << "\n1. Methode std::bernoulli_distribution :\n";
     std::cout << "   - Succes obtenus : " << success_std << "\n";
@@ -59,7 +59,7 @@ void Bernoulli::compare(int n)
     std::cout << "\nDifference de probabilite empirique entre les deux generateurs : "
               << std::abs(p_empirical_std - p_empirical_scratch) << "\n";
 
-    double theoretical_std_dev = std::sqrt((probability_p * (1.0 - probability_p)) / n);
+    double theoretical_std_dev = std::sqrt((m_probability_var * (1.0 - m_probability_var)) / n);
     std::cout << "   (Rappel : l'ecart-type theorique attendu est d'environ " << theoretical_std_dev
               << ")\n";
     std::cout << "========================================================\n\n";

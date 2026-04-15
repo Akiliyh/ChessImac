@@ -136,7 +136,7 @@ void Renderer_2D::draw(GameManager& game)
         if (ImGui::Button(label.c_str(), ImVec2{50.f, 50.f}))
         {
             std::cout << "Clicked button " << i << "\n";
-            game.on_square_clicked(i);
+            game.on_square_clicked(i, game);
         }
 
         if (should_border)

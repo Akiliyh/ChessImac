@@ -40,11 +40,11 @@ struct GameManager {
     void                                      display_who_is_next(PieceColor player_color) const;
     bool                                      is_white_turn() const;
     bool                                      is_player_move(const PieceColor& player_color) const;
-    void                                      move_piece(int from_position, int dest_position);
-    std::optional<PieceColor>                 get_dead_king_color();
-    bool                                      is_king_dead();
-    std::optional<int>                        is_piece_promoting();
-    void                                      promote_piece(int from_position, char promote_to);
+    void                      move_piece(int from_position, int dest_position, GameManager& game);
+    std::optional<PieceColor> get_dead_king_color();
+    bool                      is_king_dead();
+    std::optional<int>        is_piece_promoting();
+    void                      promote_piece(int from_position, char promote_to);
     std::optional<Move>                       get_last_move() const;
 
     // void                              game_win(PieceColor winner_color);
@@ -55,7 +55,7 @@ struct GameManager {
     std::vector<int> get_possible_moves();
     Piece*           get_selected_square();
     void             clear_possible_moves();
-    void             on_square_clicked(int i);
+    void             on_square_clicked(int i, GameManager& game);
     void             deselect_square();
 
     void new_game(GameManager& game);
@@ -69,7 +69,7 @@ struct GameManager {
     {
         m_current_mode = mode; /* Logique de reset/init du board ici */
     }
-    GameMode getMode() const
+    GameMode get_mode() const
     {
         return m_current_mode;
     }
