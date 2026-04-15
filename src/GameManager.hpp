@@ -29,7 +29,7 @@ struct GameManager {
     GameMode m_current_mode{GameMode::Classic};
 
   public:
-    Chessboard                                board{}; // let's put it in private once it works
+    Chessboard                                board{};
     int                                       get_board() const;
     int                                       get_full_move() const;
     void                                      add_move();
@@ -47,7 +47,6 @@ struct GameManager {
     void                      promote_piece(int from_position, char promote_to);
     std::optional<Move>       get_last_move() const;
 
-    // void                              game_win(PieceColor winner_color);
     void load_game_from_fen(const std::string& fen);
 
     void             play_game();
@@ -67,7 +66,7 @@ struct GameManager {
 
     void setMode(GameMode mode)
     {
-        m_current_mode = mode; /* Logique de reset/init du board ici */
+        m_current_mode = mode;
     }
     GameMode get_mode() const
     {

@@ -14,15 +14,6 @@
 #include "Probabilities/Bernoulli.hpp"
 #include "Probabilities/WeibullEvolution.hpp"
 
-void Chessboard::init_board()
-{
-    // do smth here;
-}
-
-// for now we load the board from fen
-// WE REALLY NEED TO USE UNIQUE PTR NOW LOL
-// Lilian : I'm not sure now
-
 void Chessboard::load_board_from_fen(const std::string& positionData)
 {
     // first we reset the board here

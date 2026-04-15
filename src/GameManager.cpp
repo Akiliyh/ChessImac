@@ -23,7 +23,7 @@ void GameManager::move_piece(int from_position, int dest_position, GameManager& 
             m_move_history.emplace_back(
                 board.get_board_data()[dest_position]->get_label(), dest_alg_position
             );
-            last_move = Move{.from=from_position, .to=dest_position};
+            last_move = Move{.from = from_position, .to = dest_position};
         }
     }
 };
@@ -33,7 +33,8 @@ int GameManager::get_move() const
     return m_move;
 };
 
-std::optional<Move> GameManager::get_last_move() const {
+std::optional<Move> GameManager::get_last_move() const
+{
     return last_move;
 }
 
@@ -93,7 +94,7 @@ std::optional<int> GameManager::is_piece_promoting()
     {
         if (piece != nullptr)
         {
-            // Si la position est un entier entre 0 et 63
+            // Is position between 0 and 63 ?
             int current_row = piece->get_position() / 8;
 
             if ((piece->get_label() == 'P') && (current_row == 0))
@@ -116,14 +117,11 @@ void GameManager::promote_piece(int from_position, char promote_to)
 
     if (active_square != nullptr)
     {
-        // 1. On sauvegarde la couleur du pion avant de le détruire
         PieceColor piece_color = active_square->get_color();
 
-        // 2. On calcule les coordonnées X et Y si votre constructeur les demande.
         int x = from_position % 8;
         int y = from_position / 8;
 
-        // 3. On remplace le pointeur par la nouvelle pièce selon le choix du joueur
         switch (promote_to)
         {
         case 'Q':
@@ -134,10 +132,7 @@ void GameManager::promote_piece(int from_position, char promote_to)
         case 'b': active_square = std::make_unique<Bishop>(x, y, piece_color); break;
         case 'N':
         case 'n': active_square = std::make_unique<Knight>(x, y, piece_color); break;
-        default:
-            // Si l'entrée est invalide, on donne une Reine par défaut
-            active_square = std::make_unique<Queen>(x, y, piece_color);
-            break;
+        default: active_square = std::make_unique<Queen>(x, y, piece_color); break;
         }
     }
 }

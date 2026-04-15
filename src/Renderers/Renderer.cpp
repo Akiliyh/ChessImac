@@ -32,7 +32,7 @@ void Renderer::draw(GameManager& game)
                 [&]() {
                     m_renderer_2d.draw(game);
 
-                    // --- Mode Modal ---
+                    // --- Modal Modes ---
                     ImGui::Begin("Game Settings");
                     ImGui::Text("Sélectionnez le mode de jeu :");
 
