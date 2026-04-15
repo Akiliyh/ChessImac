@@ -158,7 +158,9 @@ bool Chessboard::move_piece(
 
             this->board_data[dest_position] = std::move(active_square);
 
-            if (will_evolve)
+            bool is_king = dynamic_cast<King*>(this->board_data[dest_position].get()) != nullptr;
+
+            if (will_evolve && !is_king)
             {
                 std::cout << "Mutation Chaos ! La piece evolue !" << std::endl;
 
@@ -167,7 +169,7 @@ bool Chessboard::move_piece(
                 int dest_x = dest_position % 8;
                 int dest_y = dest_position / 8;
 
-                int random_type = std::rand() % 4; // Un nombre entre 0 et 3
+                int random_type = std::rand() % 5; // Un nombre entre 0 et 3
 
                 switch (random_type)
                 {
@@ -186,6 +188,10 @@ bool Chessboard::move_piece(
                 case 3:
                     this->board_data[dest_position] =
                         std::make_unique<Knight>(dest_x, dest_y, current_color);
+                    break;
+                case 4:
+                    this->board_data[dest_position] =
+                        std::make_unique<Pawn>(dest_x, dest_y, current_color);
                     break;
                 }
             }

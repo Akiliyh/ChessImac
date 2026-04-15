@@ -2,8 +2,8 @@
 
 class WeibullEvolution {
   private:
-    double m_shape; // Parametre k (forme) - Doit etre superieur a 1 pour ton besoin
-    double m_scale; // Parametre lambda (echelle)
+    double m_shape; // Parameter k (shape) < 1
+    double m_scale; // Parameter lambda (scale)
 
   public:
     WeibullEvolution(double shape_param, double scale_param)
@@ -12,7 +12,7 @@ class WeibullEvolution {
     // Monte Carlo with std::weibull_distribution
     double get_probability_std(int moves, int samples = 100000);
 
-    // Formule mathematique exacte CDF
+    // CDF Formula
     double get_probability_scratch(int moves) const;
 
     void compare_methods(int max_moves, int samples = 100000);

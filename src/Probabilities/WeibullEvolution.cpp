@@ -24,11 +24,11 @@ double WeibullEvolution::get_probability_std(int moves, int samples)
         }
     }
 
-    // (probabilite empirique)
+    // Empirical probability
     return static_cast<double>(evolvedCount) / samples;
 }
 
-// Implementation from scratch la fonction de repartition (CDF)
+// Implementation from scratch of the distribution function (CDF)
 double WeibullEvolution::get_probability_scratch(int moves) const
 {
     if (moves <= 0)
