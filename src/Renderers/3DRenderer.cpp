@@ -12,17 +12,17 @@
 #include "glm/ext/scalar_constants.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/fwd.hpp"
+#include <cmath>
 
 #define GLFW_INCLUDE_NONE
 #include "common.hpp"
 // #include <GLFW/glfw3.h>
 // #include <glad/glad.h>
 #include <Cube.hpp>
-#include <Cylinder.hpp>
 #include <FilePath.hpp>
 #include <Program.hpp>
-#include <Sphere.hpp>
 #include <Skybox.hpp>
+#include <Sphere.hpp>
 #include <getTime.hpp>
 #include <glm.hpp>
 
@@ -125,6 +125,38 @@ int Renderer_3D::init(int width, int height)
 
 int Renderer_3D::draw(int width, int height, GameManager& game)
 {
+    if (current_move != game.get_move())
+    {
+        auto moveOpt = game.get_last_move();
+
+        if (moveOpt)
+        {
+            anim_from = moveOpt->from;
+            anim_to   = moveOpt->to;
+
+            anim_time    = 0.3f;
+            anim_elapsed = 0.0f;
+            is_animating = true;
+        }
+
+        current_move = game.get_move();
+    }
+
+    double currentFrame = getTime();
+    double deltaTime    = currentFrame - last_frame;
+    last_frame          = currentFrame;
+
+    if (is_animating)
+    {
+        anim_elapsed += deltaTime;
+
+        if (anim_elapsed >= anim_duration)
+        {
+            is_animating = false;
+            anim_elapsed = anim_duration;
+        }
+    }
+
     ProjMatrix = glm::perspective(glm::radians(fov), 1.0f, 0.1f, 100.f);
     chessProgram->m_Program.use();
 
@@ -134,13 +166,14 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
     // lighting params
 
     glm::vec3 lightColor = light_color;
-	glm::vec3 lightPos = light_pos;
+    glm::vec3 lightPos   = light_pos;
 
-    glm::vec3 lightColor2 = glm::vec3(.0f, .0f, 1.0f);
+    glm::vec3   lightColor2    = glm::vec3(.0f, .0f, 1.0f);
     const float rotation_speed = 5.0f;
-	glm::vec3 lightPos2 = glm::vec3(glm::cos(getTime() * rotation_speed), 1.f, glm::sin(getTime() * rotation_speed));
+    glm::vec3   lightPos2 =
+        glm::vec3(glm::cos(getTime() * rotation_speed), 1.f, glm::sin(getTime() * rotation_speed));
 
-    lightPos = glm::vec3(camera.getViewMatrix() * glm::vec4(lightPos, 1.0));
+    lightPos  = glm::vec3(camera.getViewMatrix() * glm::vec4(lightPos, 1.0));
     lightPos2 = glm::vec3(camera.getViewMatrix() * glm::vec4(lightPos2, 1.0));
     glUniform3f(chessProgram->uLightColor, lightColor.r, lightColor.g, lightColor.b);
     glUniform3f(chessProgram->uLightPos, lightPos.x, lightPos.y, lightPos.z);
@@ -210,7 +243,8 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
 
         for (size_t col = 0; col < 8; col++)
         {
-            piece_position                         = col + (row * game_board_size);
+            piece_position = col + (row * game_board_size);
+
             const std::vector<int>& possible_moves = game.get_possible_moves();
 
             squareMVMatrix = glm::translate(
@@ -308,14 +342,46 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
 
             if (current_square)
             {
-                glm::mat4 pieceMVMatrix = glm::translate(
-                    squareMVMatrix,
+                glm::mat4 pieceMVMatrix = globalMVMatrix; // Translation
+                pieceMVMatrix           = glm::translate(
+                    pieceMVMatrix, glm::vec3(-1, square_height * 5, -1 + (board_width / 8.0f))
+                );
+
+                // here we retrieve the current correct piece_position
+                int anim_row = piece_position / game_board_size;
+                int anim_col = piece_position % game_board_size;
+
+                float draw_col = col;
+                float draw_row = row;
+
+                //if animation we update 
+                if (is_animating && piece_position == anim_to)
+                {
+                    // float time = anim_elapsed / anim_duration;
+                    float time = glm::sin(((anim_elapsed / anim_duration) * glm::pi<float>()) / 2);
+
+                    float from_row = anim_from / game_board_size;
+                    float from_col = anim_from % game_board_size;
+                    // we set float here so the mix works great
+
+                    float to_row = anim_to / game_board_size;
+                    float to_col = anim_to % game_board_size;
+                    
+                    // interpolation time
+                    draw_col = glm::mix(from_col, to_col, time);
+                    draw_row = glm::mix(from_row, to_row, time);
+                }
+
+                pieceMVMatrix = glm::translate(
+                    pieceMVMatrix,
                     glm::vec3(
-                        0,
-                        square_height + texture_clipping_delta, // to avoid texture clipping
-                        0.0f
+                        glm::vec3(
+                            ((square_width * 2)) * draw_col + ((board_width / 8.0)),
+                            square_height + texture_clipping_delta, (square_width * 2) * draw_row
+                        )
                     )
                 );
+
                 pieceMVMatrix = glm::scale(pieceMVMatrix, glm::vec3(0.0625, 0.0625, 0.0625));
 
                 (current_square->get_color() == White)
@@ -371,6 +437,9 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
         return 0;
 
     skybox->draw(camera.getViewMatrix(), ProjMatrix);
+
+    // here we update the move for piece animation
+    current_move = game.get_move();
 
     return 0;
 }
