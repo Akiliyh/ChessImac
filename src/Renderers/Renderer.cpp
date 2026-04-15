@@ -30,6 +30,14 @@ void Renderer::draw(GameManager& game)
             .loop =
 
                 [&]() {
+                    if (game.get_mode() == GameMode::Chaos && !game.is_paused())
+                    {
+                        if (game.is_time_over())
+                        {
+                            game.skip_turn();
+                        }
+                    }
+
                     m_renderer_2d.draw(game);
 
                     // ==========================================
@@ -56,9 +64,64 @@ void Renderer::draw(GameManager& game)
                         "Current Mode : %s",
                         (game.get_mode() == GameMode::Classic) ? "Classic" : "Chaos"
                     );
-                    ImGui::End();
 
                     // ==========================================
+                    // Chrono & Time Limit
+                    // ==========================================
+                    ImGui::Separator();
+
+                    ImGui::Text("Turn: %s", game.is_white_turn() ? "White" : "Black");
+
+                    double elapsed = game.get_current_turn_elapsed_time();
+                    ImGui::Text("Thinking time : %.1f s", elapsed);
+
+                    if (game.get_mode() == GameMode::Chaos)
+                    {
+                        double remaining = std::max(0.0, GameManager::TURN_TIME_LIMIT - elapsed);
+                        auto   progress  = (float)(remaining / GameManager::TURN_TIME_LIMIT);
+
+                        bool color_pushed = false;
+                        if (game.is_paused())
+                        {
+                            ImGui::PushStyleColor(
+                                ImGuiCol_PlotHistogram, ImVec4(0.5f, 0.5f, 0.5f, 1.0f)
+                            );
+                            color_pushed = true;
+                        }
+                        else if (remaining < 3.0)
+                        {
+                            ImGui::PushStyleColor(
+                                ImGuiCol_PlotHistogram, ImVec4(1.0f, 0.0f, 0.0f, 1.0f)
+                            );
+                            color_pushed = true;
+                        }
+
+                        ImGui::Text("Time left : %.1f s", remaining);
+                        ImGui::ProgressBar(progress, ImVec2(-1.0f, 0.0f));
+
+                        if (color_pushed)
+                        {
+                            ImGui::PopStyleColor();
+                        }
+
+                        if (game.is_paused())
+                        {
+                            ImGui::Text("GAME IN PAUSE");
+                        }
+                        else if (remaining < 3.0)
+                        {
+                            ImGui::TextColored(ImVec4(1, 0, 0, 1), "HURRY !");
+                        }
+
+                        ImGui::Separator();
+
+                        if (ImGui::Button(game.is_paused() ? "RESUME" : "PAUSE"))
+                        {
+                            game.toggle_pause();
+                        }
+                    }
+
+                    ImGui::End();
 
                     // ==========================================
                     // Mutation Pop-up
@@ -88,7 +151,6 @@ void Renderer::draw(GameManager& game)
                         ImGui::SetItemDefaultFocus();
                         ImGui::EndPopup();
                     }
-                    // ==========================================
 
                     // ==========================================
                     // Dodge Attack Pop-up
@@ -117,7 +179,6 @@ void Renderer::draw(GameManager& game)
                         ImGui::SetItemDefaultFocus();
                         ImGui::EndPopup();
                     }
-                    // ==========================================
 
                     ImGui::Begin("3D Controls");
                     ImGui::Text("Camera");
@@ -151,7 +212,7 @@ void Renderer::draw(GameManager& game)
                         m_renderer_3d.camera->rotateLeft(1.0f);
                     if (key == GLFW_KEY_L && action == GLFW_PRESS)
                         m_renderer_3d.use_trackball_camera = !m_renderer_3d.use_trackball_camera;
-                            m_renderer_3d.change_camera();
+                    m_renderer_3d.change_camera();
                 },
             .mouse_button_callback =
                 [&](int button, int action, int mods) {

@@ -100,6 +100,8 @@ bool Chessboard::move_piece(
     // Is the move legal ?
     if (std::find(legal_moves.begin(), legal_moves.end(), dest_position) != legal_moves.end())
     {
+        game.reset_turn_timer();
+
         if (game.get_mode() == GameMode::Classic)
         {
             active_square->update_position(dest_position);

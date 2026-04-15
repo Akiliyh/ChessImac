@@ -260,6 +260,7 @@ void GameManager::new_game(GameManager& game)
     m_full_move = 0;
     m_move      = 0;
     m_move_history.clear();
+    reset_turn_timer();
 
     if (game.get_mode() == GameMode::Classic)
     {
@@ -314,3 +315,54 @@ std::string GameManager::get_dodge_message()
 {
     return dodge_message;
 };
+
+void GameManager::reset_turn_timer()
+{
+    m_turn_start_time  = std::chrono::steady_clock::now();
+    m_accumulated_time = 0.0;
+    m_is_paused        = false;
+}
+
+void GameManager::toggle_pause()
+{
+    if (!m_is_paused)
+    {
+        m_accumulated_time = get_current_turn_elapsed_time();
+    }
+    else
+    {
+        m_turn_start_time = std::chrono::steady_clock::now();
+    }
+    m_is_paused = !m_is_paused;
+}
+
+double GameManager::get_current_turn_elapsed_time() const
+{
+    if (m_is_paused)
+    {
+        return m_accumulated_time;
+    }
+
+    auto                          now     = std::chrono::steady_clock::now();
+    std::chrono::duration<double> elapsed = now - m_turn_start_time;
+    return m_accumulated_time + elapsed.count();
+}
+
+bool GameManager::is_time_over() const
+{
+    return get_current_turn_elapsed_time() >= TURN_TIME_LIMIT;
+}
+
+void GameManager::skip_turn()
+{
+    m_move++;
+
+    if (m_move % 2 == 0)
+    {
+        m_full_move++;
+    }
+
+    reset_turn_timer();
+
+    std::cout << "Temps écoulé ! Tour sauté." << std::endl;
+}

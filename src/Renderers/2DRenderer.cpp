@@ -26,15 +26,6 @@ void Renderer_2D::draw(GameManager& game)
     const std::vector<int>& possible_moves  = game.get_possible_moves();
     Piece*                  selected_square = game.get_selected_square();
 
-    if (game.is_white_turn())
-    {
-        ImGui::Text("%s", ("White to move"));
-    }
-    else
-    {
-        ImGui::Text("%s", ("Black to move"));
-    }
-
     const auto& moves = game.get_move_history();
     for (size_t i = 0; i < moves.size(); i++)
     {
@@ -197,34 +188,68 @@ void Renderer_2D::draw(GameManager& game)
     ImGui::PopStyleVar();
     ImGui::End();
 
+    // ==========================================
+    // Game Over Pop-up
+    // ==========================================
+
     if (game.is_king_dead())
     {
-        ImGui::Begin("Game end");
-        if (game.get_dead_king_color() == White)
-        {
-            ImGui::Text("%s", ("Black win !"));
-        }
-        if (game.get_dead_king_color() == Black)
-        {
-            ImGui::Text("%s", ("White win !"));
-        }
+        ImGui::OpenPopup("Game Over !");
 
-        if (ImGui::Button(("New Game"), ImVec2{70.f, 50.f}))
+        // On fige le chronomètre de fin de partie
+        if (!game.is_paused())
         {
-            std::cout << "New Game button " << "\n";
-            game.new_game(game);
+            game.toggle_pause();
         }
-
-        ImGui::SameLine(0, 5.0f);
-
-        if (ImGui::Button(("Exit Game"), ImVec2{70.f, 50.f}))
-        {
-            std::cout << "Exit Game button " << "\n";
-            std::exit(0);
-            // put glfwwindow close when we'll do 3d
-        }
-        ImGui::End();
     }
+
+    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+    if (ImGui::BeginPopupModal("Game Over !", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        // On affiche le gagnant
+        if (game.get_dead_king_color() == PieceColor::White) // Assure-toi du nom de ton enum
+        {
+            ImGui::Text("Black win !");
+        }
+        else if (game.get_dead_king_color() == PieceColor::Black)
+        {
+            ImGui::Text("White win !");
+        }
+
+        ImGui::Separator();
+
+        // Bouton relancer une partie
+        if (ImGui::Button("New Game", ImVec2(100, 0)))
+        {
+            std::cout << "New Game button \n";
+            game.new_game(game);
+
+            // On relance le chronomètre pour la nouvelle partie
+            if (game.is_paused())
+            {
+                game.toggle_pause();
+            }
+
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::SameLine();
+
+        // Bouton quitter
+        if (ImGui::Button("Exit Game", ImVec2(100, 0)))
+        {
+            std::cout << "Exit Game button \n";
+            // glfwSetWindowShouldClose(window, GLFW_TRUE); // A décommenter quand tu passeras à la
+            // 3D
+            std::exit(0);
+        }
+
+        ImGui::SetItemDefaultFocus(); // Met le focus sur "Exit" ou "New Game" par défaut
+        ImGui::EndPopup();
+    }
+    // ==========================================
 
     std::optional<int> promoting_pawn = game.is_piece_promoting();
 

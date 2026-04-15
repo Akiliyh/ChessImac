@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <optional>
 #include <utility>
 #include <vector>
@@ -33,6 +34,10 @@ struct GameManager {
 
     std::string dodge_message    = "";
     bool        show_dodge_popup = false;
+
+    std::chrono::steady_clock::time_point m_turn_start_time;
+    bool                                  m_is_paused{false};
+    double                                m_accumulated_time{0.0};
 
   public:
     Chessboard                                board{};
@@ -88,4 +93,15 @@ struct GameManager {
     void        set_show_dodge_popup(bool is_dodge_showing);
     bool        get_show_dodge_popup() const;
     std::string get_dodge_message();
+
+    static constexpr double TURN_TIME_LIMIT = 20.0;
+    void                    skip_turn();
+    bool                    is_time_over() const;
+    void                    reset_turn_timer();
+    double                  get_current_turn_elapsed_time() const;
+    void                    toggle_pause();
+    bool                    is_paused() const
+    {
+        return m_is_paused;
+    }
 };
