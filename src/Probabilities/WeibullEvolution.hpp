@@ -2,21 +2,20 @@
 
 class WeibullEvolution {
   private:
-    double shape; // Parametre k (forme) - Doit etre superieur a 1 pour ton besoin
-    double scale; // Parametre lambda (echelle)
+    double m_shape; // Parametre k (forme) - Doit etre superieur a 1 pour ton besoin
+    double m_scale; // Parametre lambda (echelle)
 
   public:
-    // Constructeur
-    WeibullEvolution(double shapeParam, double scaleParam);
+    WeibullEvolution(double shape_param, double scale_param)
+        : m_shape(shape_param), m_scale(scale_param) {};
 
-    // Methode utilisant la librairie standard (Monte Carlo avec std::weibull_distribution)
-    double getProbabilityLibrary(int moves, int samples = 100000);
+    // Monte Carlo with std::weibull_distribution
+    double get_probability_std(int moves, int samples = 100000);
 
-    // Methode from scratch (Formule mathematique exacte CDF)
-    double getProbabilityScratch(int moves);
+    // Formule mathematique exacte CDF
+    double get_probability_scratch(int moves) const;
 
-    // Methode pour comparer l'ecart entre les deux approches sur n iterations
-    void compareMethods(int maxMoves, int samples = 100000);
+    void compare_methods(int max_moves, int samples = 100000);
 };
 
 // k = 2.0 (la probabilite augmente a chaque deplacement)
@@ -24,4 +23,4 @@ class WeibullEvolution {
 // WeibullEvolution chessEvolution(2.0, 15.0);
 
 // On compare sur 20 cases de deplacement
-// chessEvolution.compareMethods(20);
+// chessEvolution.compare_methods(20);

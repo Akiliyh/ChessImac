@@ -152,7 +152,7 @@ bool Chessboard::move_piece(
             // Is the Piece mutating ?
             WeibullEvolution chessEvolution(2.0, 3.0);
             Bernoulli        random_evolution(
-                chessEvolution.getProbabilityScratch(active_square->get_move_count())
+                chessEvolution.get_probability_scratch(active_square->get_move_count())
             );
             bool will_evolve = random_evolution.generate_scratch();
 
