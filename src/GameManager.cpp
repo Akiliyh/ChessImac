@@ -23,6 +23,7 @@ void GameManager::move_piece(int from_position, int dest_position, GameManager& 
             m_move_history.emplace_back(
                 board.get_board_data()[dest_position]->get_label(), dest_alg_position
             );
+            last_move = Move{.from=from_position, .to=dest_position};
         }
     }
 };
@@ -31,6 +32,10 @@ int GameManager::get_move() const
 {
     return m_move;
 };
+
+std::optional<Move> GameManager::get_last_move() const {
+    return last_move;
+}
 
 std::vector<std::pair<char, std::string>> GameManager::get_move_history() const
 {

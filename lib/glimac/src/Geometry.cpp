@@ -222,4 +222,4 @@ void Geometry::draw() const {
     glBindVertexArray(0);
 }
 
-}
+}  // namespace glimac

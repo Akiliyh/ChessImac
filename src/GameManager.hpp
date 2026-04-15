@@ -8,10 +8,17 @@
 
 enum class GameMode { Classic, Chaos };
 
+// this for the animation we want to lerp between the previous position in the 1d array of the board
+struct Move {
+    int from;
+    int to;
+};
+
 struct GameManager {
   private:
-    int m_full_move{0}; // full move is both color played capice? mamma miaaa
-    int m_move{0};
+    std::optional<Move> last_move;
+    int                 m_full_move{0}; // full move is both color played capice? mamma miaaa
+    int                 m_move{0};
     std::vector<std::pair<char, std::string>>
         m_move_history{}; // we store the type of piece and the square of destination
     // maybe later we could store if it is a capture, promotion or check eventually
@@ -38,6 +45,7 @@ struct GameManager {
     bool                      is_king_dead();
     std::optional<int>        is_piece_promoting();
     void                      promote_piece(int from_position, char promote_to);
+    std::optional<Move>       get_last_move() const;
 
     // void                              game_win(PieceColor winner_color);
     void load_game_from_fen(const std::string& fen);
