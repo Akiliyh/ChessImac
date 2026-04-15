@@ -29,6 +29,7 @@ class FreeflyCamera : public Camera
     };
 
     void moveLeft(float t);
+    void set_position(glm::vec3 position);
     void moveFront(float t) override;
     void rotateLeft(float degrees) override;
     void rotateUp(float degrees) override;

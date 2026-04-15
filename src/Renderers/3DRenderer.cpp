@@ -65,16 +65,7 @@ void Renderer_3D::init_vertex_object(
 
 void Renderer_3D::change_camera()
 {
-    if (!use_trackball_camera)
-    {
-        camera               = trackball_camera.get();
-        use_trackball_camera = true;
-    }
-    else
-    {
-        camera               = freefly_camera.get();
-        use_trackball_camera = false;
-    }
+    use_trackball_camera ? camera = trackball_camera.get() : camera = freefly_camera.get();
 }
 
 int Renderer_3D::init(int width, int height)
@@ -150,7 +141,7 @@ int Renderer_3D::init(int width, int height)
     return 0;
 }
 
-void Renderer_3D::draw_pieces(int piece_position, Piece* current_square, int col, int row) const
+void Renderer_3D::draw_pieces(int piece_position, Piece* current_square, int col, int row)
 {
     if (current_square)
     {
@@ -201,6 +192,18 @@ void Renderer_3D::draw_pieces(int piece_position, Piece* current_square, int col
                 )
             )
         );
+
+        // not very ideal to set up the camera but hey we are in a bit of a rush
+
+        if (col == selected_square_col && row == selected_square_row)
+        {
+            ffly_cam_target_pos = glm::vec3(-1, square_height * 5, -1 + (board_width / 8.0f));
+            ffly_cam_target_pos += glm::vec3(
+                ((square_width * 2)) * draw_col + ((board_width / 8.0)), square_height + 0.2f,
+                (square_width * 2) * draw_row
+            );
+            std::cout << ffly_cam_target_pos.x << std::endl;
+        }
 
         pieceMVMatrix = glm::scale(pieceMVMatrix, glm::vec3(0.0625, 0.0625, 0.0625));
 
@@ -317,8 +320,36 @@ void Renderer_3D::draw_possible_moves(
 
 int Renderer_3D::draw(int width, int height, GameManager& game)
 {
-    // here we change camera
-    (use_trackball_camera) ? camera = trackball_camera.get() : camera = freefly_camera.get();
+    int selected_square_position = -1;
+    game_board_size              = game.board.get_size();
+
+    if (!use_trackball_camera)
+    {
+        if (game.get_selected_square() != nullptr)
+        {
+            selected_square_position = game.get_selected_square()->get_position();
+            selected_square_col      = selected_square_position % game_board_size;
+            selected_square_row      = selected_square_position / game_board_size;
+
+            freefly_camera->set_position(ffly_cam_target_pos);
+            if (game.get_selected_square()->get_color() == Black)
+            {
+                if (!camera_oriented)
+                {
+                    freefly_camera->rotateLeft(180.0f);
+                    camera_oriented = true;
+                }
+            }
+            else
+            {
+                if (camera_oriented)
+                {
+                    freefly_camera->rotateLeft(180.0f);
+                    camera_oriented = false;
+                }
+            }
+        }
+    }
 
     if (current_move != game.get_move())
     {
@@ -390,7 +421,6 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
     glBindVertexArray(0);
 
     int piece_position{};
-    game_board_size = game.board.get_size();
 
     Piece* current_square = nullptr;
 

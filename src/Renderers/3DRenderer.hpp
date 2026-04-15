@@ -60,7 +60,7 @@ class Renderer_3D {
     int  init(int width, int height);
     void init_vertex_object(const glimac::ShapeVertex* data, size_t count, GLuint& vbo, GLuint& vao);
     int  draw(int width, int height, GameManager& game);
-    void draw_pieces(int piece_position, Piece* current_square, int col, int row) const;
+    void draw_pieces(int piece_position, Piece* current_square, int col, int row);
     void set_lights(bool is_white_turn);
     void draw_possible_moves(const std::vector<int>& possible_moves, int piece_position, glm::mat4 squareMVMatrix) const;
     void terminate();
@@ -71,6 +71,12 @@ class Renderer_3D {
     std::unique_ptr<glimac::TrackballCamera>         trackball_camera;
     std::unique_ptr<glimac::FreeflyCamera>        freefly_camera;
     glimac::Camera* camera = nullptr;
+    int selected_square_col;
+    int selected_square_row;
+    glm::vec3 ffly_cam_target_pos = glm::vec3(0.0, 1.0, 0.0);
+    bool camera_oriented = false;
+
+
     std::unique_ptr<glimac::Skybox> skybox;
 
     // params

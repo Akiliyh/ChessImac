@@ -132,7 +132,10 @@ void Renderer::draw(GameManager& game)
 
                     ImGui::Checkbox("Panning", &m_renderer_3d.is_panning);
                     ImGui::Checkbox("Skybox", &m_renderer_3d.is_skybox_active);
-                    ImGui::Checkbox("Camera", &m_renderer_3d.use_trackball_camera);
+                    if (ImGui::Checkbox("Trackball camera", &m_renderer_3d.use_trackball_camera))
+                    {
+                        m_renderer_3d.change_camera();
+                    }
                     ImGui::End();
 
                     m_renderer_3d.draw(width, height, game);
@@ -147,7 +150,8 @@ void Renderer::draw(GameManager& game)
                     if (key == GLFW_KEY_H && action == GLFW_PRESS)
                         m_renderer_3d.camera->rotateLeft(1.0f);
                     if (key == GLFW_KEY_L && action == GLFW_PRESS)
-                        m_renderer_3d.change_camera();
+                        m_renderer_3d.use_trackball_camera = !m_renderer_3d.use_trackball_camera;
+                            m_renderer_3d.change_camera();
                 },
             .mouse_button_callback =
                 [&](int button, int action, int mods) {

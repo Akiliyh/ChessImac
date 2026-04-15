@@ -25,19 +25,28 @@ void FreeflyCamera::moveLeft(float t)
 
 void FreeflyCamera::moveFront(float t)
 {
-    m_Position += t*m_FrontVector;
+    // m_Position += t*m_FrontVector;
+    // we don't want it to move so that's one technique
 }
 
 void FreeflyCamera::rotateLeft(float degrees)
 {
     degrees = glm::radians(degrees);
     m_fPhi+=degrees;
+    computeDirectionVectors();
+}
+
+void FreeflyCamera::set_position(glm::vec3 position)
+{
+    m_Position = position;
+    computeDirectionVectors();
 }
 
 void FreeflyCamera::rotateUp(float degrees)
 {
     degrees = glm::radians(degrees);
     m_fTheta+=degrees;
+    computeDirectionVectors();
 }
 
 glm::mat4 FreeflyCamera::getViewMatrix() const
