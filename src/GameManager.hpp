@@ -6,6 +6,7 @@
 #include <vector>
 #include "Chessboard.hpp"
 #include "Pieces.hpp"
+#include "Probabilities/ExpoLaw.hpp"
 
 enum class GameMode { Classic, Chaos };
 
@@ -38,6 +39,8 @@ struct GameManager {
     std::chrono::steady_clock::time_point m_turn_start_time;
     bool                                  m_is_paused{false};
     double                                m_accumulated_time{0.0};
+    ExpoLaw                               m_expo_law;
+    double                                m_current_turn_limit{10.0};
 
   public:
     Chessboard                                board{};
@@ -100,7 +103,11 @@ struct GameManager {
     void                    reset_turn_timer();
     double                  get_current_turn_elapsed_time() const;
     void                    toggle_pause();
-    bool                    is_paused() const
+    double                  get_current_turn_limit() const
+    {
+        return m_current_turn_limit;
+    }
+    bool is_paused() const
     {
         return m_is_paused;
     }

@@ -284,9 +284,9 @@ bool GameManager::get_show_mutation_popup() const
     return show_mutation_popup;
 }
 
-void GameManager::set_show_mutation_popup(bool is_showing)
+void GameManager::set_show_mutation_popup(bool is_mutation_showing)
 {
-    show_mutation_popup = is_showing;
+    show_mutation_popup = is_mutation_showing;
 };
 
 void GameManager::trigger_mutation_popup(const std::string& message)
@@ -321,6 +321,11 @@ void GameManager::reset_turn_timer()
     m_turn_start_time  = std::chrono::steady_clock::now();
     m_accumulated_time = 0.0;
     m_is_paused        = false;
+
+    if (m_current_mode == GameMode::Chaos)
+    {
+        m_current_turn_limit = m_expo_law.get_bounded_time(10.0, 20.0, 0.5);
+    }
 }
 
 void GameManager::toggle_pause()
@@ -350,7 +355,7 @@ double GameManager::get_current_turn_elapsed_time() const
 
 bool GameManager::is_time_over() const
 {
-    return get_current_turn_elapsed_time() >= TURN_TIME_LIMIT;
+    return get_current_turn_elapsed_time() >= m_current_turn_limit;
 }
 
 void GameManager::skip_turn()
@@ -363,6 +368,4 @@ void GameManager::skip_turn()
     }
 
     reset_turn_timer();
-
-    std::cout << "Temps écoulé ! Tour sauté." << std::endl;
 }

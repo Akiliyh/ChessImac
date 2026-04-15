@@ -83,8 +83,9 @@ void Renderer::draw(GameManager& game)
 
                     if (game.get_mode() == GameMode::Chaos)
                     {
-                        double remaining = std::max(0.0, GameManager::TURN_TIME_LIMIT - elapsed);
-                        auto   progress  = (float)(remaining / GameManager::TURN_TIME_LIMIT);
+                        double current_limit = game.get_current_turn_limit();
+                        double remaining     = std::max(0.0, current_limit - elapsed);
+                        auto   progress      = (float)(remaining / current_limit);
 
                         bool color_pushed = false;
                         if (game.is_paused())

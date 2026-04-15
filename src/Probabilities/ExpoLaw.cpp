@@ -2,14 +2,35 @@
 #include <cmath>
 #include <iostream>
 
-
 // Initialisation du générateur Mersenne Twister avec une graine aléatoire
 ExpoLaw::ExpoLaw() : m_generator(m_random())
 {}
 
+double ExpoLaw::get_bounded_time(double min_time, double max_time, double lambda)
+{
+    if (min_time >= max_time || lambda <= 0.0)
+    {
+        std::cerr << "Erreur : bornes invalides ou lambda <= 0.\n";
+        return min_time;
+    }
+
+    std::uniform_real_distribution<double> distrib(0.0, 1.0);
+    double                                 x     = 0.0;
+    double                                 range = max_time - min_time;
+
+    // Méthode de rejet : on tire jusqu'à ce que la valeur x soit dans notre intervalle [0, range]
+    do
+    {
+        double u = 1.0 - distrib(m_generator);
+        x        = -std::log(u) / lambda;
+    } while (x > range);
+
+    // On ajoute le minimum pour décaler le résultat
+    return min_time + x;
+}
+
 void ExpoLaw::simulateExpoLaw(int iterations, double lambda)
 {
-    // Sécurité : on évite les divisions par zéro ou les boucles infinies/négatives
     if (iterations <= 0 || lambda <= 0.0)
     {
         std::cerr
@@ -20,7 +41,6 @@ void ExpoLaw::simulateExpoLaw(int iterations, double lambda)
     std::uniform_real_distribution<double> distrib(0.0, 1.0);
     double                                 sum = 0.0;
 
-    // Boucle d'itérations
     for (int i = 0; i < iterations; ++i)
     {
         // 1. Tirage uniforme.
@@ -39,6 +59,5 @@ void ExpoLaw::simulateExpoLaw(int iterations, double lambda)
         sum += x;
     }
 
-    // Affichage de la moyenne finale
     std::cout << "\n---> Moyenne des " << iterations << " tirages : " << (sum / iterations) << '\n';
 }
