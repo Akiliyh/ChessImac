@@ -4,6 +4,8 @@
 #include <FilePath.hpp>
 #include <Program.hpp>
 #include <TrackballCamera.hpp>
+#include <FreeflyCamera.hpp>
+#include <Camera.hpp>
 #include "GameManager.hpp"
 #include "Geometry.hpp"
 #include "Pieces.hpp"
@@ -63,7 +65,12 @@ class Renderer_3D {
     void draw_possible_moves(const std::vector<int>& possible_moves, int piece_position, glm::mat4 squareMVMatrix) const;
     void terminate();
     void move_front(float delta);
-    glimac::TrackballCamera         camera;
+
+    void change_camera();
+    bool use_trackball_camera = false;
+    std::unique_ptr<glimac::TrackballCamera>         trackball_camera;
+    std::unique_ptr<glimac::FreeflyCamera>        freefly_camera;
+    glimac::Camera* camera = nullptr;
     std::unique_ptr<glimac::Skybox> skybox;
 
     // params
