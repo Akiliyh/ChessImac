@@ -37,15 +37,15 @@ void Renderer::draw(GameManager& game)
                     // ==========================================
 
                     ImGui::Begin("Game Settings");
-                    ImGui::Text("Sélectionnez le mode de jeu :");
+                    ImGui::Text("Select a Game Mode :");
 
-                    if (ImGui::Button("Mode Classique"))
+                    if (ImGui::Button("Classic Mode"))
                     {
                         game.setMode(GameMode::Classic);
                         game.new_game(game);
                     }
                     ImGui::SameLine();
-                    if (ImGui::Button("Mode Chaos"))
+                    if (ImGui::Button("Chaos Mode"))
                     {
                         game.setMode(GameMode::Chaos);
                         game.new_game(game);
@@ -53,8 +53,8 @@ void Renderer::draw(GameManager& game)
 
                     ImGui::Separator();
                     ImGui::Text(
-                        "Mode Actuel : %s",
-                        (game.get_mode() == GameMode::Classic) ? "Classique" : "Chaos"
+                        "Current Mode : %s",
+                        (game.get_mode() == GameMode::Classic) ? "Classic" : "Chaos"
                     );
                     ImGui::End();
 
@@ -66,16 +66,15 @@ void Renderer::draw(GameManager& game)
 
                     if (game.get_show_mutation_popup())
                     {
-                        ImGui::OpenPopup("Mutation Aléatoire !");
-                        game.set_show_mutation_popup(false); // On reset immédiatement pour ne pas
-                                                             // ré-ouvrir la popup en boucle
+                        ImGui::OpenPopup("Random Mutation !");
+                        game.set_show_mutation_popup(false);
                     }
 
                     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
                     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
                     if (ImGui::BeginPopupModal(
-                            "Mutation Aléatoire !", NULL, ImGuiWindowFlags_AlwaysAutoResize
+                            "Random Mutation !", NULL, ImGuiWindowFlags_AlwaysAutoResize
                         ))
                     {
                         ImGui::Text("%s", game.get_mutation_message().c_str());
@@ -86,7 +85,36 @@ void Renderer::draw(GameManager& game)
                             ImGui::CloseCurrentPopup();
                         }
 
-                        ImGui::SetItemDefaultFocus(); // Le bouton OK est sélectionné par défaut
+                        ImGui::SetItemDefaultFocus();
+                        ImGui::EndPopup();
+                    }
+                    // ==========================================
+
+                    // ==========================================
+                    // Dodge Attack Pop-up
+                    // ==========================================
+
+                    if (game.get_show_dodge_popup())
+                    {
+                        ImGui::OpenPopup("Attack Missed !");
+                        game.set_show_dodge_popup(false);
+                    }
+
+                    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+                    if (ImGui::BeginPopupModal(
+                            "Attack Missed !", NULL, ImGuiWindowFlags_AlwaysAutoResize
+                        ))
+                    {
+                        ImGui::Text("%s", game.get_dodge_message().c_str());
+                        ImGui::Separator();
+
+                        if (ImGui::Button("Oh okay...", ImVec2(120, 0)))
+                        {
+                            ImGui::CloseCurrentPopup();
+                        }
+
+                        ImGui::SetItemDefaultFocus();
                         ImGui::EndPopup();
                     }
                     // ==========================================

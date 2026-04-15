@@ -123,7 +123,7 @@ bool Chessboard::move_piece(
 
                 if (!random_dodge.generate_scratch())
                 {
-                    std::cout << "Esquive ! Pas de chance." << std::endl;
+                    game.trigger_dodge_popup("Bad Luck ! Your enemy dodged the attack.");
                     return true;
                 }
 
@@ -153,8 +153,6 @@ bool Chessboard::move_piece(
 
             if (will_evolve && !is_king)
             {
-                std::cout << "Mutation Chaos ! La piece evolue !" << std::endl;
-
                 PieceColor current_color = this->board_data[dest_position]->get_color();
 
                 int dest_x = dest_position % 8;
@@ -162,38 +160,46 @@ bool Chessboard::move_piece(
 
                 int random_type = std::rand() % 5; // Un nombre entre 0 et 3
 
-                std::string piece_nom = "";
+                std::string piece_nom                   = "";
+                std::string mutation_expression_feeling = "";
 
                 switch (random_type)
                 {
                 case 0:
                     this->board_data[dest_position] =
                         std::make_unique<Queen>(dest_x, dest_y, current_color);
-                    piece_nom = "Reine";
+                    piece_nom                   = "Queen";
+                    mutation_expression_feeling = "Outstanding !";
                     break;
                 case 1:
                     this->board_data[dest_position] =
                         std::make_unique<Rook>(dest_x, dest_y, current_color);
-                    piece_nom = "Tour";
+                    piece_nom                   = "Rook";
+                    mutation_expression_feeling = "Amazing !";
                     break;
                 case 2:
                     this->board_data[dest_position] =
                         std::make_unique<Bishop>(dest_x, dest_y, current_color);
-                    piece_nom = "Fou";
+                    piece_nom                   = "Bishop";
+                    mutation_expression_feeling = "Awesome !";
                     break;
                 case 3:
                     this->board_data[dest_position] =
                         std::make_unique<Knight>(dest_x, dest_y, current_color);
-                    piece_nom = "Cavalier";
+                    piece_nom                   = "Knight";
+                    mutation_expression_feeling = "Great !";
                     break;
                 case 4:
                     this->board_data[dest_position] =
                         std::make_unique<Pawn>(dest_x, dest_y, current_color);
-                    piece_nom = "Pion";
+                    piece_nom                   = "Pawn";
+                    mutation_expression_feeling = "Oops...";
                     break;
                 }
 
-                game.trigger_mutation_popup("Votre piece vient de muter en " + piece_nom + " !");
+                game.trigger_mutation_popup(
+                    mutation_expression_feeling + " Your piece becomes a " + piece_nom + " !"
+                );
             }
 
             return true;
