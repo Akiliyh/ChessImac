@@ -2,11 +2,12 @@
 #include <cmath>
 #include <vector>
 #include "glm.hpp"
+#include "Camera.hpp"
 
 namespace glimac {
 
 
-class TrackballCamera
+class TrackballCamera : public Camera
 {
     private: 
         float m_fDistance;
@@ -17,11 +18,11 @@ class TrackballCamera
     TrackballCamera(): 
         m_fDistance(5), m_fAngleX(0), m_fAngleY(0) 
     {};
-    void moveFront(float delta);
+    void moveFront(float delta) override;
     void moveTo(float distance);
-    void rotateLeft(float degrees);
-    void rotateUp(float degrees);
-    glm::mat4 getViewMatrix() const;
+    void rotateLeft(float degrees) override;
+    void rotateUp(float degrees) override;
+    glm::mat4 getViewMatrix() const override;
 };
 
 }
