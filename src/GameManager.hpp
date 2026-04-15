@@ -45,7 +45,7 @@ struct GameManager {
     bool                      is_king_dead();
     std::optional<int>        is_piece_promoting();
     void                      promote_piece(int from_position, char promote_to);
-    std::optional<Move>                       get_last_move() const;
+    std::optional<Move>       get_last_move() const;
 
     // void                              game_win(PieceColor winner_color);
     void load_game_from_fen(const std::string& fen);
