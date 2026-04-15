@@ -9,13 +9,17 @@
 Chess960Permutation::Chess960Permutation()
 {
     std::random_device rd;
-    rng.seed(rd());
+    m_random.seed(rd());
 }
 
-bool Chess960Permutation::isValidChess960(const std::vector<char>& rank) const
+bool Chess960Permutation::is_valid_chess960(const std::vector<char>& rank) const
 {
-    int bishop1 = -1, bishop2 = -1;
-    int rook1 = -1, king = -1, rook2 = -1;
+    int bishop1 = -1;
+    int bishop2 = -1;
+    int rook1   = -1;
+    int king    = -1;
+    int rook2   = -1;
+
     for (int i = 0; i < 8; ++i)
     {
         if (rank[i] == 'B')
@@ -44,61 +48,61 @@ bool Chess960Permutation::isValidChess960(const std::vector<char>& rank) const
     return true;
 }
 
-std::string Chess960Permutation::buildFen(const std::vector<char>& backRank) const
+std::string Chess960Permutation::build_fen(const std::vector<char>& back_rank) const
 {
     std::string fen = "";
-    for (char c : backRank)
+    for (char c : back_rank)
         fen += std::tolower(c);
     fen += "/pppppppp/8/8/8/8/PPPPPPPP/";
-    for (char c : backRank)
+    for (char c : back_rank)
         fen += c;
     fen += " w KQkq - 0 1";
     return fen;
 }
 
-std::string Chess960Permutation::generateWithLibrary()
+std::string Chess960Permutation::generate_std()
 {
-    std::vector<char> currentRank = basePieces;
+    std::vector<char> currentRank = m_base_pieces;
 
     while (true)
     {
-        std::shuffle(currentRank.begin(), currentRank.end(), rng);
-        if (isValidChess960(currentRank))
+        std::shuffle(currentRank.begin(), currentRank.end(), m_random);
+        if (is_valid_chess960(currentRank))
         {
-            break; // Sort de la boucle des qu'une position valide est trouvee
+            break; // Exit when position is valid
         }
     }
 
-    return buildFen(currentRank);
+    return build_fen(currentRank);
 }
 
-std::string Chess960Permutation::generateFromScratch()
+std::string Chess960Permutation::generate_scratch()
 {
-    std::vector<char> currentRank = basePieces;
+    std::vector<char> currentRank = m_base_pieces;
 
     while (true)
     {
-        customFisherYatesShuffle(currentRank);
-        if (isValidChess960(currentRank))
+        custom_fisher_yates_shuffle(currentRank);
+        if (is_valid_chess960(currentRank))
         {
-            break; // Sort de la boucle des qu'une position valide est trouvee
+            break; // Exit when position is valid
         }
     }
 
-    return buildFen(currentRank);
+    return build_fen(currentRank);
 }
 
-void Chess960Permutation::customFisherYatesShuffle(std::vector<char>& vec)
+void Chess960Permutation::custom_fisher_yates_shuffle(std::vector<char>& vec)
 {
     for (int i = vec.size() - 1; i > 0; --i)
     {
         std::uniform_int_distribution<int> dist(0, i);
-        int                                j = dist(rng);
+        int                                j = dist(m_random);
         std::swap(vec[i], vec[j]);
     }
 }
 
-void Chess960Permutation::compareMethods(int iterations)
+void Chess960Permutation::compare_methods(int iterations)
 {
     std::map<std::string, int> libCounts;
     std::map<std::string, int> srcCounts;
@@ -107,8 +111,8 @@ void Chess960Permutation::compareMethods(int iterations)
 
     for (int i = 0; i < iterations; ++i)
     {
-        libCounts[generateWithLibrary()]++;
-        srcCounts[generateFromScratch()]++;
+        libCounts[generate_std()]++;
+        srcCounts[generate_scratch()]++;
     }
 
     double expected = static_cast<double>(iterations) / 960.0;
@@ -125,11 +129,11 @@ void Chess960Permutation::compareMethods(int iterations)
                 maxAbsError = err;
         }
 
-        // MAE: Mean Absolute Error (Erreur absolue moyenne)
+        // MAE: Mean Absolute Error
         double mae = totalAbsError / 960.0;
-        // Erreur relative maximale en %
+        // Max relative error %
         double maxRelError = (maxAbsError / expected) * 100.0;
-        // Erreur moyenne en %
+        // Mean error %
         double avgRelError = (mae / expected) * 100.0;
 
         std::cout << "[" << label << "]\n";

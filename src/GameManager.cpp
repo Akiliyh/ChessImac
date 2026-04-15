@@ -269,6 +269,6 @@ void GameManager::new_game(GameManager& game)
     if (game.get_mode() == GameMode::Chaos)
     {
         Chess960Permutation generator;
-        load_game_from_fen(generator.generateFromScratch());
+        load_game_from_fen(generator.generate_scratch());
     }
 }
