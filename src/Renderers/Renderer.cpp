@@ -59,6 +59,12 @@ void Renderer::draw(GameManager& game)
                         game.new_game(game);
                     }
 
+                    if (ImGui::Button("Exit Game", ImVec2(178, 0)))
+                    {
+                        std::cout << "Exit Game button \n";
+                        std::exit(0);
+                    }
+
                     ImGui::Separator();
                     ImGui::Text(
                         "Current Mode : %s",

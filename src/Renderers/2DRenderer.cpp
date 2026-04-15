@@ -208,8 +208,7 @@ void Renderer_2D::draw(GameManager& game)
 
     if (ImGui::BeginPopupModal("Game Over !", NULL, ImGuiWindowFlags_AlwaysAutoResize))
     {
-        // On affiche le gagnant
-        if (game.get_dead_king_color() == PieceColor::White) // Assure-toi du nom de ton enum
+        if (game.get_dead_king_color() == PieceColor::White)
         {
             ImGui::Text("Black win !");
         }
@@ -220,13 +219,11 @@ void Renderer_2D::draw(GameManager& game)
 
         ImGui::Separator();
 
-        // Bouton relancer une partie
         if (ImGui::Button("New Game", ImVec2(100, 0)))
         {
             std::cout << "New Game button \n";
             game.new_game(game);
 
-            // On relance le chronomètre pour la nouvelle partie
             if (game.is_paused())
             {
                 game.toggle_pause();
@@ -237,16 +234,13 @@ void Renderer_2D::draw(GameManager& game)
 
         ImGui::SameLine();
 
-        // Bouton quitter
         if (ImGui::Button("Exit Game", ImVec2(100, 0)))
         {
             std::cout << "Exit Game button \n";
-            // glfwSetWindowShouldClose(window, GLFW_TRUE); // A décommenter quand tu passeras à la
-            // 3D
             std::exit(0);
         }
 
-        ImGui::SetItemDefaultFocus(); // Met le focus sur "Exit" ou "New Game" par défaut
+        ImGui::SetItemDefaultFocus();
         ImGui::EndPopup();
     }
     // ==========================================
