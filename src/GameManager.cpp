@@ -272,3 +272,24 @@ void GameManager::new_game(GameManager& game)
         load_game_from_fen(generator.generate_scratch());
     }
 }
+
+std::string GameManager::get_mutation_message()
+{
+    return mutation_message;
+}
+
+bool GameManager::get_show_mutation_popup() const
+{
+    return show_mutation_popup;
+}
+
+void GameManager::set_show_mutation_popup(bool is_showing)
+{
+    show_mutation_popup = is_showing;
+};
+
+void GameManager::trigger_mutation_popup(const std::string& message)
+{
+    mutation_message    = message;
+    show_mutation_popup = true;
+}

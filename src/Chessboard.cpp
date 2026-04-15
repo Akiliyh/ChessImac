@@ -162,29 +162,38 @@ bool Chessboard::move_piece(
 
                 int random_type = std::rand() % 5; // Un nombre entre 0 et 3
 
+                std::string piece_nom = "";
+
                 switch (random_type)
                 {
                 case 0:
                     this->board_data[dest_position] =
                         std::make_unique<Queen>(dest_x, dest_y, current_color);
+                    piece_nom = "Reine";
                     break;
                 case 1:
                     this->board_data[dest_position] =
                         std::make_unique<Rook>(dest_x, dest_y, current_color);
+                    piece_nom = "Tour";
                     break;
                 case 2:
                     this->board_data[dest_position] =
                         std::make_unique<Bishop>(dest_x, dest_y, current_color);
+                    piece_nom = "Fou";
                     break;
                 case 3:
                     this->board_data[dest_position] =
                         std::make_unique<Knight>(dest_x, dest_y, current_color);
+                    piece_nom = "Cavalier";
                     break;
                 case 4:
                     this->board_data[dest_position] =
                         std::make_unique<Pawn>(dest_x, dest_y, current_color);
+                    piece_nom = "Pion";
                     break;
                 }
+
+                game.trigger_mutation_popup("Votre piece vient de muter en " + piece_nom + " !");
             }
 
             return true;

@@ -32,7 +32,10 @@ void Renderer::draw(GameManager& game)
                 [&]() {
                     m_renderer_2d.draw(game);
 
-                    // --- Modal Modes ---
+                    // ==========================================
+                    // Modes Modal
+                    // ==========================================
+
                     ImGui::Begin("Game Settings");
                     ImGui::Text("Sélectionnez le mode de jeu :");
 
@@ -54,7 +57,39 @@ void Renderer::draw(GameManager& game)
                         (game.get_mode() == GameMode::Classic) ? "Classique" : "Chaos"
                     );
                     ImGui::End();
-                    // ----------------------------------------------
+
+                    // ==========================================
+
+                    // ==========================================
+                    // Mutation Pop-up
+                    // ==========================================
+
+                    if (game.get_show_mutation_popup())
+                    {
+                        ImGui::OpenPopup("Mutation Aléatoire !");
+                        game.set_show_mutation_popup(false); // On reset immédiatement pour ne pas
+                                                             // ré-ouvrir la popup en boucle
+                    }
+
+                    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+                    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+                    if (ImGui::BeginPopupModal(
+                            "Mutation Aléatoire !", NULL, ImGuiWindowFlags_AlwaysAutoResize
+                        ))
+                    {
+                        ImGui::Text("%s", game.get_mutation_message().c_str());
+                        ImGui::Separator();
+
+                        if (ImGui::Button("OK", ImVec2(120, 0)))
+                        {
+                            ImGui::CloseCurrentPopup();
+                        }
+
+                        ImGui::SetItemDefaultFocus(); // Le bouton OK est sélectionné par défaut
+                        ImGui::EndPopup();
+                    }
+                    // ==========================================
 
                     ImGui::Begin("3D Controls");
                     ImGui::Text("Camera");
