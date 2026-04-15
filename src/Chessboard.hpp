@@ -16,7 +16,6 @@ class Chessboard {
     std::vector<std::unique_ptr<Piece>>& get_board_data();
     std::unique_ptr<Piece>&              get_board_data(int i);
     std::vector<std::unique_ptr<Piece>>& get_dead_pieces();
-    void                                 init_board();
     void                                 load_board_from_fen(const std::string& positionData);
     bool move_piece(std::unique_ptr<Piece>& active_square, int dest_position, GameManager& game);
     std::string to_alg_position(int index) const;

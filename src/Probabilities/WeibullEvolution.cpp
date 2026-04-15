@@ -4,66 +4,53 @@
 #include <iostream>
 #include <random>
 
-
-// Constructeur
-WeibullEvolution::WeibullEvolution(double shapeParam, double scaleParam)
-{
-    shape = shapeParam;
-    scale = scaleParam;
-}
-
-// Methode 1: Utilisation de std::weibull_distribution (Empirique)
-double WeibullEvolution::getProbabilityLibrary(int moves, int samples)
+// Implementation using std::weibull_distribution
+double WeibullEvolution::get_probability_std(int moves, int samples)
 {
     if (moves <= 0)
         return 0.0;
 
-    // Initialisation du generateur de nombres aleatoires
     std::random_device                rd;
     std::mt19937                      gen(rd());
-    std::weibull_distribution<double> weibull_dist(shape, scale);
+    std::weibull_distribution<double> weibull_dist(m_shape, m_scale);
 
     int evolvedCount = 0;
 
-    // On simule "samples" pieces
     for (int i = 0; i < samples; ++i)
     {
-        // Si le seuil d'evolution genere est inferieur ou egal au nombre de cases parcourues,
-        // alors la piece a evolue
         if (weibull_dist(gen) <= static_cast<double>(moves))
         {
             evolvedCount++;
         }
     }
 
-    // Retourne la frequence d'evolution (probabilite empirique)
+    // Empirical probability
     return static_cast<double>(evolvedCount) / samples;
 }
 
-// Methode 2: From scratch en utilisant la fonction de repartition (CDF)
-double WeibullEvolution::getProbabilityScratch(int moves)
+// Implementation from scratch of the distribution function (CDF)
+double WeibullEvolution::get_probability_scratch(int moves) const
 {
     if (moves <= 0)
         return 0.0;
 
-    // Formule mathematique exacte : 1 - exp(-(x/lambda)^k)
-    double x = static_cast<double>(moves);
-    return 1.0 - std::exp(-std::pow(x / scale, shape));
+    // 1 - exp(-(x/lambda)^k)
+    auto x = static_cast<double>(moves);
+    return 1.0 - std::exp(-std::pow(x / m_scale, m_shape));
 }
 
-// Methode 3: Comparaison des deux methodes
-void WeibullEvolution::compareMethods(int maxMoves, int samples)
+void WeibullEvolution::compare_methods(int max_moves, int samples)
 {
-    std::cout << "\nComparaison des methodes Weibull (Shape: " << shape << ", Scale: " << scale
+    std::cout << "\nComparaison des methodes Weibull (Shape: " << m_shape << ", Scale: " << m_scale
               << ")\n";
     std::cout << "------------------------------------------------------------\n";
     std::cout << "Cases | Scratch (Exact) | Library (Monte Carlo) | Ecart\n";
     std::cout << "------------------------------------------------------------\n";
 
-    for (int moves = 1; moves <= maxMoves; ++moves)
+    for (int moves = 1; moves <= max_moves; ++moves)
     {
-        double probScratch = getProbabilityScratch(moves);
-        double probLib     = getProbabilityLibrary(moves, samples);
+        double probScratch = get_probability_scratch(moves);
+        double probLib     = get_probability_std(moves, samples);
         double diff        = std::abs(probScratch - probLib);
 
         std::cout << std::setw(5) << moves << " | " << std::fixed << std::setprecision(6)

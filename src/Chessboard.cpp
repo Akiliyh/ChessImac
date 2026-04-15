@@ -14,15 +14,6 @@
 #include "Probabilities/Bernoulli.hpp"
 #include "Probabilities/WeibullEvolution.hpp"
 
-void Chessboard::init_board()
-{
-    // do smth here;
-}
-
-// for now we load the board from fen
-// WE REALLY NEED TO USE UNIQUE PTR NOW LOL
-// Lilian : I'm not sure now
-
 void Chessboard::load_board_from_fen(const std::string& positionData)
 {
     // first we reset the board here
@@ -152,13 +143,15 @@ bool Chessboard::move_piece(
             // Is the Piece mutating ?
             WeibullEvolution chessEvolution(2.0, 3.0);
             Bernoulli        random_evolution(
-                chessEvolution.getProbabilityScratch(active_square->get_move_count())
+                chessEvolution.get_probability_scratch(active_square->get_move_count())
             );
             bool will_evolve = random_evolution.generate_scratch();
 
             this->board_data[dest_position] = std::move(active_square);
 
-            if (will_evolve)
+            bool is_king = dynamic_cast<King*>(this->board_data[dest_position].get()) != nullptr;
+
+            if (will_evolve && !is_king)
             {
                 std::cout << "Mutation Chaos ! La piece evolue !" << std::endl;
 
@@ -167,7 +160,7 @@ bool Chessboard::move_piece(
                 int dest_x = dest_position % 8;
                 int dest_y = dest_position / 8;
 
-                int random_type = std::rand() % 4; // Un nombre entre 0 et 3
+                int random_type = std::rand() % 5; // Un nombre entre 0 et 3
 
                 switch (random_type)
                 {
@@ -186,6 +179,10 @@ bool Chessboard::move_piece(
                 case 3:
                     this->board_data[dest_position] =
                         std::make_unique<Knight>(dest_x, dest_y, current_color);
+                    break;
+                case 4:
+                    this->board_data[dest_position] =
+                        std::make_unique<Pawn>(dest_x, dest_y, current_color);
                     break;
                 }
             }
