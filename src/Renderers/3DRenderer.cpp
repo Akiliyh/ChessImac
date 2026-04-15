@@ -146,12 +146,16 @@ void Renderer_3D::draw_pieces(int piece_position, Piece* current_square, int col
 
         float draw_col = col;
         float draw_row = row;
+        float draw_y = 1.0f;
+        float height_offset = 0.0f;
 
         // if animation we update
         if (is_animating && piece_position == anim_to)
         {
-            // float time = anim_elapsed / anim_duration;
-            float time = glm::sin(((anim_elapsed / anim_duration) * glm::pi<float>()) / 2);
+            float time = glm::sin(((anim_elapsed / anim_duration) * glm::pi<float>()) / 2); // easeout
+
+            float jump_height = 0.3f;
+            height_offset = 4.0f * jump_height * time * (1.0f - time);
 
             float from_row = anim_from / game_board_size;
             float from_col = anim_from % game_board_size;
@@ -165,12 +169,15 @@ void Renderer_3D::draw_pieces(int piece_position, Piece* current_square, int col
             draw_row = glm::mix(from_row, to_row, time);
         }
 
+        bool is_knight = (std::tolower(current_square->get_label()) == 'n'); 
+
         pieceMVMatrix = glm::translate(
             pieceMVMatrix,
             glm::vec3(
                 glm::vec3(
                     ((square_width * 2)) * draw_col + ((board_width / 8.0)),
-                    square_height + texture_clipping_delta, (square_width * 2) * draw_row
+                    (square_height + texture_clipping_delta) + ((is_knight) ? height_offset : 0),
+                    (square_width * 2) * draw_row
                 )
             )
         );
@@ -217,10 +224,10 @@ void Renderer_3D::draw_pieces(int piece_position, Piece* current_square, int col
     }
 }
 
-void Renderer_3D::set_lights(bool is_white_turn)
+void Renderer_3D::set_lights(bool alternative_light_condition)
 {
     // here we set the lights up in the shader
-    is_white_turn ? is_alternative_light_active = false : is_alternative_light_active = true;
+    alternative_light_condition ? is_alternative_light_active = false : is_alternative_light_active = true;
     glm::vec3 lightColor = light_color;
     glm::vec3 lightPos   = light_pos;
 
