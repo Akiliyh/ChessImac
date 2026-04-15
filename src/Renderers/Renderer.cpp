@@ -32,17 +32,20 @@ void Renderer::draw(GameManager& game)
                 [&]() {
                     m_renderer_2d.draw(game);
 
-                    // --- Modal Modes ---
-                    ImGui::Begin("Game Settings");
-                    ImGui::Text("Sélectionnez le mode de jeu :");
+                    // ==========================================
+                    // Modes Modal
+                    // ==========================================
 
-                    if (ImGui::Button("Mode Classique"))
+                    ImGui::Begin("Game Settings");
+                    ImGui::Text("Select a Game Mode :");
+
+                    if (ImGui::Button("Classic Mode"))
                     {
                         game.setMode(GameMode::Classic);
                         game.new_game(game);
                     }
                     ImGui::SameLine();
-                    if (ImGui::Button("Mode Chaos"))
+                    if (ImGui::Button("Chaos Mode"))
                     {
                         game.setMode(GameMode::Chaos);
                         game.new_game(game);
@@ -50,11 +53,71 @@ void Renderer::draw(GameManager& game)
 
                     ImGui::Separator();
                     ImGui::Text(
-                        "Mode Actuel : %s",
-                        (game.get_mode() == GameMode::Classic) ? "Classique" : "Chaos"
+                        "Current Mode : %s",
+                        (game.get_mode() == GameMode::Classic) ? "Classic" : "Chaos"
                     );
                     ImGui::End();
-                    // ----------------------------------------------
+
+                    // ==========================================
+
+                    // ==========================================
+                    // Mutation Pop-up
+                    // ==========================================
+
+                    if (game.get_show_mutation_popup())
+                    {
+                        ImGui::OpenPopup("Random Mutation !");
+                        game.set_show_mutation_popup(false);
+                    }
+
+                    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+                    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+                    if (ImGui::BeginPopupModal(
+                            "Random Mutation !", NULL, ImGuiWindowFlags_AlwaysAutoResize
+                        ))
+                    {
+                        ImGui::Text("%s", game.get_mutation_message().c_str());
+                        ImGui::Separator();
+
+                        if (ImGui::Button("OK", ImVec2(120, 0)))
+                        {
+                            ImGui::CloseCurrentPopup();
+                        }
+
+                        ImGui::SetItemDefaultFocus();
+                        ImGui::EndPopup();
+                    }
+                    // ==========================================
+
+                    // ==========================================
+                    // Dodge Attack Pop-up
+                    // ==========================================
+
+                    if (game.get_show_dodge_popup())
+                    {
+                        ImGui::OpenPopup("Attack Missed !");
+                        game.set_show_dodge_popup(false);
+                    }
+
+                    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+                    if (ImGui::BeginPopupModal(
+                            "Attack Missed !", NULL, ImGuiWindowFlags_AlwaysAutoResize
+                        ))
+                    {
+                        ImGui::Text("%s", game.get_dodge_message().c_str());
+                        ImGui::Separator();
+
+                        if (ImGui::Button("Oh okay...", ImVec2(120, 0)))
+                        {
+                            ImGui::CloseCurrentPopup();
+                        }
+
+                        ImGui::SetItemDefaultFocus();
+                        ImGui::EndPopup();
+                    }
+                    // ==========================================
 
                     ImGui::Begin("3D Controls");
                     ImGui::Text("Camera");

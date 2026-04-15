@@ -28,6 +28,12 @@ struct GameManager {
 
     GameMode m_current_mode{GameMode::Classic};
 
+    std::string mutation_message    = "";
+    bool        show_mutation_popup = false;
+
+    std::string dodge_message    = "";
+    bool        show_dodge_popup = false;
+
   public:
     Chessboard                                board{};
     int                                       get_board() const;
@@ -72,4 +78,14 @@ struct GameManager {
     {
         return m_current_mode;
     }
+
+    void        trigger_mutation_popup(const std::string& message);
+    void        set_show_mutation_popup(bool is_mutation_showing);
+    bool        get_show_mutation_popup() const;
+    std::string get_mutation_message();
+
+    void        trigger_dodge_popup(const std::string& message);
+    void        set_show_dodge_popup(bool is_dodge_showing);
+    bool        get_show_dodge_popup() const;
+    std::string get_dodge_message();
 };

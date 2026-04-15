@@ -272,3 +272,45 @@ void GameManager::new_game(GameManager& game)
         load_game_from_fen(generator.generate_scratch());
     }
 }
+
+std::string GameManager::get_mutation_message()
+{
+    return mutation_message;
+}
+
+bool GameManager::get_show_mutation_popup() const
+{
+    return show_mutation_popup;
+}
+
+void GameManager::set_show_mutation_popup(bool is_showing)
+{
+    show_mutation_popup = is_showing;
+};
+
+void GameManager::trigger_mutation_popup(const std::string& message)
+{
+    mutation_message    = message;
+    show_mutation_popup = true;
+}
+
+void GameManager::trigger_dodge_popup(const std::string& message)
+{
+    dodge_message    = message;
+    show_dodge_popup = true;
+};
+
+void GameManager::set_show_dodge_popup(bool is_dodge_showing)
+{
+    show_dodge_popup = is_dodge_showing;
+};
+
+bool GameManager::get_show_dodge_popup() const
+{
+    return show_dodge_popup;
+};
+
+std::string GameManager::get_dodge_message()
+{
+    return dodge_message;
+};
