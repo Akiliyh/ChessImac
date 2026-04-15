@@ -56,14 +56,24 @@ struct ChessProgram {
 class Renderer_3D {
   public:
     int  init(int width, int height);
-    void initVertexObject(const glimac::ShapeVertex* data, size_t count, GLuint& vbo, GLuint& vao);
+    void init_vertex_object(const glimac::ShapeVertex* data, size_t count, GLuint& vbo, GLuint& vao);
     int  draw(int width, int height, GameManager& game);
+    void draw_pieces(int piece_position, Piece* current_square, int col, int row) const;
+    void set_lights(bool is_white_turn);
+    void draw_possible_moves(const std::vector<int>& possible_moves, int piece_position, glm::mat4 squareMVMatrix) const;
     void terminate();
     void move_front(float delta);
     glimac::TrackballCamera         camera;
     std::unique_ptr<glimac::Skybox> skybox;
 
+    // params
+    float square_height;
+    float square_width;
+    float square_depth;
+    float board_width;
+    int game_board_size;
     int current_move; // to check if a piece moved
+
 
     bool      is_panning                  = false;
     bool      is_skybox_active            = true;
@@ -108,6 +118,7 @@ class Renderer_3D {
     std::unique_ptr<ChessProgram> chessProgram;
 
     glm::mat4 ProjMatrix;
+    glm::mat4 globalMVMatrix;
 
     // to improve and put inside a method, + dynamicity
     double lastX = width / 2; // start mouse position, here center of screen
