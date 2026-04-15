@@ -1,4 +1,5 @@
 #include "3DRenderer.hpp"
+#include <cmath>
 #include <cstddef>
 #include <vector>
 #include "Cylinder.hpp"
@@ -12,7 +13,6 @@
 #include "glm/ext/scalar_constants.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/fwd.hpp"
-#include <cmath>
 
 #define GLFW_INCLUDE_NONE
 #include "common.hpp"
@@ -34,7 +34,9 @@ Cylinder cylinder(0.1f, 0.02f, 20, 20);
 
 const float texture_clipping_delta{0.001f};
 
-void Renderer_3D::initVertexObject(const ShapeVertex* data, size_t count, GLuint& vbo, GLuint& vao)
+void Renderer_3D::init_vertex_object(
+    const ShapeVertex* data, size_t count, GLuint& vbo, GLuint& vao
+)
 {
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -63,6 +65,12 @@ void Renderer_3D::initVertexObject(const ShapeVertex* data, size_t count, GLuint
 
 int Renderer_3D::init(int width, int height)
 {
+    square_width  = square.getWidth();
+    square_height = square.getHeight();
+    square_depth  = square.getDepth();
+
+    board_width = board.getWidth();
+
     this->height = height;
     this->width  = width;
 
@@ -104,9 +112,9 @@ int Renderer_3D::init(int width, int height)
 
     glEnable(GL_DEPTH_TEST);
 
-    initVertexObject(board.getDataPointer(), board.getVertexCount(), boardVbo, boardVao);
-    initVertexObject(square.getDataPointer(), square.getVertexCount(), squareVbo, squareVao);
-    initVertexObject(
+    init_vertex_object(board.getDataPointer(), board.getVertexCount(), boardVbo, boardVao);
+    init_vertex_object(square.getDataPointer(), square.getVertexCount(), squareVbo, squareVao);
+    init_vertex_object(
         cylinder.getDataPointer(), cylinder.getVertexCount(), cylinderVbo, cylinderVao
     );
 
@@ -123,52 +131,101 @@ int Renderer_3D::init(int width, int height)
     return 0;
 }
 
-int Renderer_3D::draw(int width, int height, GameManager& game)
+void Renderer_3D::draw_pieces(int piece_position, Piece* current_square, int col, int row) const
 {
-    if (current_move != game.get_move())
+    if (current_square)
     {
-        auto moveOpt = game.get_last_move();
+        glm::mat4 pieceMVMatrix = globalMVMatrix; // Translation
+        pieceMVMatrix           = glm::translate(
+            pieceMVMatrix, glm::vec3(-1, square_height * 5, -1 + (board_width / 8.0f))
+        );
 
-        if (moveOpt)
+        // here we retrieve the current correct piece_position
+        int anim_row = piece_position / game_board_size;
+        int anim_col = piece_position % game_board_size;
+
+        float draw_col = col;
+        float draw_row = row;
+
+        // if animation we update
+        if (is_animating && piece_position == anim_to)
         {
-            anim_from = moveOpt->from;
-            anim_to   = moveOpt->to;
+            // float time = anim_elapsed / anim_duration;
+            float time = glm::sin(((anim_elapsed / anim_duration) * glm::pi<float>()) / 2);
 
-            anim_time    = 0.3f;
-            anim_elapsed = 0.0f;
-            is_animating = true;
+            float from_row = anim_from / game_board_size;
+            float from_col = anim_from % game_board_size;
+            // we set float here so the mix works great
+
+            float to_row = anim_to / game_board_size;
+            float to_col = anim_to % game_board_size;
+
+            // interpolation time
+            draw_col = glm::mix(from_col, to_col, time);
+            draw_row = glm::mix(from_row, to_row, time);
         }
 
-        current_move = game.get_move();
-    }
+        pieceMVMatrix = glm::translate(
+            pieceMVMatrix,
+            glm::vec3(
+                glm::vec3(
+                    ((square_width * 2)) * draw_col + ((board_width / 8.0)),
+                    square_height + texture_clipping_delta, (square_width * 2) * draw_row
+                )
+            )
+        );
 
-    double currentFrame = getTime();
-    double deltaTime    = currentFrame - last_frame;
-    last_frame          = currentFrame;
+        pieceMVMatrix = glm::scale(pieceMVMatrix, glm::vec3(0.0625, 0.0625, 0.0625));
 
-    if (is_animating)
-    {
-        anim_elapsed += deltaTime;
+        (current_square->get_color() == White)
+            ? pieceMVMatrix =
+                  glm::rotate(pieceMVMatrix, 3.f * glm::pi<float>() * .5f, glm::vec3(0, 1, 0))
+            : pieceMVMatrix =
+                  glm::rotate(pieceMVMatrix, glm::pi<float>() * .5f, glm::vec3(0, 1, 0));
 
-        if (anim_elapsed >= anim_duration)
+        glm::mat4 pieceMVPMatrix    = ProjMatrix * pieceMVMatrix;
+        glm::mat4 pieceNormalMatrix = glm::transpose(glm::inverse(glm::mat3(pieceMVMatrix)));
+
+        glUniformMatrix4fv(chessProgram->uMVPMatrix, 1, GL_FALSE, glm::value_ptr(pieceMVPMatrix));
+        glUniformMatrix4fv(chessProgram->uMVMatrix, 1, GL_FALSE, glm::value_ptr(pieceMVMatrix));
+        glUniformMatrix3fv(
+            chessProgram->uNormalMatrix, 1, GL_FALSE, glm::value_ptr(pieceNormalMatrix)
+        );
+
+        glUniform1i(chessProgram->uUseTexture, 0);
+
+        (current_square->get_color() == White)
+            ? glUniform3f(chessProgram->uColor, 1.0f, 1.0f, 1.0f)
+            : glUniform3f(chessProgram->uColor, 0.3f, 0.2f, 0.2f);
+
+        // here we choose which model to draw
+
+        switch (std::tolower(current_square->get_label()))
         {
-            is_animating = false;
-            anim_elapsed = anim_duration;
+        case 'b': bishopOBJ.draw(); break;
+
+        case 'k': kingOBJ.draw(); break;
+
+        case 'q': queenOBJ.draw(); break;
+
+        case 'r': rookOBJ.draw(); break;
+
+        case 'n': knightOBJ.draw(); break;
+
+        default: pawnOBJ.draw();
         }
     }
+}
 
-    ProjMatrix = glm::perspective(glm::radians(fov), 1.0f, 0.1f, 100.f);
-    chessProgram->m_Program.use();
-
-    const bool is_white_turn = game.is_white_turn();
+void Renderer_3D::set_lights(bool is_white_turn)
+{
+    // here we set the lights up in the shader
     is_white_turn ? is_alternative_light_active = false : is_alternative_light_active = true;
-
-    // lighting params
-
     glm::vec3 lightColor = light_color;
     glm::vec3 lightPos   = light_pos;
 
-    glm::vec3   lightColor2    = glm::vec3(.0f, .0f, 1.0f);
+    glm::vec3 lightColor2 = glm::vec3(.0f, .0f, 1.0f); // full on red
+    // the second mode we move the lights in circle bcs why not
     const float rotation_speed = 5.0f;
     glm::vec3   lightPos2 =
         glm::vec3(glm::cos(getTime() * rotation_speed), 1.f, glm::sin(getTime() * rotation_speed));
@@ -181,22 +238,106 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
 
     glUniform3f(chessProgram->uLightColor2, lightColor2.r, lightColor2.g, lightColor2.b);
     glUniform3f(chessProgram->uLightPos2, lightPos2.x, lightPos2.y, lightPos2.z);
+}
+
+void Renderer_3D::draw_possible_moves(
+    const std::vector<int>& possible_moves, int piece_position, glm::mat4 squareMVMatrix
+) const
+{
+    glUniform1i(chessProgram->uUseTexture, 0);
+    bool is_possible_square = false;
+
+    for (const int& move : possible_moves)
+    {
+        if (move == piece_position)
+        {
+            glUniform3f(chessProgram->uColor, 0.5f, 0.5f, 1.f);
+            is_possible_square = true;
+            break;
+        }
+    }
+
+    if (!is_possible_square)
+    {
+        glUniform1i(chessProgram->uUseTexture, 1);
+    }
+    else
+    {
+        glBindVertexArray(cylinderVao);
+        glm::mat4 possible_moveMVMatrix = squareMVMatrix;
+
+        possible_moveMVMatrix =
+            glm::translate(squareMVMatrix, glm::vec3(0, square_height + texture_clipping_delta, 0));
+
+        glm::mat4 possible_moveMVPMatrix = ProjMatrix * possible_moveMVMatrix;
+        glm::mat4 possible_moveNormalMatrix =
+            glm::transpose(glm::inverse(glm::mat3(possible_moveMVMatrix)));
+
+        glUniformMatrix4fv(
+            chessProgram->uMVPMatrix, 1, GL_FALSE, glm::value_ptr(possible_moveMVPMatrix)
+        );
+        glUniformMatrix4fv(
+            chessProgram->uMVMatrix, 1, GL_FALSE, glm::value_ptr(possible_moveMVMatrix)
+        );
+        glUniformMatrix3fv(
+            chessProgram->uNormalMatrix, 1, GL_FALSE, glm::value_ptr(possible_moveNormalMatrix)
+        );
+
+        glDrawArrays(GL_TRIANGLES, 0, cylinder.getVertexCount());
+    }
+}
+
+int Renderer_3D::draw(int width, int height, GameManager& game)
+{
+    if (current_move != game.get_move())
+    {
+        auto move_opt = game.get_last_move();
+
+        if (move_opt)
+        {
+            anim_from = move_opt->from;
+            anim_to   = move_opt->to;
+
+            anim_time    = 0.3f;
+            anim_elapsed = 0.0f;
+            is_animating = true;
+        }
+
+        current_move = game.get_move();
+    }
+
+    double current_frame = getTime();
+    double delta_time    = current_frame - last_frame;
+    last_frame           = current_frame;
+
+    if (is_animating)
+    {
+        anim_elapsed += delta_time;
+
+        if (anim_elapsed >= anim_duration)
+        {
+            is_animating = false;
+            anim_elapsed = anim_duration;
+        }
+    }
+
+    ProjMatrix = glm::perspective(glm::radians(fov), 1.0f, 0.1f, 100.f);
+    chessProgram->m_Program.use();
+
+    const bool is_white_turn = game.is_white_turn();
+
+    // lighting params
+    set_lights(is_white_turn);
 
     glViewport(0, 0, width, height);
 
-    /* Loop until the user closes the window */
-    // while (!glfwWindowShouldClose(window)) {
     glClearColor(0.1f, 0.f, 0.1f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    /*********************************
-     * HERE SHOULD COME THE RENDERING CODE
-     *********************************/
 
     glUniform1i(chessProgram->uBoardTexture, 0);
     glUniform1i(chessProgram->uUseTexture, 1);
-    glUniform3f(chessProgram->uCamPos, 0.0f, 0.0f, 0.0f);
 
-    glm::mat4 globalMVMatrix = camera.getViewMatrix();
+    globalMVMatrix = camera.getViewMatrix();
 
     glm::mat4 chessMVMatrix = globalMVMatrix;
     glUniformMatrix4fv(chessProgram->uMVMatrix, 1, GL_FALSE, glm::value_ptr(chessMVMatrix));
@@ -217,14 +358,8 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
 
     glBindVertexArray(0);
 
-    float const square_width  = square.getWidth();
-    float const square_height = square.getHeight();
-    float const square_depth  = square.getDepth();
-
-    float const board_width = board.getWidth();
-
-    int       piece_position{};
-    int const game_board_size = game.board.get_size();
+    int piece_position{};
+    game_board_size = game.board.get_size();
 
     Piece* current_square = nullptr;
 
@@ -244,8 +379,6 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
         for (size_t col = 0; col < 8; col++)
         {
             piece_position = col + (row * game_board_size);
-
-            const std::vector<int>& possible_moves = game.get_possible_moves();
 
             squareMVMatrix = glm::translate(
                 squareMVMatrix, glm::vec3((col != 0) ? square_width * 2 : board_width / 8.0, 0, 0)
@@ -289,145 +422,14 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
             glDrawArrays(GL_TRIANGLES, 0, square.getVertexCount());
 
             // we wanna display possible moves
-
-            glUniform1i(chessProgram->uUseTexture, 0);
-            bool is_possible_square = false;
-
-            for (const int& move : possible_moves)
-            {
-                if (move == piece_position)
-                {
-                    glUniform3f(chessProgram->uColor, 0.5f, 0.5f, 1.f);
-                    is_possible_square = true;
-                    break;
-                }
-            }
-
-            if (!is_possible_square)
-            {
-                glUniform1i(chessProgram->uUseTexture, 1);
-            }
-            else
-            {
-                glBindVertexArray(cylinderVao);
-                glm::mat4 possible_moveMVMatrix = squareMVMatrix;
-
-                possible_moveMVMatrix = glm::translate(
-                    squareMVMatrix, glm::vec3(0, square_height + texture_clipping_delta, 0)
-                );
-
-                glm::mat4 possible_moveMVPMatrix = ProjMatrix * possible_moveMVMatrix;
-                glm::mat4 possible_moveNormalMatrix =
-                    glm::transpose(glm::inverse(glm::mat3(possible_moveMVMatrix)));
-
-                glUniformMatrix4fv(
-                    chessProgram->uMVPMatrix, 1, GL_FALSE, glm::value_ptr(possible_moveMVPMatrix)
-                );
-                glUniformMatrix4fv(
-                    chessProgram->uMVMatrix, 1, GL_FALSE, glm::value_ptr(possible_moveMVMatrix)
-                );
-                glUniformMatrix3fv(
-                    chessProgram->uNormalMatrix, 1, GL_FALSE,
-                    glm::value_ptr(possible_moveNormalMatrix)
-                );
-
-                glDrawArrays(GL_TRIANGLES, 0, cylinder.getVertexCount());
-            }
+            const std::vector<int>& possible_moves = game.get_possible_moves();
+            draw_possible_moves(possible_moves, piece_position, squareMVMatrix);
 
             // deal with pawn here
-
             // we want to display a piece only if it exists in the game board
 
             current_square = game.board.get_board_data(piece_position).get();
-
-            if (current_square)
-            {
-                glm::mat4 pieceMVMatrix = globalMVMatrix; // Translation
-                pieceMVMatrix           = glm::translate(
-                    pieceMVMatrix, glm::vec3(-1, square_height * 5, -1 + (board_width / 8.0f))
-                );
-
-                // here we retrieve the current correct piece_position
-                int anim_row = piece_position / game_board_size;
-                int anim_col = piece_position % game_board_size;
-
-                float draw_col = col;
-                float draw_row = row;
-
-                //if animation we update 
-                if (is_animating && piece_position == anim_to)
-                {
-                    // float time = anim_elapsed / anim_duration;
-                    float time = glm::sin(((anim_elapsed / anim_duration) * glm::pi<float>()) / 2);
-
-                    float from_row = anim_from / game_board_size;
-                    float from_col = anim_from % game_board_size;
-                    // we set float here so the mix works great
-
-                    float to_row = anim_to / game_board_size;
-                    float to_col = anim_to % game_board_size;
-                    
-                    // interpolation time
-                    draw_col = glm::mix(from_col, to_col, time);
-                    draw_row = glm::mix(from_row, to_row, time);
-                }
-
-                pieceMVMatrix = glm::translate(
-                    pieceMVMatrix,
-                    glm::vec3(
-                        glm::vec3(
-                            ((square_width * 2)) * draw_col + ((board_width / 8.0)),
-                            square_height + texture_clipping_delta, (square_width * 2) * draw_row
-                        )
-                    )
-                );
-
-                pieceMVMatrix = glm::scale(pieceMVMatrix, glm::vec3(0.0625, 0.0625, 0.0625));
-
-                (current_square->get_color() == White)
-                    ? pieceMVMatrix = glm::rotate(
-                          pieceMVMatrix, 3.f * glm::pi<float>() * .5f, glm::vec3(0, 1, 0)
-                      )
-                    : pieceMVMatrix =
-                          glm::rotate(pieceMVMatrix, glm::pi<float>() * .5f, glm::vec3(0, 1, 0));
-
-                glm::mat4 pieceMVPMatrix = ProjMatrix * pieceMVMatrix;
-                glm::mat4 pieceNormalMatrix =
-                    glm::transpose(glm::inverse(glm::mat3(pieceMVMatrix)));
-
-                glUniformMatrix4fv(
-                    chessProgram->uMVPMatrix, 1, GL_FALSE, glm::value_ptr(pieceMVPMatrix)
-                );
-                glUniformMatrix4fv(
-                    chessProgram->uMVMatrix, 1, GL_FALSE, glm::value_ptr(pieceMVMatrix)
-                );
-                glUniformMatrix3fv(
-                    chessProgram->uNormalMatrix, 1, GL_FALSE, glm::value_ptr(pieceNormalMatrix)
-                );
-
-                glUniform1i(chessProgram->uUseTexture, 0);
-
-                (current_square->get_color() == White)
-                    ? glUniform3f(chessProgram->uColor, 1.0f, 1.0f, 1.0f)
-                    : glUniform3f(chessProgram->uColor, 0.3f, 0.2f, 0.2f);
-
-                // here we choose which model to draw
-
-                switch (std::tolower(current_square->get_label()))
-                {
-                case 'b': bishopOBJ.draw(); break;
-
-                case 'k': kingOBJ.draw(); break;
-
-                case 'q': queenOBJ.draw(); break;
-
-                case 'r': rookOBJ.draw(); break;
-
-                case 'n': knightOBJ.draw(); break;
-
-                default: pawnOBJ.draw();
-                }
-            }
+            Renderer_3D::draw_pieces(piece_position, current_square, col, row);
         }
     }
 
@@ -440,7 +442,6 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
 
     // here we update the move for piece animation
     current_move = game.get_move();
-
     return 0;
 }
 
@@ -451,4 +452,6 @@ void Renderer_3D::terminate()
     glDeleteVertexArrays(1, &squareVao);
     glDeleteBuffers(1, &boardVbo);
     glDeleteVertexArrays(1, &boardVao);
+    glDeleteBuffers(1, &cylinderVbo);
+    glDeleteVertexArrays(1, &cylinderVao);
 }
