@@ -6,6 +6,12 @@
 #include "Pieces.hpp"
 #include "Probabilities/Chess960Permutation.hpp"
 
+GameManager::GameManager() : m_fish_law(0.20) // Occurences by "tick" %
+{
+    load_game_from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    m_last_spawn_check_time = std::chrono::steady_clock::now();
+}
+
 void GameManager::move_piece(int from_position, int dest_position, GameManager& game)
 {
     std::unique_ptr<Piece>& active_square = board.get_board_data()[from_position];
@@ -329,6 +335,19 @@ bool GameManager::get_show_skip_popup() const
     return m_show_skip_popup;
 }
 
+void GameManager::trigger_spawn_popup()
+{
+    m_show_spawn_popup = true;
+}
+void GameManager::set_show_spawn_popup(bool is_spawn_showing)
+{
+    m_show_spawn_popup = is_spawn_showing;
+}
+bool GameManager::get_show_spawn_popup() const
+{
+    return m_show_spawn_popup;
+}
+
 void GameManager::reset_turn_timer()
 {
     m_turn_start_time  = std::chrono::steady_clock::now();
@@ -405,4 +424,66 @@ double GameManager::get_popup_remaining_time() const
 bool GameManager::is_popup_time_over() const
 {
     return get_popup_remaining_time() <= 0.0;
+}
+
+void GameManager::update_random_spawns()
+{
+    if (m_current_mode != GameMode::Chaos || m_is_paused)
+    {
+        return;
+    }
+
+    auto now = std::chrono::steady_clock::now();
+
+    std::chrono::duration<double> elapsed = now - m_last_spawn_check_time;
+
+    if (elapsed.count() >= m_spawn_check_interval)
+    {
+        m_last_spawn_check_time = now;
+
+        // Dice with FisherLaw
+        int pawns_to_spawn = m_fish_law.generate();
+
+        // If FisherLaw gives 1, 2, 3... spawn Pawn
+        for (int i = 0; i < pawns_to_spawn; ++i)
+        {
+            spawn_random_pawn();
+        }
+    }
+}
+
+void GameManager::spawn_random_pawn()
+{
+    std::vector<int> empty_squares;
+
+    for (int i = 0; i < 64; ++i)
+    {
+        if (board.get_board_data(i) == nullptr)
+        {
+            empty_squares.push_back(i);
+        }
+    }
+
+    if (empty_squares.empty())
+    {
+        return;
+    }
+
+    // 2. Random case
+    std::random_device              rd;
+    std::mt19937                    gen(rd());
+    std::uniform_int_distribution<> dist(0, empty_squares.size() - 1);
+
+    int random_index  = dist(gen);
+    int target_square = empty_squares[random_index];
+
+    // 3. Who is playing ?
+    PieceColor current_color = is_white_turn() ? PieceColor::White : PieceColor::Black;
+
+    int dest_x = target_square % board.get_size();
+    int dest_y = target_square / board.get_size();
+
+    board.get_board_data(target_square) = std::make_unique<Pawn>(dest_x, dest_y, current_color);
+
+    trigger_spawn_popup();
 }

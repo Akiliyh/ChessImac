@@ -39,6 +39,7 @@ void Renderer::draw(GameManager& game)
                             game.skip_turn();
                             game.trigger_skip_popup();
                         }
+                        game.update_random_spawns();
                     }
 
                     m_renderer_2d.draw(game);
@@ -239,6 +240,45 @@ void Renderer::draw(GameManager& game)
 
                         std::snprintf(
                             button_text.data(), button_text.size(), "No ! (%.1fs)", remaining
+                        );
+
+                        if (ImGui::Button(button_text.data(), ImVec2(120, 0))
+                            || game.is_popup_time_over())
+                        {
+                            game.toggle_pause();
+                            ImGui::CloseCurrentPopup();
+                        }
+
+                        ImGui::SetItemDefaultFocus();
+                        ImGui::EndPopup();
+                    }
+                    // ==========================================
+
+                    // ==========================================
+                    // Pawn Spawn Pop-up
+                    // ==========================================
+
+                    if (game.get_show_spawn_popup())
+                    {
+                        ImGui::OpenPopup("New challenger !");
+                        game.set_show_spawn_popup(false);
+                        game.start_popup_timer(1.5);
+                    }
+
+                    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+                    if (ImGui::BeginPopupModal(
+                            "New challenger !", nullptr, ImGuiWindowFlags_AlwaysAutoResize
+                        ))
+                    {
+                        ImGui::Text("Pawn joins the battle !");
+                        ImGui::Separator();
+
+                        std::array<char, 32> button_text;
+                        double               remaining = game.get_popup_remaining_time();
+
+                        std::snprintf(
+                            button_text.data(), button_text.size(), "Wow ! (%.1fs)", remaining
                         );
 
                         if (ImGui::Button(button_text.data(), ImVec2(120, 0))
