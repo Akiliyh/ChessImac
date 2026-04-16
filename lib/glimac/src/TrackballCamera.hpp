@@ -23,6 +23,7 @@ class TrackballCamera : public Camera
     void rotateLeft(float degrees) override;
     void rotateUp(float degrees) override;
     glm::mat4 getViewMatrix() const override;
+    glm::vec3 get_position() override;
 };
 
 }
