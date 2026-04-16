@@ -126,7 +126,6 @@ void Renderer_2D::draw(GameManager& game)
 
         if (ImGui::Button(label.c_str(), ImVec2{50.f, 50.f}))
         {
-            std::cout << "Clicked button " << i << "\n";
             game.on_square_clicked(i, game);
         }
 
@@ -221,7 +220,6 @@ void Renderer_2D::draw(GameManager& game)
 
         if (ImGui::Button("New Game", ImVec2(100, 0)))
         {
-            std::cout << "New Game button \n";
             game.new_game(game);
 
             if (game.is_paused())
@@ -236,7 +234,6 @@ void Renderer_2D::draw(GameManager& game)
 
         if (ImGui::Button("Exit Game", ImVec2(100, 0)))
         {
-            std::cout << "Exit Game button \n";
             std::exit(0);
         }
 
