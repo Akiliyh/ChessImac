@@ -369,3 +369,27 @@ void GameManager::skip_turn()
 
     reset_turn_timer();
 }
+
+void GameManager::start_popup_timer(double duration_in_seconds)
+{
+    m_popup_duration   = duration_in_seconds;
+    m_popup_start_time = std::chrono::steady_clock::now();
+
+    if (!m_is_paused)
+    {
+        toggle_pause();
+    }
+}
+
+double GameManager::get_popup_remaining_time() const
+{
+    auto                          now     = std::chrono::steady_clock::now();
+    std::chrono::duration<double> elapsed = now - m_popup_start_time;
+
+    return std::max(0.0, m_popup_duration - elapsed.count());
+}
+
+bool GameManager::is_popup_time_over() const
+{
+    return get_popup_remaining_time() <= 0.0;
+}

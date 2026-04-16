@@ -1,6 +1,7 @@
 #include "Renderer.hpp"
 #include <imgui.h>
 #include <algorithm>
+#include <array>
 #include <iostream>
 #include <string>
 #include <utility>
@@ -138,20 +139,30 @@ void Renderer::draw(GameManager& game)
                     {
                         ImGui::OpenPopup("Random Mutation !");
                         game.set_show_mutation_popup(false);
+                        game.start_popup_timer(2.5);
                     }
 
                     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
                     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
                     if (ImGui::BeginPopupModal(
-                            "Random Mutation !", NULL, ImGuiWindowFlags_AlwaysAutoResize
+                            "Random Mutation !", nullptr, ImGuiWindowFlags_AlwaysAutoResize
                         ))
                     {
                         ImGui::Text("%s", game.get_mutation_message().c_str());
                         ImGui::Separator();
 
-                        if (ImGui::Button("OK", ImVec2(120, 0)))
+                        std::array<char, 32> button_text;
+                        double               remaining = game.get_popup_remaining_time();
+
+                        std::snprintf(
+                            button_text.data(), button_text.size(), "OK (%.1fs)", remaining
+                        );
+
+                        if (ImGui::Button(button_text.data(), ImVec2(120, 0))
+                            || game.is_popup_time_over())
                         {
+                            game.toggle_pause();
                             ImGui::CloseCurrentPopup();
                         }
 
@@ -167,19 +178,30 @@ void Renderer::draw(GameManager& game)
                     {
                         ImGui::OpenPopup("Attack Missed !");
                         game.set_show_dodge_popup(false);
+                        game.start_popup_timer(2.5);
                     }
 
                     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
                     if (ImGui::BeginPopupModal(
-                            "Attack Missed !", NULL, ImGuiWindowFlags_AlwaysAutoResize
+                            "Attack Missed !", nullptr, ImGuiWindowFlags_AlwaysAutoResize
                         ))
                     {
                         ImGui::Text("%s", game.get_dodge_message().c_str());
                         ImGui::Separator();
 
-                        if (ImGui::Button("Oh okay...", ImVec2(120, 0)))
+                        std::array<char, 32> button_text;
+                        double               remaining = game.get_popup_remaining_time();
+
+                        // On met à jour le texte du bouton avec le temps restant
+                        std::snprintf(
+                            button_text.data(), button_text.size(), "Oh okay...(%.1fs)", remaining
+                        );
+
+                        if (ImGui::Button(button_text.data(), ImVec2(120, 0))
+                            || game.is_popup_time_over())
                         {
+                            game.toggle_pause();
                             ImGui::CloseCurrentPopup();
                         }
 

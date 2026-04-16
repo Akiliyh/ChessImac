@@ -42,6 +42,9 @@ struct GameManager {
     ExpoLaw                               m_expo_law;
     double                                m_current_turn_limit{10.0};
 
+    std::chrono::steady_clock::time_point m_popup_start_time;
+    double                                m_popup_duration{0.0};
+
   public:
     Chessboard                                board{};
     int                                       get_board() const;
@@ -111,4 +114,8 @@ struct GameManager {
     {
         return m_is_paused;
     }
+
+    void   start_popup_timer(double duration_in_seconds);
+    double get_popup_remaining_time() const;
+    bool   is_popup_time_over() const;
 };
