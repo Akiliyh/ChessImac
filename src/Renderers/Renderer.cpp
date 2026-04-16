@@ -17,8 +17,8 @@
 void Renderer::draw(GameManager& game)
 {
     GLFWwindow* window = nullptr;
-    const int   width{800};
-    const int   height{800};
+    float   width{800.0f};
+    float   height{800.0f};
 
     quick_imgui::loop(
         "ChessImac",
@@ -41,14 +41,14 @@ void Renderer::draw(GameManager& game)
                     }
 
                     m_renderer_2d.draw(game);
-
+                    
                     // ==========================================
                     // Modes Modal
                     // ==========================================
-
+                    
                     ImGui::Begin("Game Settings");
                     ImGui::Text("Select a Game Mode :");
-
+                    
                     if (ImGui::Button("Classic Mode"))
                     {
                         game.setMode(GameMode::Classic);
@@ -133,21 +133,23 @@ void Renderer::draw(GameManager& game)
                     ImGui::End();
 
                     // ==========================================
+
+                    // ==========================================
                     // Mutation Pop-up
                     // ==========================================
-
+                    
                     if (game.get_show_mutation_popup())
                     {
                         ImGui::OpenPopup("Random Mutation !");
                         game.set_show_mutation_popup(false);
                         game.start_popup_timer(2.5);
                     }
-
+                    
                     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
                     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-
+                    
                     if (ImGui::BeginPopupModal(
-                            "Random Mutation !", nullptr, ImGuiWindowFlags_AlwaysAutoResize
+                            "Random Mutation !", NULL, ImGuiWindowFlags_AlwaysAutoResize
                         ))
                     {
                         ImGui::Text("%s", game.get_mutation_message().c_str());
@@ -166,24 +168,25 @@ void Renderer::draw(GameManager& game)
                             game.toggle_pause();
                             ImGui::CloseCurrentPopup();
                         }
-
+                        
                         ImGui::SetItemDefaultFocus();
                         ImGui::EndPopup();
                     }
+                    // ==========================================
 
                     // ==========================================
                     // Dodge Attack Pop-up
                     // ==========================================
-
+                    
                     if (game.get_show_dodge_popup())
                     {
                         ImGui::OpenPopup("Attack Missed !");
                         game.set_show_dodge_popup(false);
                         game.start_popup_timer(2.5);
                     }
-
+                    
                     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-
+                    
                     if (ImGui::BeginPopupModal(
                             "Attack Missed !", nullptr, ImGuiWindowFlags_AlwaysAutoResize
                         ))
@@ -243,23 +246,23 @@ void Renderer::draw(GameManager& game)
                             game.toggle_pause();
                             ImGui::CloseCurrentPopup();
                         }
-
+                        
                         ImGui::SetItemDefaultFocus();
                         ImGui::EndPopup();
                     }
                     // ==========================================
-
+                    
                     ImGui::Begin("3D Controls");
                     ImGui::Text("Camera");
                     ImGui::SliderFloat("FOV", &m_renderer_3d.fov, 10.f, 100.0f);
                     ImGui::SliderFloat("Light Postion x", &m_renderer_3d.light_pos.x, -10.f, 10.0f);
                     ImGui::SliderFloat("Light Postion y", &m_renderer_3d.light_pos.y, -10.f, 10.0f);
                     ImGui::SliderFloat("Light Postion z", &m_renderer_3d.light_pos.z, -10.f, 10.0f);
-
+                    
                     ImGui::PushItemWidth(100);
                     ImGui::ColorPicker3("Light Color", &m_renderer_3d.light_color[0]);
                     ImGui::PopItemWidth();
-
+                    
                     ImGui::Checkbox("Panning", &m_renderer_3d.is_panning);
                     ImGui::Checkbox("Skybox", &m_renderer_3d.is_skybox_active);
                     if (ImGui::Checkbox("Trackball camera", &m_renderer_3d.use_trackball_camera))
@@ -267,8 +270,10 @@ void Renderer::draw(GameManager& game)
                         m_renderer_3d.change_camera();
                     }
                     ImGui::End();
-
-                    m_renderer_3d.draw(width, height, game);
+                    
+                    ImVec2 size = ImGui::GetMainViewport()->Size;
+                    m_renderer_3d.resize_window(static_cast<float>(size.x), static_cast<float>(size.y));
+                    m_renderer_3d.draw(static_cast<float>(size.x), static_cast<float>(size.y), game);
                 },
 
             .key_callback =

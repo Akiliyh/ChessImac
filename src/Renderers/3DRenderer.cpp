@@ -68,7 +68,7 @@ void Renderer_3D::change_camera()
     use_trackball_camera ? camera = trackball_camera.get() : camera = freefly_camera.get();
 }
 
-int Renderer_3D::init(int width, int height)
+int Renderer_3D::init(float width, float height)
 {
     trackball_camera = std::make_unique<glimac::TrackballCamera>();
     freefly_camera   = std::make_unique<glimac::FreeflyCamera>();
@@ -84,7 +84,10 @@ int Renderer_3D::init(int width, int height)
     this->height = height;
     this->width  = width;
 
-    glViewport(0, 0, width, height);
+    std::cout << this->height << std::endl;
+    std::cout << this->width << std::endl;
+
+    glViewport(0, 0, this->width, this->height);
 
     /*********************************
      * HERE SHOULD COME THE INITIALIZATION CODE
@@ -115,7 +118,7 @@ int Renderer_3D::init(int width, int height)
     FilePath applicationPath("color2D.vs.glsl");
     this->chessProgram = std::make_unique<ChessProgram>(applicationPath);
 
-    ProjMatrix             = glm::perspective(glm::radians(fov), 1.0f, 0.1f, 100.f);
+    ProjMatrix             = glm::perspective(glm::radians(fov), this->ratio, 0.1f, 100.f);
     glm::mat4 MVMatrix     = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
     glm::mat4 NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
     glm::mat4 MVPMatrix    = ProjMatrix * MVMatrix;
@@ -194,15 +197,14 @@ void Renderer_3D::draw_pieces(int piece_position, Piece* current_square, int col
         );
 
         // not very ideal to set up the camera but hey we are in a bit of a rush
-
-        if (col == selected_square_col && row == selected_square_row)
+        // line to work on
+        if (anim_col == selected_square_col && anim_row == selected_square_row)
         {
             ffly_cam_target_pos = glm::vec3(-1, square_height * 5, -1 + (board_width / 8.0f));
             ffly_cam_target_pos += glm::vec3(
                 ((square_width * 2)) * draw_col + ((board_width / 8.0)), square_height + 0.2f,
                 (square_width * 2) * draw_row
             );
-            std::cout << ffly_cam_target_pos.x << std::endl;
         }
 
         pieceMVMatrix = glm::scale(pieceMVMatrix, glm::vec3(0.0625, 0.0625, 0.0625));
@@ -318,7 +320,15 @@ void Renderer_3D::draw_possible_moves(
     }
 }
 
-int Renderer_3D::draw(int width, int height, GameManager& game)
+void Renderer_3D::resize_window(float width, float height)
+{
+    this->height = height;
+    this->width = width; 
+    this->ratio = width / height;
+    glViewport(0, 0, width, height);
+}
+
+int Renderer_3D::draw(float width, float height, GameManager& game)
 {
     int selected_square_position = -1;
     game_board_size              = game.board.get_size();
@@ -383,7 +393,7 @@ int Renderer_3D::draw(int width, int height, GameManager& game)
         }
     }
 
-    ProjMatrix = glm::perspective(glm::radians(fov), 1.0f, 0.1f, 100.f);
+    ProjMatrix = glm::perspective(glm::radians(fov), this->ratio, 0.1f, 100.f);
     chessProgram->m_Program.use();
 
     const bool is_white_turn = game.is_white_turn();
