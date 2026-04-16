@@ -163,7 +163,7 @@ bool Chessboard::move_piece(
                     int dest_x = dest_position % 8;
                     int dest_y = dest_position / 8;
 
-                    int random_type = std::rand() % 5; // Un nombre entre 0 et 3
+                    int random_type = std::rand() % 5;
 
                     std::string piece_nom                   = "";
                     std::string mutation_expression_feeling = "";
