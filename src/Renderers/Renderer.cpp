@@ -418,7 +418,6 @@ void Renderer::draw(GameManager& game)
                         {
                             game.on_square_clicked(tile, game);
                         }
-                        std::cout << "Clicked tile: " << tile << std::endl;
                     }
                 },
             .cursor_position_callback =

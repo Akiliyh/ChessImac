@@ -246,7 +246,7 @@ void Renderer_3D::draw_pieces(int piece_position, Piece* current_square, int col
     }
 }
 
-// generated from scratch 
+// generated from scratch
 
 int Renderer_3D::click_square(double mouseX, double mouseY)
 {
@@ -266,16 +266,14 @@ int Renderer_3D::click_square(double mouseX, double mouseY)
     // ----------------------------
     glm::mat4 invProj = glm::inverse(ProjMatrix);
     glm::vec4 ray_eye = invProj * ray_clip;
-    ray_eye = glm::vec4(ray_eye.x, ray_eye.y, -1.0f, 0.0f);
+    ray_eye           = glm::vec4(ray_eye.x, ray_eye.y, -1.0f, 0.0f);
 
     // ----------------------------
     // 3. World space
     // ----------------------------
     glm::mat4 invView = glm::inverse(camera->getViewMatrix());
 
-    glm::vec3 ray_dir = glm::normalize(
-        glm::vec3(invView * ray_eye)
-    );
+    glm::vec3 ray_dir = glm::normalize(glm::vec3(invView * ray_eye));
 
     glm::vec3 ray_origin = glm::vec3(invView[3]);
 
@@ -297,11 +295,7 @@ int Renderer_3D::click_square(double mouseX, double mouseY)
     // ----------------------------
     // 5. Board origin + grid definition
     // ----------------------------
-    glm::vec3 board_origin(
-        -1.0f,
-        planeY,
-        -1.0f + (board_width / 8.0f)
-    );
+    glm::vec3 board_origin(-1.0f, planeY, -1.0f + (board_width / 8.0f));
 
     float tileSize = square_width * 2.0f;
 
@@ -417,13 +411,13 @@ int Renderer_3D::draw(float width, float height, GameManager& game)
     int selected_square_position = -1;
     game_board_size              = game.board.get_size();
 
-    if (!use_trackball_camera)
+    if (game.get_selected_square() != nullptr)
     {
-        if (game.get_selected_square() != nullptr)
+        selected_square_position = game.get_selected_square()->get_position();
+        if (!use_trackball_camera)
         {
-            selected_square_position = game.get_selected_square()->get_position();
-            selected_square_col      = selected_square_position % game_board_size;
-            selected_square_row      = selected_square_position / game_board_size;
+            selected_square_col = selected_square_position % game_board_size;
+            selected_square_row = selected_square_position / game_board_size;
 
             freefly_camera->set_position(ffly_cam_target_pos);
 
@@ -555,12 +549,19 @@ int Renderer_3D::draw(float width, float height, GameManager& game)
             glm::vec3 baseColor = isDark ? glm::vec3(0.1f, 0.1f, 0.1f) : glm::vec3(1.f, 1.f, 1.f);
 
             // hover highlight
+            glUniform1i(chessProgram->uUseTexture, 0);
             if (index == hovered_square_position)
             {
                 baseColor = glm::vec3(0.8f, 0.8f, 0.2f);
-                glUniform1i(chessProgram->uUseTexture, 0);
                 glUniform3f(chessProgram->uColor, baseColor.r, baseColor.g, baseColor.b);
-            } else {
+            }
+            else if (index == selected_square_position)
+            {
+                baseColor = glm::vec3(0.1f, 0.1f, 0.9f);
+                glUniform3f(chessProgram->uColor, baseColor.r, baseColor.g, baseColor.b);
+            }
+            else
+            {
                 glUniform1i(chessProgram->uUseTexture, 1);
             }
 
