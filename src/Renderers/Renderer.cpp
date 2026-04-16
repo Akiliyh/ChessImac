@@ -1,6 +1,7 @@
 #include "Renderer.hpp"
 #include <imgui.h>
 #include <algorithm>
+#include <array>
 #include <iostream>
 #include <string>
 #include <utility>
@@ -30,6 +31,15 @@ void Renderer::draw(GameManager& game)
             .loop =
 
                 [&]() {
+                    if (game.get_mode() == GameMode::Chaos && !game.is_paused())
+                    {
+                        if (game.is_time_over())
+                        {
+                            game.skip_turn();
+                            game.trigger_skip_popup();
+                        }
+                    }
+
                     m_renderer_2d.draw(game);
                     
                     // ==========================================
@@ -50,16 +60,80 @@ void Renderer::draw(GameManager& game)
                         game.setMode(GameMode::Chaos);
                         game.new_game(game);
                     }
-                    
+
+                    if (ImGui::Button("Exit Game", ImVec2(178, 0)))
+                    {
+                        std::cout << "Exit Game button \n";
+                        std::exit(0);
+                    }
+
                     ImGui::Separator();
                     ImGui::Text(
                         "Current Mode : %s",
                         (game.get_mode() == GameMode::Classic) ? "Classic" : "Chaos"
                     );
-                    ImGui::End();
-                    
+
                     // ==========================================
-                    
+                    // Chrono & Time Limit
+                    // ==========================================
+                    ImGui::Separator();
+
+                    ImGui::Text("Turn: %s", game.is_white_turn() ? "White" : "Black");
+
+                    double elapsed = game.get_current_turn_elapsed_time();
+                    ImGui::Text("Thinking time : %.1f s", elapsed);
+
+                    if (game.get_mode() == GameMode::Chaos)
+                    {
+                        double current_limit = game.get_current_turn_limit();
+                        double remaining     = std::max(0.0, current_limit - elapsed);
+                        auto   progress      = (float)(remaining / current_limit);
+
+                        bool color_pushed = false;
+                        if (game.is_paused())
+                        {
+                            ImGui::PushStyleColor(
+                                ImGuiCol_PlotHistogram, ImVec4(0.5f, 0.5f, 0.5f, 1.0f)
+                            );
+                            color_pushed = true;
+                        }
+                        else if (remaining < 3.0)
+                        {
+                            ImGui::PushStyleColor(
+                                ImGuiCol_PlotHistogram, ImVec4(1.0f, 0.0f, 0.0f, 1.0f)
+                            );
+                            color_pushed = true;
+                        }
+
+                        ImGui::Text("Time left : %.1f s", remaining);
+                        ImGui::ProgressBar(progress, ImVec2(-1.0f, 0.0f), "");
+
+                        if (color_pushed)
+                        {
+                            ImGui::PopStyleColor();
+                        }
+
+                        if (game.is_paused())
+                        {
+                            ImGui::Text("GAME IN PAUSE");
+                        }
+                        else if (remaining < 3.0)
+                        {
+                            ImGui::TextColored(ImVec4(1, 0, 0, 1), "HURRY !");
+                        }
+
+                        ImGui::Separator();
+
+                        if (ImGui::Button(game.is_paused() ? "RESUME" : "PAUSE"))
+                        {
+                            game.toggle_pause();
+                        }
+                    }
+
+                    ImGui::End();
+
+                    // ==========================================
+
                     // ==========================================
                     // Mutation Pop-up
                     // ==========================================
@@ -68,20 +142,30 @@ void Renderer::draw(GameManager& game)
                     {
                         ImGui::OpenPopup("Random Mutation !");
                         game.set_show_mutation_popup(false);
+                        game.start_popup_timer(2.5);
                     }
                     
                     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
                     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
                     
                     if (ImGui::BeginPopupModal(
-                        "Random Mutation !", NULL, ImGuiWindowFlags_AlwaysAutoResize
-                    ))
+                            "Random Mutation !", NULL, ImGuiWindowFlags_AlwaysAutoResize
+                        ))
                     {
                         ImGui::Text("%s", game.get_mutation_message().c_str());
                         ImGui::Separator();
-                        
-                        if (ImGui::Button("OK", ImVec2(120, 0)))
+
+                        std::array<char, 32> button_text;
+                        double               remaining = game.get_popup_remaining_time();
+
+                        std::snprintf(
+                            button_text.data(), button_text.size(), "OK (%.1fs)", remaining
+                        );
+
+                        if (ImGui::Button(button_text.data(), ImVec2(120, 0))
+                            || game.is_popup_time_over())
                         {
+                            game.toggle_pause();
                             ImGui::CloseCurrentPopup();
                         }
                         
@@ -89,7 +173,7 @@ void Renderer::draw(GameManager& game)
                         ImGui::EndPopup();
                     }
                     // ==========================================
-                    
+
                     // ==========================================
                     // Dodge Attack Pop-up
                     // ==========================================
@@ -98,19 +182,68 @@ void Renderer::draw(GameManager& game)
                     {
                         ImGui::OpenPopup("Attack Missed !");
                         game.set_show_dodge_popup(false);
+                        game.start_popup_timer(2.5);
                     }
                     
                     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
                     
                     if (ImGui::BeginPopupModal(
-                        "Attack Missed !", NULL, ImGuiWindowFlags_AlwaysAutoResize
-                    ))
+                            "Attack Missed !", nullptr, ImGuiWindowFlags_AlwaysAutoResize
+                        ))
                     {
                         ImGui::Text("%s", game.get_dodge_message().c_str());
                         ImGui::Separator();
-                        
-                        if (ImGui::Button("Oh okay...", ImVec2(120, 0)))
+
+                        std::array<char, 32> button_text;
+                        double               remaining = game.get_popup_remaining_time();
+
+                        // On met à jour le texte du bouton avec le temps restant
+                        std::snprintf(
+                            button_text.data(), button_text.size(), "Oh okay...(%.1fs)", remaining
+                        );
+
+                        if (ImGui::Button(button_text.data(), ImVec2(120, 0))
+                            || game.is_popup_time_over())
                         {
+                            game.toggle_pause();
+                            ImGui::CloseCurrentPopup();
+                        }
+
+                        ImGui::SetItemDefaultFocus();
+                        ImGui::EndPopup();
+                    }
+
+                    // ==========================================
+                    // Skip Turn Pop-up
+                    // ==========================================
+
+                    if (game.get_show_skip_popup())
+                    {
+                        ImGui::OpenPopup("Time's Up !");
+                        game.set_show_skip_popup(false);
+                        game.start_popup_timer(2.0);
+                    }
+
+                    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+                    if (ImGui::BeginPopupModal(
+                            "Time's Up !", nullptr, ImGuiWindowFlags_AlwaysAutoResize
+                        ))
+                    {
+                        ImGui::Text("Too late. Turn skipped !");
+                        ImGui::Separator();
+
+                        std::array<char, 32> button_text;
+                        double               remaining = game.get_popup_remaining_time();
+
+                        std::snprintf(
+                            button_text.data(), button_text.size(), "No ! (%.1fs)", remaining
+                        );
+
+                        if (ImGui::Button(button_text.data(), ImVec2(120, 0))
+                            || game.is_popup_time_over())
+                        {
+                            game.toggle_pause();
                             ImGui::CloseCurrentPopup();
                         }
                         
@@ -153,7 +286,7 @@ void Renderer::draw(GameManager& game)
                         m_renderer_3d.camera->rotateLeft(1.0f);
                     if (key == GLFW_KEY_L && action == GLFW_PRESS)
                         m_renderer_3d.use_trackball_camera = !m_renderer_3d.use_trackball_camera;
-                            m_renderer_3d.change_camera();
+                    m_renderer_3d.change_camera();
                 },
             .mouse_button_callback =
                 [&](int button, int action, int mods) {

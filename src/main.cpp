@@ -7,5 +7,6 @@ int main()
     Renderer    renderer{};
     GameManager game{};
 
+    game.reset_turn_timer();
     renderer.draw(game);
 }
