@@ -187,95 +187,63 @@ void Renderer_2D::draw(GameManager& game)
     ImGui::PopStyleVar();
     ImGui::End();
 
-    // ==========================================
-    // Game Over Pop-up
-    // ==========================================
-
-    if (game.is_king_dead())
-    {
-        ImGui::OpenPopup("Game Over !");
-
-        // On fige le chronomètre de fin de partie
-        if (!game.is_paused())
-        {
-            game.toggle_pause();
-        }
-    }
-
-    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-
-    if (ImGui::BeginPopupModal("Game Over !", NULL, ImGuiWindowFlags_AlwaysAutoResize))
-    {
-        if (game.get_dead_king_color() == PieceColor::White)
-        {
-            ImGui::Text("Black win !");
-        }
-        else if (game.get_dead_king_color() == PieceColor::Black)
-        {
-            ImGui::Text("White win !");
-        }
-
-        ImGui::Separator();
-
-        if (ImGui::Button("New Game", ImVec2(100, 0)))
-        {
-            game.new_game(game);
-
-            if (game.is_paused())
-            {
-                game.toggle_pause();
-            }
-
-            ImGui::CloseCurrentPopup();
-        }
-
-        ImGui::SameLine();
-
-        if (ImGui::Button("Exit Game", ImVec2(100, 0)))
-        {
-            std::exit(0);
-        }
-
-        ImGui::SetItemDefaultFocus();
-        ImGui::EndPopup();
-    }
-    // ==========================================
-
     std::optional<int> promoting_pawn = game.is_piece_promoting();
 
     if (promoting_pawn.has_value())
     {
         int promote_pos = promoting_pawn.value();
 
-        ImGui::Begin("Promote Piece");
-
-        if (ImGui::Button(("Queen"), ImVec2{70.f, 50.f}))
+        // 1. Déclenchement du Pop-up
+        // (À placer là où tu vérifies si une pièce doit être promue, probablement en utilisant ton
+        // "game.is_piece_promoting()")
+        if (auto promoting_square = game.is_piece_promoting())
         {
-            game.promote_piece(promote_pos, 'Q');
+            ImGui::OpenPopup("Promote Piece");
+            // promote_pos = promoting_square.value(); // Assure-toi d'avoir cette variable à
+            // disposition
         }
 
-        ImGui::SameLine(0, 5.0f);
+        // 2. Affichage du Pop-up Modal
+        // On centre le pop-up au milieu de l'écran pour que ce soit bien visible
+        ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+        ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-        if (ImGui::Button(("Rook"), ImVec2{70.f, 50.f}))
+        if (ImGui::BeginPopupModal("Promote Piece", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
         {
-            game.promote_piece(promote_pos, 'R');
+            ImGui::Text("Choose your promotion !");
+            ImGui::Separator();
+
+            if (ImGui::Button("Queen", ImVec2{70.f, 50.f}))
+            {
+                game.promote_piece(promote_pos, 'Q');
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::SameLine(0, 5.0f);
+
+            if (ImGui::Button("Rook", ImVec2{70.f, 50.f}))
+            {
+                game.promote_piece(promote_pos, 'R');
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::SameLine(0, 5.0f);
+
+            if (ImGui::Button("Bishop", ImVec2{70.f, 50.f}))
+            {
+                game.promote_piece(promote_pos, 'B');
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::SameLine(0, 5.0f);
+
+            if (ImGui::Button("Knight", ImVec2{70.f, 50.f}))
+            {
+                game.promote_piece(promote_pos, 'N');
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::EndPopup();
         }
-
-        ImGui::SameLine(0, 5.0f);
-
-        if (ImGui::Button(("Bishop"), ImVec2{70.f, 50.f}))
-        {
-            game.promote_piece(promote_pos, 'B');
-        }
-
-        ImGui::SameLine(0, 5.0f);
-
-        if (ImGui::Button(("Knight"), ImVec2{70.f, 50.f}))
-        {
-            game.promote_piece(promote_pos, 'N');
-        }
-
-        ImGui::End();
     }
 }

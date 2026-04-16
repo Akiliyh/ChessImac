@@ -296,6 +296,63 @@ void Renderer::draw(GameManager& game)
                     }
                     // ==========================================
 
+                    // ==========================================
+                    // Game Over Pop-up
+                    // ==========================================
+
+                    if (game.is_king_dead())
+                    {
+                        ImGui::OpenPopup("Game Over !");
+
+                        // On fige le chronomètre de fin de partie
+                        if (!game.is_paused())
+                        {
+                            game.toggle_pause();
+                        }
+                        m_renderer_3d.is_panning = false;
+                    }
+
+                    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+                    if (ImGui::BeginPopupModal(
+                            "Game Over !", NULL, ImGuiWindowFlags_AlwaysAutoResize
+                        ))
+                    {
+                        if (game.get_dead_king_color() == PieceColor::White)
+                        {
+                            ImGui::Text("Black win !");
+                        }
+                        else if (game.get_dead_king_color() == PieceColor::Black)
+                        {
+                            ImGui::Text("White win !");
+                        }
+
+                        ImGui::Separator();
+
+                        if (ImGui::Button("New Game", ImVec2(100, 0)))
+                        {
+                            game.new_game(game);
+
+                            if (game.is_paused())
+                            {
+                                game.toggle_pause();
+                            }
+
+                            ImGui::CloseCurrentPopup();
+                        }
+
+                        ImGui::SameLine();
+
+                        if (ImGui::Button("Exit Game", ImVec2(100, 0)))
+                        {
+                            std::exit(0);
+                        }
+
+                        ImGui::SetItemDefaultFocus();
+                        ImGui::EndPopup();
+                    }
+                    // ==========================================
+
                     ImGui::Begin("3D Controls");
                     ImGui::Text("Camera");
                     ImGui::SliderFloat("FOV", &m_renderer_3d.fov, 10.f, 100.0f);
