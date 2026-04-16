@@ -356,7 +356,7 @@ void GameManager::reset_turn_timer()
 
     if (m_current_mode == GameMode::Chaos)
     {
-        m_current_turn_limit = m_expo_law.get_bounded_time(10.0, 20.0, 0.5);
+        m_current_turn_limit = m_expo_law.get_bounded_time(10.0, 30.0, 0.5);
     }
 }
 
