@@ -42,6 +42,11 @@ void FreeflyCamera::set_position(glm::vec3 position)
     computeDirectionVectors();
 }
 
+glm::vec3 FreeflyCamera::get_position()
+{
+    return m_Position;
+}
+
 void FreeflyCamera::rotateUp(float degrees)
 {
     degrees = glm::radians(degrees);

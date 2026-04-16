@@ -57,14 +57,15 @@ struct ChessProgram {
 
 class Renderer_3D {
   public:
-    int  init(int width, int height);
+    int  init(float width, float height);
     void init_vertex_object(const glimac::ShapeVertex* data, size_t count, GLuint& vbo, GLuint& vao);
-    int  draw(int width, int height, GameManager& game);
+    int  draw(float width, float height, GameManager& game);
     void draw_pieces(int piece_position, Piece* current_square, int col, int row);
     void set_lights(bool is_white_turn);
     void draw_possible_moves(const std::vector<int>& possible_moves, int piece_position, glm::mat4 squareMVMatrix) const;
     void terminate();
     void move_front(float delta);
+    void resize_window(float width, float height);
 
     void change_camera();
     bool use_trackball_camera = false;
@@ -115,8 +116,9 @@ class Renderer_3D {
     glimac::Geometry rookOBJ;
     glimac::Geometry knightOBJ;
 
-    int width{800};
-    int height{800};
+    float width{1920.0f};
+    float height{991.0f};
+    float ratio{1.0f};
 
     GLuint boardVbo;
     GLuint squareVbo;
