@@ -144,6 +144,7 @@ void Renderer::draw(GameManager& game)
                         ImGui::OpenPopup("Random Mutation !");
                         game.set_show_mutation_popup(false);
                         game.start_popup_timer(2.5);
+                        m_renderer_3d.is_panning = false;
                     }
 
                     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
@@ -184,6 +185,7 @@ void Renderer::draw(GameManager& game)
                         ImGui::OpenPopup("Attack Missed !");
                         game.set_show_dodge_popup(false);
                         game.start_popup_timer(2.5);
+                        m_renderer_3d.is_panning = false;
                     }
 
                     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
@@ -223,6 +225,7 @@ void Renderer::draw(GameManager& game)
                         ImGui::OpenPopup("Time's Up !");
                         game.set_show_skip_popup(false);
                         game.start_popup_timer(2.0);
+                        m_renderer_3d.is_panning = false;
                     }
 
                     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
@@ -262,6 +265,7 @@ void Renderer::draw(GameManager& game)
                         ImGui::OpenPopup("New challenger !");
                         game.set_show_spawn_popup(false);
                         game.start_popup_timer(1.5);
+                        m_renderer_3d.is_panning = false;
                     }
 
                     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
@@ -347,11 +351,11 @@ void Renderer::draw(GameManager& game)
                     glfwGetCursorPos(window, &mouseX, &mouseY);
 
                     int tile = m_renderer_3d.click_square(mouseX, mouseY);
-                    
+
                     if (tile != -1)
                     {
-                        if (m_renderer_3d.use_trackball_camera) {
-                        
+                        if (m_renderer_3d.use_trackball_camera)
+                        {
                             game.on_square_clicked(tile, game);
                         }
                         std::cout << "Clicked tile: " << tile << std::endl;
