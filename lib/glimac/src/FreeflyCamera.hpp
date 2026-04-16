@@ -23,13 +23,14 @@ class FreeflyCamera : public Camera
 
     public:
     FreeflyCamera(): 
-        m_Position(glm::vec3(0,0,0)), m_fPhi(glm::pi<float>()), m_fTheta(0.0) 
+        m_Position(glm::vec3(0,2,0)), m_fPhi(glm::pi<float>()), m_fTheta(3 * glm::pi<float>()/2) 
     {
         computeDirectionVectors();
     };
 
     void moveLeft(float t);
     void set_position(glm::vec3 position);
+    void set_pov(bool is_white);
     glm::vec3 get_position();
     void moveFront(float t) override;
     void rotateLeft(float degrees) override;

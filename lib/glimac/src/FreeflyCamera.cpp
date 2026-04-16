@@ -47,6 +47,13 @@ glm::vec3 FreeflyCamera::get_position()
     return m_Position;
 }
 
+void FreeflyCamera::set_pov(bool is_white)
+{
+    m_fPhi = is_white ? glm::radians(180.0f) : glm::radians(0.0f);
+    m_fTheta = 0.0;
+    computeDirectionVectors();
+}
+
 void FreeflyCamera::rotateUp(float degrees)
 {
     degrees = glm::radians(degrees);
