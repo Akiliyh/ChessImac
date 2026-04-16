@@ -193,18 +193,11 @@ void Renderer_2D::draw(GameManager& game)
     {
         int promote_pos = promoting_pawn.value();
 
-        // 1. Déclenchement du Pop-up
-        // (À placer là où tu vérifies si une pièce doit être promue, probablement en utilisant ton
-        // "game.is_piece_promoting()")
         if (auto promoting_square = game.is_piece_promoting())
         {
             ImGui::OpenPopup("Promote Piece");
-            // promote_pos = promoting_square.value(); // Assure-toi d'avoir cette variable à
-            // disposition
         }
 
-        // 2. Affichage du Pop-up Modal
-        // On centre le pop-up au milieu de l'écran pour que ce soit bien visible
         ImVec2 center = ImGui::GetMainViewport()->GetCenter();
         ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 

@@ -161,7 +161,7 @@ void Renderer::draw(GameManager& game)
                         double               remaining = game.get_popup_remaining_time();
 
                         std::snprintf(
-                            button_text.data(), button_text.size(), "OK (%.1fs)", remaining
+                            button_text.data(), button_text.size(), "OK (%.1fs)###MutBtn", remaining
                         );
 
                         if (ImGui::Button(button_text.data(), ImVec2(120, 0))
@@ -202,7 +202,8 @@ void Renderer::draw(GameManager& game)
 
                         // On met à jour le texte du bouton avec le temps restant
                         std::snprintf(
-                            button_text.data(), button_text.size(), "Oh okay...(%.1fs)", remaining
+                            button_text.data(), button_text.size(), "Oh okay...(%.1fs)###DodgeBtn",
+                            remaining
                         );
 
                         if (ImGui::Button(button_text.data(), ImVec2(120, 0))
@@ -241,7 +242,8 @@ void Renderer::draw(GameManager& game)
                         double               remaining = game.get_popup_remaining_time();
 
                         std::snprintf(
-                            button_text.data(), button_text.size(), "No ! (%.1fs)", remaining
+                            button_text.data(), button_text.size(), "No ! (%.1fs)###SkipBtn",
+                            remaining
                         );
 
                         if (ImGui::Button(button_text.data(), ImVec2(120, 0))
@@ -281,7 +283,8 @@ void Renderer::draw(GameManager& game)
                         double               remaining = game.get_popup_remaining_time();
 
                         std::snprintf(
-                            button_text.data(), button_text.size(), "Wow ! (%.1fs)", remaining
+                            button_text.data(), button_text.size(), "Wow ! (%.1fs)###SpawnBtn",
+                            remaining
                         );
 
                         if (ImGui::Button(button_text.data(), ImVec2(120, 0))
