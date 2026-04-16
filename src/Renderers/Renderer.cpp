@@ -104,7 +104,7 @@ void Renderer::draw(GameManager& game)
                         }
 
                         ImGui::Text("Time left : %.1f s", remaining);
-                        ImGui::ProgressBar(progress, ImVec2(-1.0f, 0.0f));
+                        ImGui::ProgressBar(progress, ImVec2(-1.0f, 0.0f), "");
 
                         if (color_pushed)
                         {
