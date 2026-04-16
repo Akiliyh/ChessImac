@@ -12,6 +12,7 @@
 #include "GameManager.hpp"
 #include "Pieces.hpp"
 #include "Probabilities/Bernoulli.hpp"
+#include "Probabilities/Uniform.hpp"
 #include "Probabilities/WeibullEvolution.hpp"
 
 void Chessboard::load_board_from_fen(const std::string& positionData)
@@ -163,7 +164,7 @@ bool Chessboard::move_piece(
                     int dest_x = dest_position % 8;
                     int dest_y = dest_position / 8;
 
-                    int random_type = std::rand() % 5;
+                    int random_type = Uniform::generate_int(0, 4);
 
                     std::string piece_nom                   = "";
                     std::string mutation_expression_feeling = "";
