@@ -369,6 +369,7 @@ void Renderer::draw(GameManager& game)
 
                     ImGui::Checkbox("Panning", &m_renderer_3d.is_panning);
                     ImGui::Checkbox("Skybox", &m_renderer_3d.is_skybox_active);
+                    ImGui::Checkbox("Sound on", &sound_active);
                     if (ImGui::Checkbox("Trackball camera", &m_renderer_3d.use_trackball_camera))
                     {
                         m_renderer_3d.change_camera();
@@ -382,6 +383,19 @@ void Renderer::draw(GameManager& game)
                     m_renderer_3d.draw(
                         static_cast<float>(size.x), static_cast<float>(size.y), game
                     );
+
+                    if (m_renderer_3d.is_alternative_light_active && !was_light_active && sound_active)
+                    {
+                        PlaySound(
+                            TEXT("./assets/sounds/beegees.wav"), NULL, SND_FILENAME | SND_ASYNC
+                        );
+                    }
+                    else if (!m_renderer_3d.is_alternative_light_active && was_light_active || !sound_active)
+                    {
+                        PlaySound(NULL, NULL, 0);
+                    }
+
+                    was_light_active = m_renderer_3d.is_alternative_light_active;
                 },
 
             .key_callback =

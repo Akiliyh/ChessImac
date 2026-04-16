@@ -11,4 +11,6 @@ class Renderer {
   public:
     void draw(GameManager& game);
     Renderer() = default;
+    bool was_light_active = false;
+    bool sound_active = true;
 };

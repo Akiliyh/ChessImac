@@ -1,4 +1,6 @@
 #include "3DRenderer.hpp"
+#include <playsoundapi.h>
+#include <winnt.h>
 #include <cmath>
 #include <cstddef>
 #include <vector>
@@ -25,6 +27,10 @@
 #include <Sphere.hpp>
 #include <getTime.hpp>
 #include <glm.hpp>
+
+// sound
+#include <Windows.h>
+#include <mmsystem.h>
 
 using namespace glimac;
 
@@ -550,14 +556,14 @@ int Renderer_3D::draw(float width, float height, GameManager& game)
 
             // hover highlight
             glUniform1i(chessProgram->uUseTexture, 0);
-            if (index == hovered_square_position)
+            if (index == hovered_square_position) // we set the hover in yellow
             {
                 baseColor = glm::vec3(0.8f, 0.8f, 0.2f);
                 glUniform3f(chessProgram->uColor, baseColor.r, baseColor.g, baseColor.b);
             }
-            else if (index == selected_square_position)
+            else if (index == selected_square_position) // we set the selection in blue
             {
-                baseColor = glm::vec3(0.1f, 0.1f, 0.9f);
+                baseColor = glm::vec3(0.5f, 0.5f, 1.0f);
                 glUniform3f(chessProgram->uColor, baseColor.r, baseColor.g, baseColor.b);
             }
             else

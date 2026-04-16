@@ -51,6 +51,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE glimac)
 include("./CMakeUtils/files_and_folders.cmake")
 Cool__target_copy_folder(${PROJECT_NAME} assets)
 
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+    winmm
+)
+
 # Cool__target_copy_folder(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/src/fonts ${CMAKE_BINARY_DIR}/fonts)
 # Cool__target_copy_folder(${PROJECT_NAME} src/fonts ${CMAKE_BINARY_DIR}/fonts)
 # Cool__target_copy_folder(${CMAKE_BINARY_DIR} src/fonts)
