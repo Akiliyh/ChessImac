@@ -249,6 +249,89 @@ void Renderer_3D::draw_pieces(int piece_position, Piece* current_square, int col
     }
 }
 
+// generated from scratch 
+
+int Renderer_3D::click_square(double mouseX, double mouseY)
+{
+    if (!camera)
+        return -1;
+
+    // ----------------------------
+    // 1. Normalized Device Coordinates
+    // ----------------------------
+    float x = (2.0f * mouseX) / width - 1.0f;
+    float y = 1.0f - (2.0f * mouseY) / height;
+
+    glm::vec4 ray_clip(x, y, -1.0f, 1.0f);
+
+    // ----------------------------
+    // 2. Eye space
+    // ----------------------------
+    glm::mat4 invProj = glm::inverse(ProjMatrix);
+    glm::vec4 ray_eye = invProj * ray_clip;
+    ray_eye = glm::vec4(ray_eye.x, ray_eye.y, -1.0f, 0.0f);
+
+    // ----------------------------
+    // 3. World space
+    // ----------------------------
+    glm::mat4 invView = glm::inverse(camera->getViewMatrix());
+
+    glm::vec3 ray_dir = glm::normalize(
+        glm::vec3(invView * ray_eye)
+    );
+
+    glm::vec3 ray_origin = glm::vec3(invView[3]);
+
+    // ----------------------------
+    // 4. Board plane (Y constant)
+    // ----------------------------
+    float planeY = square_height * 5.0f;
+
+    if (std::fabs(ray_dir.y) < 1e-6f)
+        return -1;
+
+    float t = (planeY - ray_origin.y) / ray_dir.y;
+
+    if (t < 0.0f)
+        return -1;
+
+    glm::vec3 hit = ray_origin + t * ray_dir;
+
+    // ----------------------------
+    // 5. Board origin + grid definition
+    // ----------------------------
+    glm::vec3 board_origin(
+        -1.0f,
+        planeY,
+        -1.0f + (board_width / 8.0f)
+    );
+
+    float tileSize = square_width * 2.0f;
+
+    // convert to board local space
+    glm::vec3 local = hit - board_origin;
+
+    // ----------------------------
+    // 6. FIX: center correction (IMPORTANT)
+    // ----------------------------
+    // local.x += tileSize * 0.5f;
+    local.z += tileSize * 0.5f;
+
+    // ----------------------------
+    // 7. Convert to indices (safe floor)
+    // ----------------------------
+    int col = (int)std::floor(local.x / tileSize);
+    int row = (int)std::floor(local.z / tileSize);
+
+    // ----------------------------
+    // 8. Bounds check
+    // ----------------------------
+    if (col < 0 || col >= 8 || row < 0 || row >= 8)
+        return -1;
+
+    return col + row * 8;
+}
+
 void Renderer_3D::set_lights(bool alternative_light_condition)
 {
     // here we set the lights up in the shader
@@ -330,6 +413,10 @@ void Renderer_3D::resize_window(float width, float height)
 
 int Renderer_3D::draw(float width, float height, GameManager& game)
 {
+    double mouseX, mouseY;
+    glfwGetCursorPos(glfwGetCurrentContext(), &mouseX, &mouseY);
+
+    hovered_square_position      = click_square(mouseX, mouseY);
     int selected_square_position = -1;
     game_board_size              = game.board.get_size();
 
@@ -466,8 +553,21 @@ int Renderer_3D::draw(float width, float height, GameManager& game)
 
             bool isDark = (row + col) % 2 == 1;
 
-            isDark ? glUniform3f(chessProgram->uColor, 0.1f, 0.1f, 0.1f)
-                   : glUniform3f(chessProgram->uColor, 1.f, 1.f, 1.f);
+            int index = piece_position;
+
+            glm::vec3 baseColor = isDark ? glm::vec3(0.1f, 0.1f, 0.1f) : glm::vec3(1.f, 1.f, 1.f);
+
+            // hover highlight
+            if (index == hovered_square_position)
+            {
+                baseColor = glm::vec3(0.8f, 0.8f, 0.2f);
+                glUniform1i(chessProgram->uUseTexture, 0);
+                glUniform3f(chessProgram->uColor, baseColor.r, baseColor.g, baseColor.b);
+            } else {
+                glUniform1i(chessProgram->uUseTexture, 1);
+            }
+
+            glUniform3f(chessProgram->uColor, baseColor.r, baseColor.g, baseColor.b);
 
             glUniformMatrix4fv(
                 chessProgram->uMVPMatrix, 1, GL_FALSE, glm::value_ptr(squareMVPMatrix)
@@ -478,8 +578,6 @@ int Renderer_3D::draw(float width, float height, GameManager& game)
             glUniformMatrix3fv(
                 chessProgram->uNormalMatrix, 1, GL_FALSE, glm::value_ptr(squareNormalMatrix)
             );
-
-            glUniform1i(chessProgram->uUseTexture, 1);
 
             glBindVertexArray(squareVao);
             glDrawArrays(GL_TRIANGLES, 0, square.getVertexCount());

@@ -77,6 +77,9 @@ class Renderer_3D {
     glm::vec3 ffly_cam_target_pos = glm::vec3(0.0, 1.0, 0.0);
     bool camera_oriented = false;
 
+    int click_square(double mouseX, double mouseY);
+    int hovered_square_position = -1;
+
 
     std::unique_ptr<glimac::Skybox> skybox;
 

@@ -14,6 +14,15 @@ void TrackballCamera::moveTo(float distance)
     m_fDistance = distance;
 }
 
+glm::vec3 TrackballCamera::get_position()
+{
+    float x = m_fDistance * std::cos(m_fAngleX) * std::sin(m_fAngleY);
+    float y = m_fDistance * std::sin(m_fAngleX);
+    float z = m_fDistance * std::cos(m_fAngleX) * std::cos(m_fAngleY);
+
+    return {x, y, z};
+}
+
 void TrackballCamera::rotateLeft(float degrees)
 {
     m_fAngleX+=degrees;

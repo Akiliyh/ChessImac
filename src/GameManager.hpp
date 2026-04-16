@@ -26,6 +26,7 @@ struct GameManager {
     // maybe later we could store if it is a capture, promotion or check eventually
 
     Piece*           selected_square{nullptr};
+    Piece*           selectable_square{nullptr};
     std::vector<int> possible_moves;
 
     GameMode m_current_mode{GameMode::Classic};

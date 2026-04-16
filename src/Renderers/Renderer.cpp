@@ -8,6 +8,7 @@
 #include <vector>
 #include "2DRenderer.hpp"
 #include "3DRenderer.hpp"
+#include "Camera.hpp"
 #include "Chessboard.hpp"
 #include "GLFW/glfw3.h"
 #include "GameManager.hpp"
@@ -301,6 +302,20 @@ void Renderer::draw(GameManager& game)
                     else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
                     {
                         m_renderer_3d.is_panning = false;
+                    }
+
+                    double mouseX, mouseY;
+                    glfwGetCursorPos(window, &mouseX, &mouseY);
+
+                    int tile = m_renderer_3d.click_square(mouseX, mouseY);
+                    
+                    if (tile != -1)
+                    {
+                        if (m_renderer_3d.use_trackball_camera) {
+                        
+                            game.on_square_clicked(tile, game);
+                        }
+                        std::cout << "Clicked tile: " << tile << std::endl;
                     }
                 },
             .cursor_position_callback =
