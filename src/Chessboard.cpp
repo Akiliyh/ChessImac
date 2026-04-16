@@ -213,7 +213,7 @@ bool Chessboard::move_piece(
         }
         else
         {
-            std::cout << "Illegal move!" << '\n';
+            // Illegal Move
             return false;
         }
 

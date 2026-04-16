@@ -84,9 +84,6 @@ int Renderer_3D::init(float width, float height)
     this->height = height;
     this->width  = width;
 
-    std::cout << this->height << std::endl;
-    std::cout << this->width << std::endl;
-
     glViewport(0, 0, this->width, this->height);
 
     /*********************************
