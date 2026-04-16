@@ -18,23 +18,25 @@ struct Move {
 
 struct GameManager {
   private:
-    std::optional<Move> last_move;
+    std::optional<Move> m_last_move;
     int                 m_full_move{0}; // full move is both color played capice? mamma miaaa
     int                 m_move{0};
     std::vector<std::pair<char, std::string>>
         m_move_history{}; // we store the type of piece and the square of destination
     // maybe later we could store if it is a capture, promotion or check eventually
 
-    Piece*           selected_square = nullptr;
+    Piece*           selected_square{nullptr};
     std::vector<int> possible_moves;
 
     GameMode m_current_mode{GameMode::Classic};
 
-    std::string mutation_message    = "";
-    bool        show_mutation_popup = false;
+    std::string m_mutation_message{""};
+    bool        m_show_mutation_popup{false};
 
-    std::string dodge_message    = "";
-    bool        show_dodge_popup = false;
+    std::string m_dodge_message{""};
+    bool        m_show_dodge_popup{false};
+
+    bool m_show_skip_popup{false};
 
     std::chrono::steady_clock::time_point m_turn_start_time;
     bool                                  m_is_paused{false};
@@ -99,6 +101,10 @@ struct GameManager {
     void        set_show_dodge_popup(bool is_dodge_showing);
     bool        get_show_dodge_popup() const;
     std::string get_dodge_message();
+
+    void trigger_skip_popup();
+    void set_show_skip_popup(bool is_skip_showing);
+    bool get_show_skip_popup() const;
 
     static constexpr double TURN_TIME_LIMIT = 20.0;
     void                    skip_turn();

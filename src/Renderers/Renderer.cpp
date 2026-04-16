@@ -36,6 +36,7 @@ void Renderer::draw(GameManager& game)
                         if (game.is_time_over())
                         {
                             game.skip_turn();
+                            game.trigger_skip_popup();
                         }
                     }
 
@@ -208,6 +209,45 @@ void Renderer::draw(GameManager& game)
                         ImGui::SetItemDefaultFocus();
                         ImGui::EndPopup();
                     }
+
+                    // ==========================================
+                    // Skip Turn Pop-up
+                    // ==========================================
+
+                    if (game.get_show_skip_popup())
+                    {
+                        ImGui::OpenPopup("Time's Up !");
+                        game.set_show_skip_popup(false);
+                        game.start_popup_timer(2.0);
+                    }
+
+                    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+                    if (ImGui::BeginPopupModal(
+                            "Time's Up !", nullptr, ImGuiWindowFlags_AlwaysAutoResize
+                        ))
+                    {
+                        ImGui::Text("Too late. Turn skipped !");
+                        ImGui::Separator();
+
+                        std::array<char, 32> button_text;
+                        double               remaining = game.get_popup_remaining_time();
+
+                        std::snprintf(
+                            button_text.data(), button_text.size(), "No ! (%.1fs)", remaining
+                        );
+
+                        if (ImGui::Button(button_text.data(), ImVec2(120, 0))
+                            || game.is_popup_time_over())
+                        {
+                            game.toggle_pause();
+                            ImGui::CloseCurrentPopup();
+                        }
+
+                        ImGui::SetItemDefaultFocus();
+                        ImGui::EndPopup();
+                    }
+                    // ==========================================
 
                     ImGui::Begin("3D Controls");
                     ImGui::Text("Camera");

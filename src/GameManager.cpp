@@ -23,7 +23,7 @@ void GameManager::move_piece(int from_position, int dest_position, GameManager& 
             m_move_history.emplace_back(
                 board.get_board_data()[dest_position]->get_label(), dest_alg_position
             );
-            last_move = Move{.from = from_position, .to = dest_position};
+            m_last_move = Move{.from = from_position, .to = dest_position};
         }
     }
 };
@@ -35,7 +35,7 @@ int GameManager::get_move() const
 
 std::optional<Move> GameManager::get_last_move() const
 {
-    return last_move;
+    return m_last_move;
 }
 
 std::vector<std::pair<char, std::string>> GameManager::get_move_history() const
@@ -276,45 +276,58 @@ void GameManager::new_game(GameManager& game)
 
 std::string GameManager::get_mutation_message()
 {
-    return mutation_message;
+    return m_mutation_message;
 }
 
 bool GameManager::get_show_mutation_popup() const
 {
-    return show_mutation_popup;
+    return m_show_mutation_popup;
 }
 
 void GameManager::set_show_mutation_popup(bool is_mutation_showing)
 {
-    show_mutation_popup = is_mutation_showing;
+    m_show_mutation_popup = is_mutation_showing;
 };
 
 void GameManager::trigger_mutation_popup(const std::string& message)
 {
-    mutation_message    = message;
-    show_mutation_popup = true;
+    m_mutation_message    = message;
+    m_show_mutation_popup = true;
 }
 
 void GameManager::trigger_dodge_popup(const std::string& message)
 {
-    dodge_message    = message;
-    show_dodge_popup = true;
+    m_dodge_message    = message;
+    m_show_dodge_popup = true;
 };
 
 void GameManager::set_show_dodge_popup(bool is_dodge_showing)
 {
-    show_dodge_popup = is_dodge_showing;
+    m_show_dodge_popup = is_dodge_showing;
 };
 
 bool GameManager::get_show_dodge_popup() const
 {
-    return show_dodge_popup;
+    return m_show_dodge_popup;
 };
 
 std::string GameManager::get_dodge_message()
 {
-    return dodge_message;
+    return m_dodge_message;
 };
+
+void GameManager::trigger_skip_popup()
+{
+    m_show_skip_popup = true;
+}
+void GameManager::set_show_skip_popup(bool is_skip_showing)
+{
+    m_show_skip_popup = is_skip_showing;
+}
+bool GameManager::get_show_skip_popup() const
+{
+    return m_show_skip_popup;
+}
 
 void GameManager::reset_turn_timer()
 {
