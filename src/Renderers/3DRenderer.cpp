@@ -323,8 +323,8 @@ void Renderer_3D::draw_possible_moves(
 void Renderer_3D::resize_window(float width, float height)
 {
     this->height = height;
-    this->width = width; 
-    this->ratio = width / height;
+    this->width  = width;
+    this->ratio  = width / height;
     glViewport(0, 0, width, height);
 }
 
@@ -342,21 +342,13 @@ int Renderer_3D::draw(float width, float height, GameManager& game)
             selected_square_row      = selected_square_position / game_board_size;
 
             freefly_camera->set_position(ffly_cam_target_pos);
-            if (game.get_selected_square()->get_color() == Black)
+
+            // a bit bruteforce but it's all good for now
+            bool is_white = (game.get_selected_square()->get_color() == White);
+            if (is_white != camera_oriented)
             {
-                if (!camera_oriented)
-                {
-                    freefly_camera->rotateLeft(180.0f);
-                    camera_oriented = true;
-                }
-            }
-            else
-            {
-                if (camera_oriented)
-                {
-                    freefly_camera->rotateLeft(180.0f);
-                    camera_oriented = false;
-                }
+                freefly_camera->set_pov(is_white);
+                camera_oriented = is_white;
             }
         }
     }
