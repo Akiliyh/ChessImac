@@ -7,6 +7,7 @@
 #include "Chessboard.hpp"
 #include "Pieces.hpp"
 #include "Probabilities/ExpoLaw.hpp"
+#include "Probabilities/FishLaw.hpp"
 
 enum class GameMode { Classic, Chaos };
 
@@ -37,12 +38,17 @@ struct GameManager {
     bool        m_show_dodge_popup{false};
 
     bool m_show_skip_popup{false};
+    bool m_show_spawn_popup{false};
 
     std::chrono::steady_clock::time_point m_turn_start_time;
     bool                                  m_is_paused{false};
     double                                m_accumulated_time{0.0};
     ExpoLaw                               m_expo_law;
     double                                m_current_turn_limit{10.0};
+
+    FishLaw                               m_fish_law;
+    std::chrono::steady_clock::time_point m_last_spawn_check_time;
+    double                                m_spawn_check_interval{15.0}; // Check every 15 second
 
     std::chrono::steady_clock::time_point m_popup_start_time;
     double                                m_popup_duration{0.0};
@@ -78,10 +84,7 @@ struct GameManager {
 
     void new_game(GameManager& game);
 
-    GameManager()
-    {
-        load_game_from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-    }
+    GameManager();
 
     void setMode(GameMode mode)
     {
@@ -106,6 +109,10 @@ struct GameManager {
     void set_show_skip_popup(bool is_skip_showing);
     bool get_show_skip_popup() const;
 
+    void trigger_spawn_popup();
+    void set_show_spawn_popup(bool is_spawn_showing);
+    bool get_show_spawn_popup() const;
+
     static constexpr double TURN_TIME_LIMIT = 20.0;
     void                    skip_turn();
     bool                    is_time_over() const;
@@ -124,4 +131,7 @@ struct GameManager {
     void   start_popup_timer(double duration_in_seconds);
     double get_popup_remaining_time() const;
     bool   is_popup_time_over() const;
+
+    void update_random_spawns();
+    void spawn_random_pawn();
 };
